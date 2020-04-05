@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:EnlightenMobile.ViewModels"
+             x:Class="EnlightenMobile.Views.BluetoothView" 
+             Title="ᛒ" 
+             BackgroundColor="White">
+
+    <ContentPage.BindingContext>
+        <vm:BluetoothViewModel/>
+    </ContentPage.BindingContext>
+    
+    <ContentPage.Content>
+        <StackLayout Orientation="Vertical" BackgroundColor="#333">
+
+            <!-- Page header -->
+            <Image Source="enlightenLOGO" WidthRequest="300"/>
+
+            <!-- Button Bar -->
+            <Frame Grid.Row="11" Grid.ColumnSpan="2" CornerRadius="10" BackgroundColor="#666" Padding="2">
+                <Frame CornerRadius="10" BackgroundColor="#444" Padding="2">
+                    <StackLayout Orientation="Horizontal" Padding="2" HorizontalOptions="FillAndExpand">
+                        <Button x:Name="btnScan"    Text="Scan"    Clicked="btnScan_Clicked"/>
+                        <Button x:Name="btnConnect" Text="Connect" Clicked="btnConnect_Clicked"/>
+                    </StackLayout>
+                </Frame>
+            </Frame>
+
+            <!-- Connection ProgressBar -->
+            <ProgressBar x:Name="progressBarConnect" ProgressColor="#2994d3" />
+
+            <!-- List of discovered BLE devices -->
+            <ListView x:Name="listView" ItemSelected="listView_ItemSelected" SeparatorColor="#27c0a1" Margin="20, 0, 20, 0" HasUnevenRows="True"> 
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <StackLayout Orientation="Vertical" MinimumHeightRequest="100">
+                                <StackLayout Orientation="Horizontal">
+                                    <Label TextColor="#27c0a1" Text="{Binding Rssi, StringFormat='RSSI: {0}'}" FontSize="Large"/>
+                                    <Label TextColor="#2994d3" Text="{Binding Name}" FontSize="Large"/>
+                                </StackLayout>
+                                <Label TextColor="#cccccc" Text="{Binding Id}"/>
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

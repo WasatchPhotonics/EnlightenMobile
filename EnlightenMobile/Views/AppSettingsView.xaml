@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+             xmlns:vm="clr-namespace:EnlightenMobile.ViewModels"
+             x:Class="EnlightenMobile.Views.AppSettingsView"
+             Title="💾"
+             BackgroundColor="White">
+             
+    <ContentPage.BindingContext>
+        <vm:AppSettingsViewModel/>
+    </ContentPage.BindingContext>
+    
+    <ContentPage.Content>
+        <StackLayout Orientation="Vertical" BackgroundColor="#333">
+
+            <!-- Page header -->
+            <Image Source="enlightenLOGO" WidthRequest="300"/>
+
+            <ScrollView Margin="10, 0, 50, 0">
+                <StackLayout HorizontalOptions="FillAndExpand">
+
+                    <!-- Category header -->
+                    <Label Text="Save Options" FontSize="Large" TextColor="#eee" Margin="0, 10, 0, 10" />
+
+                    <StackLayout Orientation="Horizontal" Margin="30, 0, 0, 0">
+                        <Label  Text="Save Pixel" TextColor="#ccc" VerticalTextAlignment="Center"/>
+                        <Switch IsToggled="{Binding savePixel}" HorizontalOptions="EndAndExpand" />
+                    </StackLayout>
+                    <StackLayout Orientation="Horizontal" Margin="30, 0, 0, 0">
+                        <Label  Text="Save Wavelength" TextColor="#ccc" VerticalTextAlignment="Center"/>
+                        <Switch IsToggled="{Binding saveWavelength}" HorizontalOptions="EndAndExpand" />
+                    </StackLayout>
+                    <StackLayout Orientation="Horizontal" Margin="30, 0, 0, 0">
+                        <Label  Text="Save Wavenumber" TextColor="#ccc" VerticalTextAlignment="Center"/>
+                        <Switch IsToggled="{Binding saveWavenumber}" HorizontalOptions="EndAndExpand" />
+                    </StackLayout>
+                    <StackLayout Orientation="Horizontal" Margin="30, 0, 0, 0">
+                        <Label  Text="Save Raw" TextColor="#ccc" VerticalTextAlignment="Center"/>
+                        <Switch IsToggled="{Binding saveRaw}" HorizontalOptions="EndAndExpand" />
+                    </StackLayout>
+                    <StackLayout Orientation="Horizontal" Margin="30, 0, 0, 0">
+                        <Label  Text="Save Dark" TextColor="#ccc" VerticalTextAlignment="Center"/>
+                        <Switch IsToggled="{Binding saveDark}" HorizontalOptions="EndAndExpand" />
+                    </StackLayout>
+                    <StackLayout Orientation="Horizontal" Margin="30, 0, 0, 0">
+                        <Label  Text="Save Reference" TextColor="#ccc" VerticalTextAlignment="Center"/>
+                        <Switch IsToggled="{Binding saveReference}" HorizontalOptions="EndAndExpand" />
+                    </StackLayout>
+                </StackLayout>
+            </ScrollView>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

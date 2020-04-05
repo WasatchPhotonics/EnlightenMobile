@@ -1,0 +1,147 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             mc:Ignorable="d" 
+
+             x:Class="EnlightenMobile.Views.ScopeView"
+             xmlns:vm="clr-namespace:EnlightenMobile.ViewModels"
+             xmlns:microcharts="clr-namespace:Microcharts.Forms;assembly=Microcharts.Forms" 
+             Title="📈"
+             BackgroundColor="#333">
+
+    <ContentPage.BindingContext>
+        <vm:ScopeViewModel/>
+    </ContentPage.BindingContext>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Color x:Key="Primary">#2196F3</Color>
+            <Color x:Key="Accent">#96d1ff</Color>
+            <Color x:Key="LightTextColor">#999999</Color>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <!-- TODO: add Xamarin.Forms.RefreshView to scan by pulling down -->
+    
+    <ContentPage.Content>
+
+        <!-- This is the stack whose orientation toggles when phone rotates -->
+        <StackLayout x:Name="outerStack" Orientation="Vertical" HorizontalOptions="FillAndExpand" Spacing="5">
+
+            <!-- Chart Block: Keep together (left in landscape mode) -->
+            <StackLayout Orientation="Vertical" VerticalOptions="FillAndExpand">
+
+                <!-- Page header (when in portrait mode) -->
+                <Image x:Name="logoVertical" Source="enlightenLOGO" BackgroundColor="#333" />
+
+                <!-- the all-important spectral chart -->
+                <microcharts:ChartView x:Name="chart" 
+                                       Chart="{Binding chart}" 
+                                       WidthRequest="500" 
+                                       MinimumHeightRequest="300" 
+                                       VerticalOptions="FillAndExpand"/>
+
+            </StackLayout>
+
+            <!-- User Controls: keep together (right in landscape mode) -->
+            <ScrollView>
+                <StackLayout WidthRequest="1000" HorizontalOptions="FillAndExpand">
+
+                    <!-- Page header if in landscape mode -->
+                    <Image x:Name="logoHorizontal" WidthRequest="300" Source="enlightenLOGO" IsVisible="False"/>
+
+                    <!-- Acquisition ProgressBar -->
+                    <ProgressBar Progress="{Binding acquisitionProgress}" ProgressColor="#2994d3"/>
+
+                    <!-- Command buttons -->
+                    <StackLayout Orientation="Horizontal">
+                        <Button Text="Acquire" Command="{Binding acquireCmd}" />
+                        <Button Text="Save" Command="{Binding saveCmd}" />
+                    </StackLayout>
+
+                    <!-- Acquisition Parameters -->
+                    <Grid HorizontalOptions="FillAndExpand">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>  <!--  Laser       Switch   Integration Time  Entry -->
+                            <RowDefinition Height="*"/>  <!--  Dark        Switch   Gain              Entry -->
+                            <RowDefinition Height="*"/>  <!--  Alternating Switch   Averaging         Entry -->
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                    
+                        <!-- Row 0 -->
+                        <Label  Grid.Row="0" Grid.Column="0" Text="Fire Laser" TextColor="#ccc" WidthRequest="75" VerticalTextAlignment="Center"/>
+                        <Switch Grid.Row="0" Grid.Column="1" IsToggled="{Binding laserEnabled}" />
+
+                        <Label Grid.Row="0" Grid.Column="2" Text="Integration Time (ms)" TextColor="#ccc" VerticalTextAlignment="Center" />
+                        <Entry Grid.Row="0" Grid.Column="3" 
+                               x:Name="entryIntegrationTimeMS"
+                               Placeholder="3" 
+                               PlaceholderColor="#f7e842" 
+                               TextColor="#fff" 
+                               ClearButtonVisibility="WhileEditing" 
+                               Text="{Binding integrationTimeMS}" 
+                               Keyboard="Numeric" />
+
+                        <!-- Row 1 -->
+                        <Label  Grid.Row="1" Grid.Column="0" Text="Dark" TextColor="#ccc" WidthRequest="75" VerticalTextAlignment="Center"/>
+                        <Switch Grid.Row="1" Grid.Column="1" IsToggled="{Binding darkEnabled}" />
+
+                        <Label Grid.Row="1" Grid.Column="2" Text="Gain (dB)" TextColor="#ccc" VerticalTextAlignment="Center" />
+                        <Entry Grid.Row="1" Grid.Column="3" 
+                               x:Name="entryGainDb"
+                               Placeholder="24" 
+                               PlaceholderColor="#f7e842" 
+                               TextColor="#fff" 
+                               ClearButtonVisibility="WhileEditing" 
+                               Text="{Binding gainDb}" 
+                               Keyboard="Numeric" />
+
+                        <!-- Row 2 -->
+                        <Label  Grid.Row="2" Grid.Column="0" Text="Alternating" TextColor="#ccc" WidthRequest="75" VerticalTextAlignment="Center"/>
+                        <Switch Grid.Row="2" Grid.Column="1" IsToggled="{Binding alternatingEnabled}" />
+
+                        <Label Grid.Row="2" Grid.Column="2" Text="Scans to Average" TextColor="#ccc" VerticalTextAlignment="Center" />
+                        <Entry Grid.Row="2" Grid.Column="3" 
+                               x:Name="entryScansToAverage"
+                               Placeholder="1" 
+                               PlaceholderColor="#f7e842" 
+                               TextColor="#fff" 
+                               ClearButtonVisibility="WhileEditing" 
+                               Text="{Binding scansToAverage}" 
+                               Keyboard="Numeric" />
+                    </Grid>
+
+                    <!-- Note field -->
+                    <StackLayout Orientation="Horizontal">
+                        <Label Text="Note" TextColor="#ccc"  VerticalTextAlignment="Center"/>
+                        <Entry x:Name="entryNote"
+                               Placeholder="your text here" 
+                               PlaceholderColor="#f7e842" 
+                               HorizontalOptions="FillAndExpand"
+                               TextColor="#fff" 
+                               ClearButtonVisibility="WhileEditing"
+                               Text="{Binding note}" />
+                    </StackLayout>
+
+                    <!-- Status Bar -->
+                    <Frame CornerRadius="10" BackgroundColor="#666" Padding="2" Margin="2, 0, 2, 4">
+                        <Frame CornerRadius="10" BackgroundColor="#444" Padding="2">
+                            <StackLayout Orientation="Horizontal" Padding="2" HorizontalOptions="Center">
+                                <Label Text="{Binding spectrumMax}" TextColor="#eee" Padding="10, 0, 10, 0" />
+                                <Label Text="{Binding batteryState}" TextColor="#eee" Padding="10, 0, 10, 0" />
+                            </StackLayout>
+                        </Frame>
+                    </Frame>
+                </StackLayout>
+            </ScrollView>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

@@ -1,27 +1,60 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <resources>
+
     <style name="MainTheme" parent="MainTheme.Base">
     </style>
+
     <!-- Base theme applied no matter what API -->
     <style name="MainTheme.Base" parent="Theme.AppCompat.Light.DarkActionBar">
         <!--If you are using revision 22.1 please use just windowNoTitle. Without android:-->
         <item name="windowNoTitle">true</item>
-        <!--We will be using the toolbar so no need to show ActionBar-->
+
+        <!-- We will be using the toolbar so no need to show ActionBar -->
         <item name="windowActionBar">false</item>
-        <!-- Set theme colors from https://aka.ms/material-colors -->
+
+        <!-- Set theme colors from http://www.google.com/design/spec/style/color.html#color-color-palette -->
+
         <!-- colorPrimary is used for the default action bar background -->
-        <item name="colorPrimary">#2196F3</item>
+        <item name="colorPrimary">#27c0a1</item> <!-- ENLIGHTEN "L" -->
+
         <!-- colorPrimaryDark is used for the status bar -->
-        <item name="colorPrimaryDark">#1976D2</item>
-        <!-- colorAccent is used as the default value for colorControlActivated
-         which is used to tint widgets -->
-        <item name="colorAccent">#FF4081</item>
-        <!-- You can also set colorControlNormal, colorControlActivated
-         colorControlHighlight and colorSwitchThumbNormal. -->
+        <item name="colorPrimaryDark">#222</item> <!-- was ENLIGHTEN "N1" -->
+
+        <!-- colorAccent is used as the default value for colorControlActivated which is used to tint widgets -->
+        <item name="colorAccent">#60b34e</item> <!-- ENLIGHTEN "G" -->
+
+        <item name="colorControlNormal">#ccc</item> 
+        <item name="colorControlActivated">#cd242b</item> <!-- ENLIGHTEN "N2" -->
+        <item name="colorControlHighlight">#27c0a1</item> 
+        <item name="colorSwitchThumbNormal">#ccc</item> 
+
         <item name="windowActionModeOverlay">true</item>
+
         <item name="android:datePickerDialogTheme">@style/AppCompatDialogStyle</item>
+
+        <item name="android:colorPressedHighlight">@color/ListViewSelected</item>
+        <item name="android:colorLongPressedHighlight">@color/ListViewHighlighted</item>
+        <item name="android:colorFocusedHighlight">@color/ListViewSelected</item>
+        <item name="android:colorActivatedHighlight">@color/ListViewSelected</item>
+        <item name="android:activatedBackgroundIndicator">@color/ListViewSelected</item>
     </style>
+
     <style name="AppCompatDialogStyle" parent="Theme.AppCompat.Light.Dialog">
-        <item name="colorAccent">#FF4081</item>
+        <item name="colorAccent">#27c0a1</item> <!-- ENLIGHTEN "I" -->
     </style>
+
+    <color name="ListViewSelected">#555</color>
+    <color name="ListViewHighlighted">#27c0a1</color>
 </resources>
+
+<!--
+'enlighten_name_e1':    '#6758c5', # the 'E' in ENLIGHTEN (violet)
+'enlighten_name_n1':    '#4a5da9', # the 'N' in ENLIGHTEN (blue)
+'enlighten_name_l':     '#2994d3', # the 'L' in ENLIGHTEN (cyan)         (cyan)
+'enlighten_name_i':     '#27c0a1', # the 'I' in ENLIGHTEN (bluegreen)    (teal)
+'enlighten_name_g':     '#60b34e', # the 'G' in ENLIGHTEN (green)
+'enlighten_name_h':     '#f7e842', # the 'H' in ENLIGHTEN (yellow)
+'enlighten_name_t':     '#f79a1c', # the 'T' in ENLIGHTEN (orange)
+'enlighten_name_e2':    '#f84f21', # the 'E' in ENLIGHTEN (orangered)
+'enlighten_name_n2':    '#cd242b', # the 'N' in ENLIGHTEN (red)
+-->

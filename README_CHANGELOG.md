@@ -1,0 +1,47 @@
+# Version History
+
+- 2020-??-?? 0.2.6
+    - added ScopeView.checkForBadMeasurement
+    - added deploy.checkVersion
+- 2020-04-03 0.2.5
+    - learning how to cut a release
+    - cleanup
+- 2020-04-03 0.2.4
+    - scripts/deploy
+    - initial SaveOptions
+- 2020-04-03 0.2.3
+    - supports screen rotation
+- 2020-04-02 0.2.2
+    - toast on save
+- 2020-04-02 0.2.1
+    - LogView updates
+    - acquisition progress bar is accurate and supports scan averaging
+- 2020-04-01 0.2.0
+    - lots of things mostly work
+- 2020-03-20 0.1.9
+    - added Laser, Dark, IntegrationTime, Gain scope controls
+    - added Measurement.saveAsync
+    - added AppSettings.getSavePath
+    - restructured Spectrometer properties
+    - added dark subtraction
+- 2020-03-16 0.1.8
+    - think it graphs spectra (or would with a sensor)
+- 2020-03-16 0.1.7
+    - formatting improvements
+- 2020-03-16 0.1.6
+    - EEPROM appears on scrolling list
+- 2020-03-11 0.1.5
+    - basic graphing works (noisy sine wave)
+- 2020-03-10 0.1.4
+    - EEPROM loaded and parsed :-)
+    - basic logging (not fully responsive)
+- 2020-03-06 0.1.3
+    - figuring out MVVM structure
+    - added ENLIGHTEN logo
+- 2020-03-05 0.1.2
+    - GUI scaffolding
+    - started README\_ARCHITECTURE
+- 2020-03-05 0.1.1
+    - registers characteristics
+- 2020-03-05 0.1.0
+    - actually sees WP-SiG on scan

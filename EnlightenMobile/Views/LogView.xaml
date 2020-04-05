@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="EnlightenMobile.Views.LogView"
+             xmlns:vm="clr-namespace:EnlightenMobile.ViewModels"
+             Title="📋"
+             BackgroundColor="#eee">
+    <ContentPage.BindingContext>
+        <vm:LogViewModel/>
+    </ContentPage.BindingContext>   
+
+    <ContentPage.Content>
+        <StackLayout Orientation="Vertical" BackgroundColor="#333">
+
+            <!-- Page header -->
+            <Image Source="enlightenLOGO" WidthRequest="300"/>
+
+            <!-- Log lines (would make this readonly if I could) -->
+            <Editor Text="{Binding LogText}" 
+                    TextColor="#ccc"
+                    BackgroundColor="#666"
+                    Margin="10,0,10,0"
+                    IsSpellCheckEnabled="False"
+                    HorizontalOptions="FillAndExpand"
+                    VerticalOptions="FillAndExpand" />
+
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+             xmlns:vm="clr-namespace:EnlightenMobile.ViewModels"
+             x:Class="EnlightenMobile.Views.SpectrometerSettingsView"
+             Title="️⚙️"
+             BackgroundColor="#fff">
+
+    <ContentPage.BindingContext>
+        <vm:SpectrometerSettingsViewModel/>
+    </ContentPage.BindingContext>
+    
+    <ContentPage.Content>
+        <StackLayout Orientation="Vertical" BackgroundColor="#333">
+
+            <!-- Page header -->
+            <Image Source="enlightenLOGO" WidthRequest="300"/>
+
+            <!-- Scrolling ListView of EEPROM (name, value) tuples -->
+            <ListView x:Name="listView" BackgroundColor="#333" SeparatorColor="#27c0a1"> 
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <StackLayout Orientation="Horizontal">
+                                <Label TextColor="#999" Text="{Binding name}"/>
+                                <Label TextColor="#eee" Text="{Binding value}" HorizontalTextAlignment="End" HorizontalOptions="EndAndExpand"/>
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>
