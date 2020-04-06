@@ -3,8 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="EnlightenMobile.Views.LogView"
              xmlns:vm="clr-namespace:EnlightenMobile.ViewModels"
-             Title="📋"
+             Title="{Binding title}"
              BackgroundColor="#eee">
+             <!-- Title="📋" -->
+
     <ContentPage.BindingContext>
         <vm:LogViewModel/>
     </ContentPage.BindingContext>   
@@ -16,7 +18,7 @@
             <Image Source="enlightenLOGO" WidthRequest="300"/>
 
             <!-- Log lines (would make this readonly if I could) -->
-            <Editor Text="{Binding LogText}" 
+            <Editor Text="{Binding logText}" 
                     TextColor="#ccc"
                     BackgroundColor="#666"
                     Margin="10,0,10,0"

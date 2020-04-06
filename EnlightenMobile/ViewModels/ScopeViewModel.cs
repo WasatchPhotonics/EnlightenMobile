@@ -48,19 +48,9 @@ namespace EnlightenMobile.ViewModels
         //
         ////////////////////////////////////////////////////////////////////////
 
-
-        ////////////////////////////////////////////////////////////////////////
-        // Status Bar
-        ////////////////////////////////////////////////////////////////////////
-
-        public string spectrumMax
-        { 
-            get => string.Format("Max: {0:f2}", spec.measurement.max);
-        }
-
-        public string batteryState 
-        { 
-            get => spec.battery.ToString();
+        public string title
+        {
+            get => "Scope Mode";
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -128,6 +118,20 @@ namespace EnlightenMobile.ViewModels
         {
             get => spec.alternatingEnabled;
             set => spec.alternatingEnabled = value;
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        // Status Bar
+        ////////////////////////////////////////////////////////////////////////
+
+        public string spectrumMax
+        { 
+            get => string.Format("Max: {0:f2}", spec.measurement.max);
+        }
+
+        public string batteryState 
+        { 
+            get => spec.battery.ToString();
         }
 
         ////////////////////////////////////////////////////////////////////////

@@ -11,6 +11,15 @@ namespace EnlightenMobile.ViewModels
         public event PropertyChangedEventHandler PropertyChanged;
         Logger logger = Logger.getInstance();
 
+        ////////////////////////////////////////////////////////////////////////
+        // Public Properties
+        ////////////////////////////////////////////////////////////////////////
+
+        public string title
+        {
+            get => "Bluetooth Pairing";
+        }
+
         protected void RaisePropertyChanged([CallerMemberName] string caller = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(caller));

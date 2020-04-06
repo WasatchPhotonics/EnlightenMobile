@@ -31,6 +31,8 @@ namespace EnlightenMobile.Models
 
         public string version => $"version {VersionTracking.CurrentVersion}";
 
+        public string companyURL = "https://wasatchphotonics.com";
+
         Logger logger = Logger.getInstance();
 
         ////////////////////////////////////////////////////////////////////////

@@ -3,8 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
              xmlns:vm="clr-namespace:EnlightenMobile.ViewModels"
              x:Class="EnlightenMobile.Views.AppSettingsView"
-             Title="💾"
+             Title="{Binding title}"
              BackgroundColor="White">
+             <!-- Title="💾" -->
              
     <ContentPage.BindingContext>
         <vm:AppSettingsViewModel/>

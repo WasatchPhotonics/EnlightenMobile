@@ -3,8 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:EnlightenMobile.ViewModels"
              x:Class="EnlightenMobile.Views.BluetoothView" 
-             Title="ᛒ" 
-             BackgroundColor="White">
+             Title="{Binding title}">
 
     <ContentPage.BindingContext>
         <vm:BluetoothViewModel/>
@@ -17,7 +16,7 @@
             <Image Source="enlightenLOGO" WidthRequest="300"/>
 
             <!-- Button Bar -->
-            <Frame Grid.Row="11" Grid.ColumnSpan="2" CornerRadius="10" BackgroundColor="#666" Padding="2">
+            <Frame CornerRadius="10" BackgroundColor="#666" Padding="2">
                 <Frame CornerRadius="10" BackgroundColor="#444" Padding="2">
                     <StackLayout Orientation="Horizontal" Padding="2" HorizontalOptions="FillAndExpand">
                         <Button x:Name="btnScan"    Text="Scan"    Clicked="btnScan_Clicked"/> 

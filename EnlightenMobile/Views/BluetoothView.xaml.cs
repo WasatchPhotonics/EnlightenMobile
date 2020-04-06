@@ -14,8 +14,9 @@ using Xamarin.Forms;
 
 namespace EnlightenMobile.Views
 {
-    // Arguably, most of this could go into BluetoothViewModel, if we changed the
-    // XAML Button.OnClick events to Button.Command bindings.  
+    // Arguably, most of this should go into BluetoothViewModel, if we changed 
+    // the Button.OnClick events to Button.Command bindings. It's not GUI-related
+    // and spends a lot of time talking to the Spectrometer Model.
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class BluetoothView : ContentPage
     {
@@ -48,6 +49,9 @@ namespace EnlightenMobile.Views
             InitializeComponent();
 
             logger.debug("BluetoothView: initializing BLE stuff");
+
+            // this crashes on iOS if you don't follow add plist entries per
+            // https://stackoverflow.com/a/59998233/11615696
             ble = CrossBluetoothLE.Current;
             adapter = CrossBluetoothLE.Current.Adapter;
             deviceList = new ObservableCollection<IDevice>();

@@ -12,6 +12,11 @@ namespace EnlightenMobile.ViewModels
 
         AppSettings appSettings = AppSettings.getInstance();
 
+        public string title
+        {
+            get => "Application Settings";
+        }
+
         public bool savePixel 
         {
             get => appSettings.savePixel;

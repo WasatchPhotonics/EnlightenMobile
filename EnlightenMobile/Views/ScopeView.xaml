@@ -9,8 +9,9 @@
              x:Class="EnlightenMobile.Views.ScopeView"
              xmlns:vm="clr-namespace:EnlightenMobile.ViewModels"
              xmlns:microcharts="clr-namespace:Microcharts.Forms;assembly=Microcharts.Forms" 
-             Title="📈"
-             BackgroundColor="#333">
+             Title="{Binding title}"
+             BackgroundColor="#333" >
+             <!-- "📈" -->
 
     <ContentPage.BindingContext>
         <vm:ScopeViewModel/>
@@ -35,7 +36,7 @@
             <StackLayout Orientation="Vertical" VerticalOptions="FillAndExpand">
 
                 <!-- Page header (when in portrait mode) -->
-                <Image x:Name="logoVertical" Source="enlightenLOGO" BackgroundColor="#333" />
+                <Image x:Name="logoVertical" Source="enlightenLOGO" WidthRequest="300" BackgroundColor="#333" />
 
                 <!-- the all-important spectral chart -->
                 <microcharts:ChartView x:Name="chart" 

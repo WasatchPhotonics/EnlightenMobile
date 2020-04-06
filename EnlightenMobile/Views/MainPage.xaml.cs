@@ -22,10 +22,15 @@ namespace EnlightenMobile.Views
             // ViewModels are instantiated as each View calls InitializeComponent
             InitializeComponent();
 
-            logger.debug("MainPage: populating pages");
-            pageNav.tabbedPage = this;
-            foreach (var child in Children)
-                pageNav.add(child.Title, child);
+            // conditional execution simplifies testing live-updated XAML
+            if (pageNav.tabbedPage is null)
+            {
+                logger.debug("MainPage: populating pages");
+                pageNav.tabbedPage = this;
+                foreach (var child in Children)
+                    pageNav.add(child.Title, child);
+            }
+
             logger.debug("MainPage: finished ctor");
         }
 

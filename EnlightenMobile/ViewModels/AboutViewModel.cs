@@ -3,22 +3,38 @@ using System.ComponentModel;
 using System.Windows.Input;
 using Xamarin.Essentials;
 using Xamarin.Forms;
+using EnlightenMobile.Models;
 
 namespace EnlightenMobile.ViewModels
 {
     public class AboutViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
+
+        AppSettings appSettings = AppSettings.getInstance();
+
         Logger logger = Logger.getInstance();
 
-        public string Title = "About";
-
-        public ICommand OpenWebCommand { get; }
+        ////////////////////////////////////////////////////////////////////////
+        // Lifecycle
+        ////////////////////////////////////////////////////////////////////////
 
         public AboutViewModel()
         {
-            OpenWebCommand = new Command(async () => await Browser.OpenAsync("https://xamarin.com"));
+            OpenWebCommand = new Command(async () => await Browser.OpenAsync(appSettings.companyURL));
         }
 
+        ////////////////////////////////////////////////////////////////////////
+        // Public Properties
+        ////////////////////////////////////////////////////////////////////////
+
+        public string title 
+        {
+            get => "About ENLIGHTEN™";
+        }
+
+        public string version => AppSettings.getInstance().version;
+
+        public ICommand OpenWebCommand { get; }
     }
 } 

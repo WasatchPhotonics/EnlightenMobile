@@ -19,6 +19,11 @@ namespace EnlightenMobile.ViewModels
 
         Logger logger = Logger.getInstance();
 
+        public string title
+        {
+            get => "Spectrometer Settings";
+        }
+
         public ViewableSetting ViewableSetting
         {
             get { return _viewableSetting; }

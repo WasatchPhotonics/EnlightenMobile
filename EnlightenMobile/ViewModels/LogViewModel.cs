@@ -18,21 +18,22 @@ namespace EnlightenMobile.ViewModels
 
         public LogViewModel()
         {
-            logger.debug("LVM: starting ctor");
-
             // pass the StringBuilder into the Logger to acrue messages
             logger.history = history;
 
             // give the Logger a callback to let the ViewModel know when the
             // StringBuilder has been updated (probably easier way to do this)
             logger.logChangedDelegate = RaisePropertyChanged;
-
-            logger.debug("LVM: finished ctor");
         } 
+
+        public string title
+        {
+            get => "Event Log";
+        }
 
         // when the GUI receives a notification to redraw the LogView, it will
         // call this to render the StringBuilder
-        public string LogText 
+        public string logText
         {
             get => history.ToString();
         }
@@ -41,9 +42,10 @@ namespace EnlightenMobile.ViewModels
         // are sent to the GUI or not)
         StringBuilder history = new StringBuilder("Log data");
 
+        // this gets called by the Logger via its logChangedDelegate handle
         protected void RaisePropertyChanged()
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LogText)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(logText)));
         }
     }
 }
