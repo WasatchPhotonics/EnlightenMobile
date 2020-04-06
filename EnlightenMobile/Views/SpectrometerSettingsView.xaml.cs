@@ -46,6 +46,7 @@ namespace EnlightenMobile.Views
 
         public SpectrometerSettingsView()
         {
+            logger.debug("SpectrometerSettingsView: starting ctor");
             InitializeComponent();
 
             viewableSettings = new ObservableCollection<ViewableSetting>();
@@ -55,6 +56,7 @@ namespace EnlightenMobile.Views
                 eeprom.viewableSettings = viewableSettings;
 
             listView.ItemsSource = viewableSettings;
+            logger.debug("SpectrometerSettingsView: finished ctor");
         }
     }
 }

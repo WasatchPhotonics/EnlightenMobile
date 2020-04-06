@@ -29,11 +29,17 @@ namespace EnlightenMobile.ViewModels
 
         public ScopeViewModel()
         {
+            logger.debug("SVM: starting ctor");
+
+            logger.debug("SVM: getting Spectrometer instance");
             spec = Spectrometer.getInstance();
+            logger.debug("SVM: back from Spectrometer instance");
 
             // bind closures (method calls) to each Command
             acquireCmd = new Command(() => { _ = doAcquireAsync(); });
             saveCmd    = new Command(() => { _ = doSave        (); });
+
+            logger.debug("SVM: finished ctor");
         } 
 
         ////////////////////////////////////////////////////////////////////////
@@ -83,7 +89,7 @@ namespace EnlightenMobile.ViewModels
                 if (UInt16.TryParse(value, out val))
                     spec.gainDb = val;
                 else
-                    spec.integrationTimeMS = 24;
+                    spec.gainDb = 24;
             }
         }
 

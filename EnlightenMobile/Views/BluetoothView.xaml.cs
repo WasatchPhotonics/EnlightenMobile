@@ -32,9 +32,10 @@ namespace EnlightenMobile.Views
 
         Guid primaryServiceId;
 
-        Logger logger = Logger.getInstance();
 
         Spectrometer spec = Spectrometer.getInstance();
+
+        Logger logger = Logger.getInstance();
 
         ////////////////////////////////////////////////////////////////////////
         // Lifecycle
@@ -42,7 +43,11 @@ namespace EnlightenMobile.Views
 
         public BluetoothView()
         {
+            logger.debug("BluetoothView: starting ctor");
+
             InitializeComponent();
+
+            logger.debug("BluetoothView: initializing BLE stuff");
             ble = CrossBluetoothLE.Current;
             adapter = CrossBluetoothLE.Current.Adapter;
             deviceList = new ObservableCollection<IDevice>();
@@ -54,6 +59,7 @@ namespace EnlightenMobile.Views
             primaryServiceId = _makeGuid("ff00");
 
             // characteristics
+            logger.debug("BluetoothView: initializing characteristic GUIDs");
             guidByName["pixels"]            = _makeGuid("ff01");
             guidByName["integrationTimeMS"] = _makeGuid("ff02");
             guidByName["gainDb"]            = _makeGuid("ff03");
@@ -66,6 +72,8 @@ namespace EnlightenMobile.Views
             guidByName["spectrumRequest"]   = _makeGuid("ff0a");
 
             btnConnect.IsEnabled = false;
+
+            logger.debug("BluetoothView: finished ctor");
         }
 
         ////////////////////////////////////////////////////////////////////////

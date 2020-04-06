@@ -9,12 +9,16 @@ namespace EnlightenMobile.Views
         double lastWidth;
         double lastHeight;
 
+        Logger logger = Logger.getInstance();
+
         public ScopeView()
         {
+            logger.debug("ScopeView: starting ctor");
             InitializeComponent();
 
             // needed?
             OnSizeAllocated(Width, Height);
+            logger.debug("ScopeView: finished ctor");
         }
 
         // This event is used to reformat the ScopeView from Portrait to Landscape 

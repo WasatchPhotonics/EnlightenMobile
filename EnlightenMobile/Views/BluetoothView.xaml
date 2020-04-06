@@ -20,8 +20,8 @@
             <Frame Grid.Row="11" Grid.ColumnSpan="2" CornerRadius="10" BackgroundColor="#666" Padding="2">
                 <Frame CornerRadius="10" BackgroundColor="#444" Padding="2">
                     <StackLayout Orientation="Horizontal" Padding="2" HorizontalOptions="FillAndExpand">
-                        <Button x:Name="btnScan"    Text="Scan"    Clicked="btnScan_Clicked"/>
-                        <Button x:Name="btnConnect" Text="Connect" Clicked="btnConnect_Clicked"/>
+                        <Button x:Name="btnScan"    Text="Scan"    Clicked="btnScan_Clicked"/> 
+                        <Button x:Name="btnConnect" Text="Connect" Clicked="btnConnect_Clicked"/> 
                     </StackLayout>
                 </Frame>
             </Frame>
@@ -30,7 +30,11 @@
             <ProgressBar x:Name="progressBarConnect" ProgressColor="#2994d3" />
 
             <!-- List of discovered BLE devices -->
-            <ListView x:Name="listView" ItemSelected="listView_ItemSelected" SeparatorColor="#27c0a1" Margin="20, 0, 20, 0" HasUnevenRows="True"> 
+            <ListView x:Name="listView" 
+                      ItemSelected="listView_ItemSelected" 
+                      SeparatorColor="#27c0a1" 
+                      Margin="20, 0, 20, 0" 
+                      HasUnevenRows="True"> 
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>

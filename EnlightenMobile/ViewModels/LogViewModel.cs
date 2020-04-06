@@ -18,12 +18,16 @@ namespace EnlightenMobile.ViewModels
 
         public LogViewModel()
         {
+            logger.debug("LVM: starting ctor");
+
             // pass the StringBuilder into the Logger to acrue messages
             logger.history = history;
 
             // give the Logger a callback to let the ViewModel know when the
             // StringBuilder has been updated (probably easier way to do this)
             logger.logChangedDelegate = RaisePropertyChanged;
+
+            logger.debug("LVM: finished ctor");
         } 
 
         // when the GUI receives a notification to redraw the LogView, it will

@@ -7,9 +7,14 @@ namespace EnlightenMobile.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
     {
+        Logger logger = Logger.getInstance();
+
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public MainViewModel() {}
+        public MainViewModel() 
+        {
+            logger.debug("MVM: too many MVVM");
+        }
 
         public string appVersion => AppSettings.getInstance().version;
 

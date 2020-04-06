@@ -14,55 +14,30 @@
         </NavigationPage>
 
         <NavigationPage Title="BLE">
-            <NavigationPage.Icon>
-                <OnPlatform x:TypeArguments="FileImageSource">
-                    <On Platform="iOS" Value="tab_ble.png" />
-                </OnPlatform>
-            </NavigationPage.Icon>
             <x:Arguments>
                 <views:BluetoothView />
             </x:Arguments>
         </NavigationPage>
 
         <NavigationPage Title="Scope">
-            <NavigationPage.Icon>
-                <OnPlatform x:TypeArguments="FileImageSource">
-                    <On Platform="iOS" Value="tab_scope.png" />
-                </OnPlatform>
-            </NavigationPage.Icon>
             <x:Arguments>
                 <views:ScopeView />
             </x:Arguments>
         </NavigationPage>
 
         <NavigationPage Title="Spec">
-            <NavigationPage.Icon>
-                <OnPlatform x:TypeArguments="FileImageSource">
-                    <On Platform="iOS" Value="tab_spectrometer_settings.png" />
-                </OnPlatform>
-            </NavigationPage.Icon>
             <x:Arguments>
                 <views:SpectrometerSettingsView />
             </x:Arguments>
         </NavigationPage>
 
         <NavigationPage Title="Settings">
-            <NavigationPage.Icon>
-                <OnPlatform x:TypeArguments="FileImageSource">
-                    <On Platform="iOS" Value="tab_app_settings.png" />
-                </OnPlatform>
-            </NavigationPage.Icon>
             <x:Arguments>
                 <views:AppSettingsView />
             </x:Arguments>
         </NavigationPage>
 
         <NavigationPage Title="Log">
-            <NavigationPage.Icon>
-                <OnPlatform x:TypeArguments="FileImageSource">
-                    <On Platform="iOS" Value="tab_log.png" />
-                </OnPlatform>
-            </NavigationPage.Icon>
             <x:Arguments>
                 <views:LogView />
             </x:Arguments>

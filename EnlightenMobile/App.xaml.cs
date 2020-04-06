@@ -9,13 +9,17 @@ namespace EnlightenMobile
 {
     public partial class App : Application
     {
+        Logger logger = Logger.getInstance();
+
         public App()
         {
+            logger.debug("App: starting ctor");
             InitializeComponent();
 
             DependencyService.Register<IPlatformUtil>();
             VersionTracking.Track();
             MainPage = new MainPage();
+            logger.debug("App: finished ctor");
         }
 
         protected override void OnStart() { }

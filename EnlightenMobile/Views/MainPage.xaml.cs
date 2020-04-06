@@ -16,11 +16,17 @@ namespace EnlightenMobile.Views
 
         public MainPage()
         {
+            logger.debug("MainPage: starting ctor");
+
+            // all other Views are implicitly instantiated here; their respective 
+            // ViewModels are instantiated as each View calls InitializeComponent
             InitializeComponent();
 
+            logger.debug("MainPage: populating pages");
             pageNav.tabbedPage = this;
             foreach (var child in Children)
                 pageNav.add(child.Title, child);
+            logger.debug("MainPage: finished ctor");
         }
 
         // a callback for whenever the tab is changed; handy to notify the Logger

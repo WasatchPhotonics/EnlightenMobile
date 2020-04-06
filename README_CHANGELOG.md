@@ -1,6 +1,12 @@
 # Version History
 
-- 2020-??-?? 0.2.6
+- 2020-04-06 0.3.0
+    - moved code from EnlightenSimple (deprecated) to EnlightenMobile
+    - navigable on iOS, haven't tested BLE
+    - colors / welcome page need redone
+    - TabbedPage now properly declared in XAML
+
+- 2020-04-03 0.2.6
     - added ScopeView.checkForBadMeasurement
     - added deploy.checkVersion
 - 2020-04-03 0.2.5
