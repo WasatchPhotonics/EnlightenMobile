@@ -1,16 +1,20 @@
 # Overview
 
-A lightweight ENLIGHTEN-like GUI for Android, designed for Wasatch Photonics SiG
-spectrometers with BLE.
+A lightweight ENLIGHTEN-like (-lite?) GUI for Android and iOS, designed for 
+Wasatch Photonics SiG spectrometers with BLE.
 
 # Architecture
 
-For a walk-through of how the application is structured, and what-file-does-what,
-see [Architecture](README_ARCHITECTURE.md).
+For a walk-through of how the application is structured, see 
+[Architecture](README_ARCHITECTURE.md).
 
 # Dependencies
 
 Builds with Visual Studio Community 2019 (tested using MacOS version).
+
+Requires several NuGet packages (Plugin.BLE, Plugin.Permissions, Microcharts, 
+Microcharts.Forms etc), but all should self-download adn install under Visual 
+Studio.
 
 ## Android Target Version
 
@@ -30,7 +34,12 @@ And Xamarin.Forms doesn't want me going below Android 9:
     need to increase the $(TargetFrameworkVersion) for EnlightenSimple. (XF005) 
     (EnlightenSimple)
 
+That said, I _think_ the newest version of EnlightenMobile.Droid may work down 
+to Android 5...testing to come.
+
 # Release Procedure
+
+## Android 
 
 Follow the process here:
 
@@ -39,6 +48,13 @@ Follow the process here:
 Essentially:
 - Target -> Release (or Ad-Hoc?)
 - Build -> Archive for Publishing -> Sign and Distribute -> Ad-Hoc
+
+## iOS
+
+TBD
+
+## Final
+
 - run scripts/deploy
 
 # Backlog

@@ -1,5 +1,7 @@
 # Version History
 
+- 2020-04-06 0.3.1
+    - takes spectra on iOS
 - 2020-04-06 0.3.0
     - moved code from EnlightenSimple (deprecated) to EnlightenMobile
     - navigable on iOS, haven't tested BLE
