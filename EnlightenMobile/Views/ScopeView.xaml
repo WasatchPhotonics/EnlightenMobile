@@ -44,7 +44,6 @@
                                        WidthRequest="500" 
                                        MinimumHeightRequest="300" 
                                        VerticalOptions="FillAndExpand"/>
-
             </StackLayout>
 
             <!-- User Controls: keep together (right in landscape mode) -->

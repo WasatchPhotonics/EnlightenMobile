@@ -50,5 +50,8 @@
     <!--Description of the Bluetooth request message (required on iOS 13)-->
     <key>NSBluetoothAlwaysUsageDescription</key>
     <string>App needs BLE to control spectrometer</string>
+
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>App needs Location access to use BLE</string>
 </dict>
 </plist>
