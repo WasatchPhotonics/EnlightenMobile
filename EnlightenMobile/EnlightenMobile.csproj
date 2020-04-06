@@ -18,13 +18,4 @@
     <PackageReference Include="Plugin.BLE" Version="2.1.1" />
     <PackageReference Include="Microcharts.Forms" Version="0.7.1" />
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Remove="Views\AboutView.xaml" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Views\AboutView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-    </None>
-  </ItemGroup>
 </Project>

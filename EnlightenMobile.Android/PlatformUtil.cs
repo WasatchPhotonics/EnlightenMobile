@@ -54,7 +54,7 @@ namespace EnlightenMobile.Droid
             }
                 
             logger.debug($"getSavePath: returning writeable todayPath {todayPath}");
-            return todayPath;
+            return savePath = todayPath;
         }
 
         bool writeable(string path)

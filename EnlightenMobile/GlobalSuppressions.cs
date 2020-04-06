@@ -5,4 +5,4 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "can't be bothered", Scope = "module", Target = "EnlightenMobile")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "can't be arsed", Scope = "module", Target = "EnlightenMobile")]

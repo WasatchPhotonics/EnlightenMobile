@@ -13,7 +13,7 @@ namespace EnlightenMobile
         {
             InitializeComponent();
 
-            DependencyService.Register<MockDataStore>();
+            DependencyService.Register<IPlatformUtil>();
             VersionTracking.Track();
             MainPage = new MainPage();
         }

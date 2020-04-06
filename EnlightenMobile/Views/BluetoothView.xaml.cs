@@ -326,12 +326,12 @@ namespace EnlightenMobile.Views
 				}
 				else if (status != PermissionStatus.Unknown)
 				{
-					logger.error($"{name} permission denied");
+					return logger.error($"{name} permission denied");
 				}
 			}
 			catch (Exception ex)
 			{
-                logger.error($"Exception obtaining {name} permission: {ex}");
+                return logger.error($"Exception obtaining {name} permission: {ex}");
 			}
             return false;
 		}
