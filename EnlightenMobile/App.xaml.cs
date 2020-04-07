@@ -16,7 +16,9 @@ namespace EnlightenMobile
             logger.debug("App: starting ctor");
             InitializeComponent();
 
+            // register platform-specific Services here
             DependencyService.Register<IPlatformUtil>();
+
             VersionTracking.Track();
             MainPage = new MainPage();
             logger.debug("App: finished ctor");

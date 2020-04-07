@@ -84,9 +84,5 @@ I use the MVVM where I can and understand how.
 One big possible exception is that most of the BLE control logic is actually 
 implemented in the BluetoothView.cs code-behind, rather than (as it probably
 should be) BluetoothViewModel.cs.  That's the way it was in the sample code
-I started with, and I didn't want to break things by moving it.  
-
-Also, if we decide to turn this into a multi-platform app with iOS targets, then
-it may make perfect sense to have the (platform-dependent) BLE code in the View's 
-code-behind...I'm just not sure.  We can move it if and when it makes sense to do
-so, but what we have works.
+I started with, and I didn't want to break things by moving it.  We can move it 
+if and when it makes sense to do so, but what we have works.

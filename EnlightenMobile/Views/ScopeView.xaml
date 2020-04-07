@@ -29,11 +29,23 @@
     
     <ContentPage.Content>
 
-        <!-- This is the stack whose orientation toggles when phone rotates -->
-        <StackLayout x:Name="outerStack" Orientation="Vertical" HorizontalOptions="FillAndExpand" Spacing="5">
+        <!-- This is the Grid whose structure changes when phone rotates -->
 
-            <!-- Chart Block: Keep together (left in landscape mode) -->
-            <StackLayout Orientation="Vertical" VerticalOptions="FillAndExpand">
+        <!-- (an earlier version of the project just toggled the Orientation of 
+              a StackLayout, which works too) -->
+		<Grid x:Name="outerGrid" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+
+            <!-- initialize to Portrait mode -->
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+			</Grid.RowDefinitions>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+			
+            <!-- Chart Block: Keep together (will be "left" in landscape mode) -->
+            <StackLayout Grid.Row="0" Grid.Column="0" x:Name="stackChart" Orientation="Vertical" VerticalOptions="FillAndExpand">
 
                 <!-- Page header (when in portrait mode) -->
                 <Image x:Name="logoVertical" Source="enlightenLOGO" WidthRequest="300" BackgroundColor="#333" />
@@ -41,14 +53,14 @@
                 <!-- the all-important spectral chart -->
                 <microcharts:ChartView x:Name="chart" 
                                        Chart="{Binding chart}" 
-                                       WidthRequest="500" 
-                                       MinimumHeightRequest="300" 
+                                       HorizontalOptions="FillAndExpand"
                                        VerticalOptions="FillAndExpand"/>
+
             </StackLayout>
 
-            <!-- User Controls: keep together (right in landscape mode) -->
-            <ScrollView>
-                <StackLayout WidthRequest="1000" HorizontalOptions="FillAndExpand">
+            <!-- User Controls: keep together (will be "right" in landscape mode) -->
+            <ScrollView Grid.Row="1" Grid.Column="0" x:Name="scrollOptions">
+                <StackLayout HorizontalOptions="FillAndExpand">
 
                     <!-- Page header if in landscape mode -->
                     <Image x:Name="logoHorizontal" WidthRequest="300" Source="enlightenLOGO" IsVisible="False"/>
@@ -142,6 +154,6 @@
                     </Frame>
                 </StackLayout>
             </ScrollView>
-        </StackLayout>
+        </Grid>
     </ContentPage.Content>
 </ContentPage>
