@@ -32,3 +32,4 @@ namespace EnlightenMobile.Droid
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
+}

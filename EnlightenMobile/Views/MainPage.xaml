@@ -1,5 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TabbedPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:d="http://xamarin.com/schemas/2014/forms/design" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" xmlns:views="clr-namespace:EnlightenMobile.Views" x:Class="EnlightenMobile.Views.MainPage">
+<TabbedPage xmlns="http://xamarin.com/schemas/2014/forms"
+            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+            xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+            mc:Ignorable="d"
+            xmlns:views="clr-namespace:EnlightenMobile.Views"
+            BackgroundColor="#333"
+            x:Class="EnlightenMobile.Views.MainPage">
     <TabbedPage.Children>
 
         <!--
@@ -8,70 +15,40 @@
             goes in the "tab" (so should be short), and the ContentPage.Title 
             goes above it in the TabBar (so can be long).
         -->
-        <NavigationPage Title="About">
-            <x:Arguments>
+        <NavigationPage Title="About" IconImageSource="tab_about.png">
+             <x:Arguments>
                 <views:AboutView />
             </x:Arguments>
-            <NavigationPage.Icon>
-                <OnPlatform x:TypeArguments="FileImageSource">
-                    <On Platform="iOS" Value="tab_about.png" />
-                </OnPlatform>
-            </NavigationPage.Icon>
         </NavigationPage>
 
-        <NavigationPage Title="BLE">
+        <NavigationPage Title="BLE" IconImageSource="tab_ble.png">
             <x:Arguments>
                 <views:BluetoothView />
             </x:Arguments>
-            <NavigationPage.Icon>
-                <OnPlatform x:TypeArguments="FileImageSource">
-                    <On Platform="iOS" Value="tab_ble.png" />
-                </OnPlatform>
-            </NavigationPage.Icon>
         </NavigationPage>
 
-        <NavigationPage Title="Scope">
+        <NavigationPage Title="Scope" IconImageSource="tab_scope.png">
             <x:Arguments>
                 <views:ScopeView />
             </x:Arguments>
-            <NavigationPage.Icon>
-                <OnPlatform x:TypeArguments="FileImageSource">
-                    <On Platform="iOS" Value="tab_scope.png" />
-                </OnPlatform>
-            </NavigationPage.Icon>
         </NavigationPage>
 
-        <NavigationPage Title="Spec">
+        <NavigationPage Title="Spec" IconImageSource="tab_spec_settings.png">
             <x:Arguments>
                 <views:SpectrometerSettingsView />
             </x:Arguments>
-            <NavigationPage.Icon>
-                <OnPlatform x:TypeArguments="FileImageSource">
-                    <On Platform="iOS" Value="tab_spec_settings.png" />
-                </OnPlatform>
-            </NavigationPage.Icon>
         </NavigationPage>
 
-        <NavigationPage Title="Settings">
+        <NavigationPage Title="Settings" IconImageSource="tab_app_settings.png">
             <x:Arguments>
                 <views:AppSettingsView />
             </x:Arguments>
-            <NavigationPage.Icon>
-                <OnPlatform x:TypeArguments="FileImageSource">
-                    <On Platform="iOS" Value="tab_app_settings.png" />
-                </OnPlatform>
-            </NavigationPage.Icon>
         </NavigationPage>
 
-        <NavigationPage Title="Log">
+        <NavigationPage Title="Log" IconImageSource="tab_log.png">
             <x:Arguments>
                 <views:LogView />
             </x:Arguments>
-            <NavigationPage.Icon>
-                <OnPlatform x:TypeArguments="FileImageSource">
-                    <On Platform="iOS" Value="tab_log.png" />
-                </OnPlatform>
-            </NavigationPage.Icon>
         </NavigationPage>
 
     </TabbedPage.Children>
