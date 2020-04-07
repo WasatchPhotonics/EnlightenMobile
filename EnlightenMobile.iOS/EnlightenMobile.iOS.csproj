@@ -123,6 +123,21 @@
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\512.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\512-1.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\256-1.png" />
+    <BundleResource Include="Resources\tab_ble.png" />
+    <BundleResource Include="Resources\tab_ble%402x.png" />
+    <BundleResource Include="Resources\tab_ble%403x.png" />
+    <BundleResource Include="Resources\tab_app_settings.png" />
+    <BundleResource Include="Resources\tab_app_settings%402x.png" />
+    <BundleResource Include="Resources\tab_app_settings%403x.png" />
+    <BundleResource Include="Resources\tab_spec_settings.png" />
+    <BundleResource Include="Resources\tab_spec_settings%402x.png" />
+    <BundleResource Include="Resources\tab_spec_settings%403x.png" />
+    <BundleResource Include="Resources\tab_log.png" />
+    <BundleResource Include="Resources\tab_log%402x.png" />
+    <BundleResource Include="Resources\tab_log%403x.png" />
+    <BundleResource Include="Resources\tab_scope.png" />
+    <BundleResource Include="Resources\tab_scope%402x.png" />
+    <BundleResource Include="Resources\tab_scope%403x.png" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -152,5 +167,9 @@
       <Project>{61AD8B13-2EE8-43AB-8150-F28A7CDE8305}</Project>
       <Name>EnlightenMobile</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ITunesArtwork Include="iTunesArtwork" />
+    <ITunesArtwork Include="iTunesArtwork%402x" />
   </ItemGroup>
 </Project>

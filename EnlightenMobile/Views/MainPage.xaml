@@ -9,44 +9,69 @@
             goes above it in the TabBar (so can be long).
         -->
         <NavigationPage Title="About">
+            <x:Arguments>
+                <views:AboutView />
+            </x:Arguments>
             <NavigationPage.Icon>
                 <OnPlatform x:TypeArguments="FileImageSource">
                     <On Platform="iOS" Value="tab_about.png" />
                 </OnPlatform>
             </NavigationPage.Icon>
-            <x:Arguments>
-                <views:AboutView />
-            </x:Arguments>
         </NavigationPage>
 
         <NavigationPage Title="BLE">
             <x:Arguments>
                 <views:BluetoothView />
             </x:Arguments>
+            <NavigationPage.Icon>
+                <OnPlatform x:TypeArguments="FileImageSource">
+                    <On Platform="iOS" Value="tab_ble.png" />
+                </OnPlatform>
+            </NavigationPage.Icon>
         </NavigationPage>
 
         <NavigationPage Title="Scope">
             <x:Arguments>
                 <views:ScopeView />
             </x:Arguments>
+            <NavigationPage.Icon>
+                <OnPlatform x:TypeArguments="FileImageSource">
+                    <On Platform="iOS" Value="tab_scope.png" />
+                </OnPlatform>
+            </NavigationPage.Icon>
         </NavigationPage>
 
         <NavigationPage Title="Spec">
             <x:Arguments>
                 <views:SpectrometerSettingsView />
             </x:Arguments>
+            <NavigationPage.Icon>
+                <OnPlatform x:TypeArguments="FileImageSource">
+                    <On Platform="iOS" Value="tab_spec_settings.png" />
+                </OnPlatform>
+            </NavigationPage.Icon>
         </NavigationPage>
 
         <NavigationPage Title="Settings">
             <x:Arguments>
                 <views:AppSettingsView />
             </x:Arguments>
+            <NavigationPage.Icon>
+                <OnPlatform x:TypeArguments="FileImageSource">
+                    <On Platform="iOS" Value="tab_app_settings.png" />
+                </OnPlatform>
+            </NavigationPage.Icon>
         </NavigationPage>
 
         <NavigationPage Title="Log">
             <x:Arguments>
                 <views:LogView />
             </x:Arguments>
+            <NavigationPage.Icon>
+                <OnPlatform x:TypeArguments="FileImageSource">
+                    <On Platform="iOS" Value="tab_log.png" />
+                </OnPlatform>
+            </NavigationPage.Icon>
         </NavigationPage>
 
     </TabbedPage.Children>
