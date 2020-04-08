@@ -6,10 +6,40 @@
 			 mc:Ignorable="d" 
 			 x:Class="EnlightenMobile.App">
     <Application.Resources>
+
+        <!-- This is basically your stylesheet.css for the whole app -->
         <ResourceDictionary>
             <Style TargetType="NavigationPage">
-                <Setter Property="BarBackgroundColor" Value="#474747" />
-                <Setter Property="BarTextColor" Value="White" />
+                <Setter Property="BarBackgroundColor"       Value="#474747" />
+                <Setter Property="BarTextColor"             Value="White" />
+            </Style>
+            <Style TargetType="Button">
+                <Setter Property="TextColor"                Value="#333"    />
+                <Setter Property="BackgroundColor"          Value="#ccc"    />
+                <Setter Property="BorderColor"              Value="#999"    />
+
+                <!-- iOS buttons need explicit MinimumWidthRequest and Padding 
+                     that perversely look bad on Android -->
+                <Setter Property="Padding">
+                    <Setter.Value>
+                        <OnPlatform x:TypeArguments="Thickness" iOS="20, 0, 20, 0" /> 
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="MinimumWidthRequest">
+                  <Setter.Value>
+                    <OnPlatform x:TypeArguments="x:Double" iOS="150" />
+                  </Setter.Value>
+                </Setter>
+            </Style>
+            <Style TargetType="Label">
+                <Setter Property="VerticalTextAlignment"    Value="Center" />
+                <Setter Property="TextColor"                Value="#ccc" />
+            </Style>
+            <Style TargetType="Entry">
+                <Setter Property="BackgroundColor"          Value="#555" />
+                <Setter Property="TextColor"                Value="#fff" />
+                <Setter Property="ClearButtonVisibility"    Value="WhileEditing" />
+                <Setter Property="PlaceholderColor"         Value="#f7e842" />
             </Style>
         </ResourceDictionary>
     </Application.Resources>

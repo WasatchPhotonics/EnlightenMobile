@@ -60,7 +60,7 @@
       <Version>0.7.1</Version>
     </PackageReference>
     <PackageReference Include="Plugin.Permissions">
-      <Version>3.0.0.12</Version>
+      <Version>6.0.1</Version>
     </PackageReference>
     <PackageReference Include="Plugin.BLE">
       <Version>2.1.1</Version>

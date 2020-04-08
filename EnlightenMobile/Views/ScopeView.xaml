@@ -11,31 +11,18 @@
              xmlns:microcharts="clr-namespace:Microcharts.Forms;assembly=Microcharts.Forms" 
              Title="{Binding title}"
              BackgroundColor="#333" >
-             <!-- "📈" -->
 
     <ContentPage.BindingContext>
         <vm:ScopeViewModel/>
     </ContentPage.BindingContext>
 
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <Color x:Key="Primary">#2196F3</Color>
-            <Color x:Key="Accent">#96d1ff</Color>
-            <Color x:Key="LightTextColor">#999999</Color>
-        </ResourceDictionary>
-    </ContentPage.Resources>
-
-    <!-- TODO: add Xamarin.Forms.RefreshView to scan by pulling down -->
-    
     <ContentPage.Content>
 
-        <!-- This is the Grid whose structure changes when phone rotates -->
-
-        <!-- (an earlier version of the project just toggled the Orientation of 
-              a StackLayout, which works too) -->
+        <!-- This is the Grid whose structure changes when phone rotates 
+             (consider making this a FlexLayout as well) -->
 		<Grid x:Name="outerGrid" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
 
-            <!-- initialize to Portrait mode -->
+            <!-- initialize to Portrait mode (1 col, 2 rows) -->
 			<Grid.RowDefinitions>
 				<RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
@@ -45,7 +32,7 @@
 			</Grid.ColumnDefinitions>
 			
             <!-- Chart Block: Keep together (will be "left" in landscape mode) -->
-            <StackLayout Grid.Row="0" Grid.Column="0" x:Name="stackChart" Orientation="Vertical" VerticalOptions="FillAndExpand">
+            <StackLayout Grid.Row="0" Grid.Column="0" x:Name="stackChart" VerticalOptions="FillAndExpand">
 
                 <!-- Page header (when in portrait mode) -->
                 <Image x:Name="logoVertical" Source="enlightenLOGO" WidthRequest="300" BackgroundColor="#333" />
@@ -59,101 +46,82 @@
             </StackLayout>
 
             <!-- User Controls: keep together (will be "right" in landscape mode) -->
-            <ScrollView Grid.Row="1" Grid.Column="0" x:Name="scrollOptions">
-                <StackLayout HorizontalOptions="FillAndExpand">
+            <RefreshView Grid.Row="1" 
+                         Grid.Column="0" 
+                         x:Name="scrollOptions"
+                         IsRefreshing="{Binding isRefreshing}"
+                         Command="{Binding refreshCmd}">
 
-                    <!-- Page header if in landscape mode -->
-                    <Image x:Name="logoHorizontal" WidthRequest="300" Source="enlightenLOGO" IsVisible="False"/>
+                <ScrollView>
+                    <StackLayout HorizontalOptions="FillAndExpand">
 
-                    <!-- Acquisition ProgressBar -->
-                    <ProgressBar Progress="{Binding acquisitionProgress}" ProgressColor="#2994d3"/>
+                        <!-- Page header if in landscape mode -->
+                        <Image x:Name="logoHorizontal" WidthRequest="300" Source="enlightenLOGO" IsVisible="False"/>
 
-                    <!-- Command buttons -->
-                    <StackLayout Orientation="Horizontal">
-                        <Button Text="Acquire" Command="{Binding acquireCmd}" />
-                        <Button Text="Save" Command="{Binding saveCmd}" />
-                    </StackLayout>
+                        <!-- Acquisition ProgressBar -->
+                        <ProgressBar Progress="{Binding acquisitionProgress}" ProgressColor="#2994d3"/>
 
-                    <!-- Acquisition Parameters -->
-                    <Grid HorizontalOptions="FillAndExpand">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>  <!--  Laser       Switch   Integration Time  Entry -->
-                            <RowDefinition Height="*"/>  <!--  Dark        Switch   Gain              Entry -->
-                            <RowDefinition Height="*"/>  <!--  Alternating Switch   Averaging         Entry -->
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                    
-                        <!-- Row 0 -->
-                        <Label  Grid.Row="0" Grid.Column="0" Text="Fire Laser" TextColor="#ccc" WidthRequest="75" VerticalTextAlignment="Center"/>
-                        <Switch Grid.Row="0" Grid.Column="1" IsToggled="{Binding laserEnabled}" />
+                        <!-- Command buttons -->
+                        <StackLayout Orientation="Horizontal">
+                            <Button Text="Acquire" Command="{Binding acquireCmd}" />
+                            <Button Text="Save" Command="{Binding saveCmd}" />
+                        </StackLayout>
 
-                        <Label Grid.Row="0" Grid.Column="2" Text="Integration Time (ms)" TextColor="#ccc" VerticalTextAlignment="Center" />
-                        <Entry Grid.Row="0" Grid.Column="3" 
-                               x:Name="entryIntegrationTimeMS"
-                               Placeholder="3" 
-                               PlaceholderColor="#f7e842" 
-                               TextColor="#fff" 
-                               ClearButtonVisibility="WhileEditing" 
-                               Text="{Binding integrationTimeMS}" 
-                               Keyboard="Numeric" />
+                        <StackLayout HorizontalOptions="FillAndExpand" Padding="20, 10, 20, 10">
+                            <FlexLayout JustifyContent="SpaceBetween">
+                                <Label  Text="Fire Laser" MinimumWidthRequest="75" />
+                                <Switch IsToggled="{Binding laserEnabled}" />
+                            </FlexLayout>    
+                            <FlexLayout JustifyContent="SpaceBetween">
+                                <Label  Text="Dark" MinimumWidthRequest="75" />
+                                <Switch IsToggled="{Binding darkEnabled}" />
+                            </FlexLayout>    
+                            <FlexLayout JustifyContent="SpaceBetween">
+                                <Label  Text="Alternating" MinimumWidthRequest="75" />
+                                <Switch IsToggled="{Binding alternatingEnabled}" />
+                            </FlexLayout>    
 
-                        <!-- Row 1 -->
-                        <Label  Grid.Row="1" Grid.Column="0" Text="Dark" TextColor="#ccc" WidthRequest="75" VerticalTextAlignment="Center"/>
-                        <Switch Grid.Row="1" Grid.Column="1" IsToggled="{Binding darkEnabled}" />
+                            <FlexLayout JustifyContent="SpaceBetween">
+                                <Label Text="Integration Time (ms)" />
+                                <Entry x:Name="entryIntegrationTimeMS"
+                                       Text="{Binding integrationTimeMS}" 
+                                       Placeholder="3" 
+                                       Keyboard="Numeric" />
+                            </FlexLayout>    
+                            <FlexLayout JustifyContent="SpaceBetween">
+                                <Label Text="Gain (dB)" />
+                                <Entry x:Name="entryGainDb"
+                                       Text="{Binding gainDb}" 
+                                       Placeholder="24" 
+                                       Keyboard="Numeric" />
+                            </FlexLayout>    
+                            <FlexLayout JustifyContent="SpaceBetween">
+                                <Label Text="Scans to Average" />
+                                <Entry x:Name="entryScansToAverage"
+                                       Text="{Binding scansToAverage}" 
+                                       Placeholder="1" 
+                                       Keyboard="Numeric" />
+                            </FlexLayout>    
 
-                        <Label Grid.Row="1" Grid.Column="2" Text="Gain (dB)" TextColor="#ccc" VerticalTextAlignment="Center" />
-                        <Entry Grid.Row="1" Grid.Column="3" 
-                               x:Name="entryGainDb"
-                               Placeholder="24" 
-                               PlaceholderColor="#f7e842" 
-                               TextColor="#fff" 
-                               ClearButtonVisibility="WhileEditing" 
-                               Text="{Binding gainDb}" 
-                               Keyboard="Numeric" />
-
-                        <!-- Row 2 -->
-                        <Label  Grid.Row="2" Grid.Column="0" Text="Alternating" TextColor="#ccc" WidthRequest="75" VerticalTextAlignment="Center"/>
-                        <Switch Grid.Row="2" Grid.Column="1" IsToggled="{Binding alternatingEnabled}" />
-
-                        <Label Grid.Row="2" Grid.Column="2" Text="Scans to Average" TextColor="#ccc" VerticalTextAlignment="Center" />
-                        <Entry Grid.Row="2" Grid.Column="3" 
-                               x:Name="entryScansToAverage"
-                               Placeholder="1" 
-                               PlaceholderColor="#f7e842" 
-                               TextColor="#fff" 
-                               ClearButtonVisibility="WhileEditing" 
-                               Text="{Binding scansToAverage}" 
-                               Keyboard="Numeric" />
-                    </Grid>
-
-                    <!-- Note field -->
-                    <StackLayout Orientation="Horizontal">
-                        <Label Text="Note" TextColor="#ccc"  VerticalTextAlignment="Center"/>
-                        <Entry x:Name="entryNote"
-                               Placeholder="your text here" 
-                               PlaceholderColor="#f7e842" 
-                               HorizontalOptions="FillAndExpand"
-                               TextColor="#fff" 
-                               ClearButtonVisibility="WhileEditing"
-                               Text="{Binding note}" />
-                    </StackLayout>
-
-                    <!-- Status Bar -->
-                    <Frame CornerRadius="10" BackgroundColor="#666" Padding="2" Margin="2, 0, 2, 4">
-                        <Frame CornerRadius="10" BackgroundColor="#444" Padding="2">
-                            <StackLayout Orientation="Horizontal" Padding="2" HorizontalOptions="Center">
-                                <Label Text="{Binding spectrumMax}" TextColor="#eee" Padding="10, 0, 10, 0" />
-                                <Label Text="{Binding batteryState}" TextColor="#eee" Padding="10, 0, 10, 0" />
+                            <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand" >
+                                <Label Text="Note"/>
+                                <Entry x:Name="entryNote"
+                                       Text="{Binding note}" 
+                                       Placeholder="your text here" 
+                                       HorizontalOptions="FillAndExpand" />
                             </StackLayout>
-                        </Frame>
-                    </Frame>
-                </StackLayout>
-            </ScrollView>
+                        </StackLayout>
+
+
+                        <!-- Status Bar -->
+                        <FlexLayout JustifyContent="SpaceBetween" BackgroundColor="#444" Padding="10">
+                            <Label Text="{Binding spectrumMax}" />
+                            <Label Text="{Binding batteryState, StringFormat='Batt: {0}'}" TextColor="{Binding batteryColor}" />
+                        </FlexLayout>
+
+                    </StackLayout>
+                </ScrollView>
+            </RefreshView>
         </Grid>
     </ContentPage.Content>
 </ContentPage>

@@ -1,5 +1,17 @@
 # Version History
 
+- 2020-04-08 0.3.3
+    - better iOS toast
+    - playing with layouts and styles
+    - hostDescription
+- 2020-04-07 0.3.2
+    - tab icons
+    - iOS application icons (square)
+    - Android application icons (round)
+    - make clean
+    - pull to refresh
+    - iOS toast
+    - trying to move Permissions check to Generic
 - 2020-04-06 0.3.1
     - takes spectra on iOS
 - 2020-04-06 0.3.0

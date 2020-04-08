@@ -3,8 +3,8 @@ using Plugin.BLE.Abstractions.Contracts;
 using Plugin.BLE.Abstractions.EventArgs;
 using Plugin.BLE.Abstractions.Exceptions;
 using Plugin.BLE;
-using Plugin.Permissions.Abstractions;
 using Plugin.Permissions;
+using Plugin.Permissions.Abstractions;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
@@ -291,6 +291,7 @@ namespace EnlightenMobile.Views
             // not sure if we need to de-dupe or not
             if (!deviceList.Contains(dev))
             {
+                // @todo replace dev.Id with UUID
                 logger.debug($"added {dev.Name} (RSSI {dev.Rssi} Id {dev.Id})");
                 deviceList.Add(dev);
             }
@@ -300,30 +301,37 @@ namespace EnlightenMobile.Views
 		{ 
             // Recent versions of Android require either coarse- or fine-grained 
             // Location access in order to perform a BLE scan.
-            if (!await _requestPermissionAsync(Permission.LocationWhenInUse, "Location", 
+            if (!await _requestPermissionAsync<LocationPermission>(Permission.Location, "Location", 
                 "Bluetooth requires access to the 'Location' service in order to function."))
                 return false;
 
-            if (!await _requestPermissionAsync(Permission.Storage, "Storage", 
+            if (!await _requestPermissionAsync<StoragePermission>(Permission.Storage, "Storage", 
                 "App needs to be able to save spectra to local filesystem."))
                 return false;
 
             return true;
         }
 
-        async Task<bool> _requestPermissionAsync(Permission perm, string name, string reason)
+        // @todo figure out why generic CheckPermissionStatusAsync doesn't compile
+        async Task<bool> _requestPermissionAsync<T>(Permission perm, string name, string reason) 
+            where T : BasePermission
         {
 			try
 			{
                 // do we already have permission?
-				var status = await CrossPermissions.Current.CheckPermissionStatusAsync(perm);
+
+                // WHY DOESN'T THIS WORK?!?
+                // I almost feel like I'm working from a cached version of the Plugin.Permissions package...
+                // like if I fully flushed and reinstalled that package, this would be okay.
+		  	 // var status = await CrossPermissions.Current.CheckPermissionStatusAsync<T>(); 
+	           	var status = await CrossPermissions.Current.CheckPermissionStatusAsync(perm);
 
                 // if not, prompt the user to authorize it
 				if (status != PermissionStatus.Granted)
 				{
 					if (await CrossPermissions.Current.ShouldShowRequestPermissionRationaleAsync(perm))
 					{
-						await DisplayAlert("Bluetooth Privileges", reason, "OK");
+						await DisplayAlert($"{name} Permission", reason, "OK");
 					}
 
 					var result = await CrossPermissions.Current.RequestPermissionsAsync(perm);

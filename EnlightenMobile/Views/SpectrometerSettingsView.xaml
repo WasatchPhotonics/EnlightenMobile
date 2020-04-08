@@ -18,7 +18,7 @@
             <Image Source="enlightenLOGO" WidthRequest="300"/>
 
             <!-- Scrolling ListView of EEPROM (name, value) tuples -->
-            <ListView x:Name="listView" BackgroundColor="#333" SeparatorColor="#27c0a1"> 
+            <ListView x:Name="listView" BackgroundColor="#333" SeparatorColor="#555"> 
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>

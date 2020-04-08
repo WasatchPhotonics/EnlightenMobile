@@ -6,10 +6,11 @@ namespace EnlightenMobile
 {
     public class Util
     {
-        public static void toast(string msg)
+        // View is there for iOS (Android doesn't need it)
+        public static void toast(string msg, View view = null)
         {
             IPlatformUtil platformUtil = DependencyService.Get<IPlatformUtil>();
-            platformUtil.toast(msg);
+            platformUtil.toast(msg, view);
         }
 
         // only really used by BluetoothView

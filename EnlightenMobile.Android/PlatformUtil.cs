@@ -18,7 +18,7 @@ namespace EnlightenMobile.Droid
         // Make a little pop-up message notification appear (no buttons, it just 
         // fades away after a few seconds).  Currently used when a Measurement 
         // is successfully saved.
-        public void toast(string message)  
+        public void toast(string message, View view = null)  
         {  
             var context = Android.App.Application.Context;  
             Toast.MakeText(context, message, ToastLength.Long).Show();  

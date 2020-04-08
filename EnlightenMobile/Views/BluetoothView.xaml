@@ -19,8 +19,8 @@
             <Frame CornerRadius="10" BackgroundColor="#666" Padding="2">
                 <Frame CornerRadius="10" BackgroundColor="#444" Padding="2">
                     <StackLayout Orientation="Horizontal" Padding="2" HorizontalOptions="FillAndExpand">
-                        <Button x:Name="btnScan"    Text="Scan"    Clicked="btnScan_Clicked"/> 
-                        <Button x:Name="btnConnect" Text="Connect" Clicked="btnConnect_Clicked"/> 
+                        <Button x:Name="btnScan"    Text="Scan"    Clicked="btnScan_Clicked" />
+                        <Button x:Name="btnConnect" Text="Connect" Clicked="btnConnect_Clicked" /> 
                     </StackLayout>
                 </Frame>
             </Frame>
@@ -31,7 +31,8 @@
             <!-- List of discovered BLE devices -->
             <ListView x:Name="listView" 
                       ItemSelected="listView_ItemSelected" 
-                      SeparatorColor="#27c0a1" 
+                      SeparatorColor="#555" 
+                      BackgroundColor="#333"
                       Margin="20, 0, 20, 0" 
                       HasUnevenRows="True"> 
                 <ListView.ItemTemplate>

@@ -51,6 +51,29 @@ namespace EnlightenMobile.Models
         }
 
         ////////////////////////////////////////////////////////////////////////
+        // Device / Platform
+        ////////////////////////////////////////////////////////////////////////
+
+        public string os
+        {
+            get => Device.RuntimePlatform.ToString();
+        }
+
+        public string hostDescription
+        {
+            get
+            {
+                var model = DeviceInfo.Model; // SMG-950U, iPhone10,6 etc
+                var manuf = DeviceInfo.Manufacturer; // Samsung, Apple etc
+                var name = DeviceInfo.Name; // "Mark's iPhone" etc
+                var version = DeviceInfo.VersionString; // 7.0 etc
+                var os = DeviceInfo.Platform; // Android, iOS etc
+                // var idiom = DeviceInfo.Idiom; // Phone, Tablet, Watch, TV etc
+                return $"{name} ({manuf} {model} running {os} {version})";
+            }
+        }
+
+        ////////////////////////////////////////////////////////////////////////
         // SaveOptions / FileManager
         ////////////////////////////////////////////////////////////////////////
 

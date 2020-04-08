@@ -8,7 +8,7 @@ namespace EnlightenMobile.Models
         ushort raw;
         byte rawLevel;
         byte rawState;
-        double level;
+        public double level {get; private set; }
         
         bool charging;
 
@@ -31,7 +31,7 @@ namespace EnlightenMobile.Models
             ushort raw = ParseData.toUInt16(response, 0);
             this.raw = raw; // store for debugging, as toString() outputs this
 
-            // reversed from SiG-290
+            // reversed from SiG-290?
             rawLevel = (byte)((raw & 0xff00) >> 8);
             rawState = (byte)(raw & 0xff);
 
@@ -45,7 +45,9 @@ namespace EnlightenMobile.Models
         override public string ToString()
         {
             logger.debug("Battery: raw 0x{0:x4} (lvl {1}, st 0x{2:x2}) = {3:f2}", raw, rawLevel, rawState, level);
-            return string.Format("Battery {0} ({1}%)", charging ? "charging" : "discharging", (int)Math.Round(level));
+
+            int intLevel = (int)Math.Round(level);
+            return charging ? $"{intLevel}%>" : $"<{intLevel}%";
         }
     }
 }

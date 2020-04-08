@@ -15,6 +15,12 @@ namespace EnlightenMobile.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
+        // A "clean-ish" way for the ViewModel to raise events in the View's
+        // code-behind
+        // https://stackoverflow.com/a/26038700/11615696
+        public delegate void ScopeViewNotification(string msg);
+        public event ScopeViewNotification scopeViewNotification;
+
         ////////////////////////////////////////////////////////////////////////
         // Private attributes
         ////////////////////////////////////////////////////////////////////////
@@ -37,6 +43,7 @@ namespace EnlightenMobile.ViewModels
 
             // bind closures (method calls) to each Command
             acquireCmd = new Command(() => { _ = doAcquireAsync(); });
+            refreshCmd = new Command(() => { _ = doAcquireAsync(); }); // just re-use prev command?
             saveCmd    = new Command(() => { _ = doSave        (); });
 
             logger.debug("SVM: finished ctor");
@@ -121,6 +128,28 @@ namespace EnlightenMobile.ViewModels
         }
 
         ////////////////////////////////////////////////////////////////////////
+        // Refresh
+        ////////////////////////////////////////////////////////////////////////
+
+        public bool isRefreshing
+        {
+            get => _isRefreshing;
+            set 
+            {
+                logger.debug($"SVM: isRefreshing -> {value}");
+                _isRefreshing = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(isRefreshing)));
+            }
+        }
+        bool _isRefreshing;
+
+        // invoked by ScopeView when the user pulls-down on the Scope Options grid
+        // @todo consider whether this feature should user-configurable, as an 
+        //       accidental acquisition could be destructive of both data and 
+        //       health (as the laser could auto-fire)
+        public Command refreshCmd { get; }
+
+        ////////////////////////////////////////////////////////////////////////
         // Status Bar
         ////////////////////////////////////////////////////////////////////////
 
@@ -132,6 +161,11 @@ namespace EnlightenMobile.ViewModels
         public string batteryState 
         { 
             get => spec.battery.ToString();
+        }
+
+        public string batteryColor
+        { 
+            get => spec.battery.level > 20 ? "#eee" : "#f33";
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -158,6 +192,7 @@ namespace EnlightenMobile.ViewModels
 
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(batteryState)));
             showProgress(0);
+            isRefreshing = false;
 
             return ok;
         }
@@ -194,9 +229,9 @@ namespace EnlightenMobile.ViewModels
             }
 
             if (allZero)
-                Util.toast("ERROR: spectrum is all zero");
+                scopeViewNotification?.Invoke("ERROR: spectrum is all zero");
             else if (allHigh)
-                Util.toast("ERROR: spectrum is all 0xff");
+                scopeViewNotification?.Invoke("ERROR: spectrum is all 0xff");
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -251,7 +286,10 @@ namespace EnlightenMobile.ViewModels
         // the user clicked the "Save" button on the Scope View
         bool doSave()
         {
-            return spec.measurement.save();
+            var ok = spec.measurement.save();
+            if (ok)
+                scopeViewNotification?.Invoke($"saved {spec.measurement.filename}");
+            return ok;
         }
 
         // This is required, but I don't remember how / why

@@ -46,7 +46,7 @@ namespace EnlightenMobile.Models
             applyDark();
            
             var serialNumber = spec is null ? "sim" : spec.eeprom.serialNumber;
-            measurementID = string.Format("enlighten-droid-{0}-{1}", 
+            measurementID = string.Format("enlighten-{0}-{1}", 
                 timestamp.ToString("yyyyMMdd-HHmmss-ffffff"), 
                 serialNumber);
             filename = measurementID + ".csv";
@@ -112,15 +112,14 @@ namespace EnlightenMobile.Models
                 writeSpectra(sw);
             }
 
-            Util.toast($"saved {filename}");
-
             return true;
         }
 
         void writeMetadata(StreamWriter sw)
         { 
+            var appSettings = AppSettings.getInstance();
             // not the full ENLIGHTEN set, but the key ones for now
-            sw.WriteLine("ENLIGHTEN Version, {0} for Android", AppSettings.getInstance().version);
+            sw.WriteLine("ENLIGHTEN Version, Mobile {0} for {1}", appSettings.version, appSettings.os);
             sw.WriteLine("Measurement ID, {0}", measurementID);
             sw.WriteLine("Serial Number, {0}", spec.eeprom.serialNumber);
             sw.WriteLine("Model, {0}", spec.eeprom.model);
@@ -131,6 +130,7 @@ namespace EnlightenMobile.Models
             sw.WriteLine("Laser Wavelength, {0}", spec.eeprom.laserExcitationWavelengthNMFloat);
             sw.WriteLine("Note, {0}", spec.note);
             sw.WriteLine("Pixel Count, {0}", spec.eeprom.activePixelsHoriz);
+            sw.WriteLine("Host Description, {0}", appSettings.hostDescription);
         }
 
         string render(double[] a, int index, string format="f2")

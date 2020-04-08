@@ -173,7 +173,10 @@ namespace EnlightenMobile.Models
 
         async Task<bool> syncIntegrationTimeMSAsync()
         {
-            if (_nextIntegrationTimeMS == _lastIntegrationTimeMS)        
+            if (characteristicsByName is null)
+                return false;
+
+            if (_nextIntegrationTimeMS == _lastIntegrationTimeMS)
                 return true;
 
             var characteristic = characteristicsByName["integrationTimeMS"];
@@ -189,16 +192,13 @@ namespace EnlightenMobile.Models
             logger.debug($"Spectrometer.syncIntegrationTimeMSAsync({value})");
             logger.hexdump(request, "data: ");
 
-            if (await characteristic.WriteAsync(request))
-            {
+            var ok = await characteristic.WriteAsync(request);
+            if (ok)
                 _lastIntegrationTimeMS = _nextIntegrationTimeMS;
-                return true;
-            }
             else
-            {
                 logger.error($"Failed to set integrationTimeMS {value}");
-                return false;
-            }
+
+            return ok;
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -219,6 +219,9 @@ namespace EnlightenMobile.Models
 
         async Task<bool> syncGainDbAsync()
         {
+            if (characteristicsByName is null)
+                return false;
+
             if (_nextGainDb == _lastGainDb)
                 return true;
                             
@@ -234,16 +237,14 @@ namespace EnlightenMobile.Models
 
             logger.debug($"Spectrometer.syncGainDbAsync({value})"); 
             logger.hexdump(request, "data: ");
-            if (await characteristic.WriteAsync(request))
-            {
+
+            var ok = await characteristic.WriteAsync(request);
+            if (ok)
                 _lastGainDb = _nextGainDb;
-                return true;
-            }
             else
-            {
                 logger.error($"Failed to set gainDb {value}");
-                return false;
-            }
+
+            return ok;
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -253,29 +254,35 @@ namespace EnlightenMobile.Models
         public bool laserEnabled
         {
             get => _laserEnabled;
-            set => setLaserEnabledAsync(value);
+            set => _ = setLaserEnabledAsync(value);
         }
         bool _laserEnabled = false;
 
-        async void setLaserEnabledAsync(bool flag)
+        async Task<bool> setLaserEnabledAsync(bool flag)
         {
+            if (characteristicsByName is null)
+                return false;
+
             var characteristic = characteristicsByName["laserEnable"];
             if (characteristic is null)
             {
                 logger.error("can't find laserEnable characteristic");
-                return;
+                return false;
             }
             byte[] request = ToBLEData.convert(flag);
 
             logger.debug($"Spectrometer.setLaserEnabledAsync({flag})");
             logger.hexdump(request, "data: ");
 
-            if (await characteristic.WriteAsync(request))
+            var ok = await characteristic.WriteAsync(request);
+            if (ok)
                 _laserEnabled = flag;
             else
                 logger.error($"Failed to set laserEnabled {flag}");
 
             updateBatteryAsync();
+
+            return ok;
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -290,6 +297,9 @@ namespace EnlightenMobile.Models
 
         async public void updateBatteryAsync()
         {
+            if (characteristicsByName is null)
+                return;
+
             var characteristic = characteristicsByName["batteryStatus"];
             if (characteristic is null)
             {
@@ -321,6 +331,9 @@ namespace EnlightenMobile.Models
         // responsible for taking one fully-averaged measurement
         public async Task<bool> takeOneAveragedAsync(ProgressBarDelegate showProgress)
         {
+            if (characteristicsByName is null)
+                return false;
+
             // push-down any changed acquisition parameters
             if (! await syncIntegrationTimeMSAsync())
                 return false;
@@ -366,6 +379,9 @@ namespace EnlightenMobile.Models
         // callers are expected to use takeOneAveragedAsync().
         private async Task<double[]> takeOneAsync(ProgressBarDelegate showProgress)
         {
+            if (characteristicsByName is null)
+                return null;
+
             const int headerLen = 2;
 
             var acquireChar = characteristicsByName["acquireSpectrum"];

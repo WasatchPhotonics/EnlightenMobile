@@ -17,18 +17,16 @@
        </ResourceDictionary>
     </ContentPage.Resources>
 
-    <StackLayout BackgroundColor="{StaticResource DarkGray}" 
-                 VerticalOptions="CenterAndExpand"
-                 HorizontalOptions="FillAndExpand">
-        <Image Source="enlightenLOGO.png" HeightRequest="100" HorizontalOptions="Fill" Margin="10, 30, 10, 30" />
-        <Label FontSize="22" 
-               TextColor="#eee" 
-               HorizontalTextAlignment="Center"
-               Text="{Binding version, StringFormat='ENLIGHTEN™ Mobile {0}'}" />
-        <Button Margin="30,20,30,20" 
+    <FlexLayout BackgroundColor="{StaticResource DarkGray}" 
+                Direction="Column"
+                AlignItems="Center"
+                JustifyContent="SpaceEvenly">
+        <Image Source="enlightenLOGO.png" HeightRequest="100" />
+        <Label FontSize="22" TextColor="#eee" Text="{Binding version, StringFormat='ENLIGHTEN™ Mobile {0}'}" />
+        <Button Padding="40,10,40,10" 
                 Text="Learn more" 
                 Command="{Binding OpenWebCommand}" 
                 BackgroundColor="{StaticResource Teal}" 
                 TextColor="White" />
-    </StackLayout>
+    </FlexLayout>
 </ContentPage>

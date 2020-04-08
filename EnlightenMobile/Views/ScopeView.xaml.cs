@@ -1,5 +1,6 @@
 ﻿using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using EnlightenMobile.ViewModels;
 
 namespace EnlightenMobile.Views
 {
@@ -18,6 +19,10 @@ namespace EnlightenMobile.Views
             // needed?
             OnSizeAllocated(Width, Height);
             logger.debug("ScopeView: finished ctor");
+
+            // https://stackoverflow.com/a/26038700/11615696
+            var vm = (ScopeViewModel)BindingContext;
+            vm.scopeViewNotification += (string msg) => Util.toast(msg, scrollOptions);
         }
 
         // This event is used to reformat the ScopeView from Portrait to Landscape 
@@ -32,6 +37,7 @@ namespace EnlightenMobile.Views
             if (landscape != lastLandscape)
             {
                 lastLandscape = landscape;
+                logger.debug($"OnSizeAllocated: Width {width}, Height {height}");
 
                 if (landscape)
                 {
