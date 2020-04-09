@@ -48,6 +48,11 @@ namespace EnlightenMobile.ViewModels
         // are sent to the GUI or not)
         StringBuilder history = new StringBuilder("Log data");
 
+        public bool verbose 
+        { 
+            get => logger.level == LogLevel.DEBUG;
+            set => logger.level = value ? LogLevel.DEBUG : LogLevel.INFO;
+        }
 
         public Command saveCmd { get; }
 

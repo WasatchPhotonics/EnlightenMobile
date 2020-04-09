@@ -15,7 +15,13 @@
         <StackLayout Orientation="Vertical" BackgroundColor="#333">
 
             <!-- Page header -->
-            <Button Command="{Binding saveCmd}" Text="Save" Margin="30, 10, 30, 10"/>
+            <StackLayout Orientation="Horizontal">
+                <Button Command="{Binding saveCmd}" Text="Save" Margin="30, 10, 30, 10"/>
+                <StackLayout Orientation="Horizontal">
+                    <Label Text="Verbose"/>
+                    <Switch IsToggled="{Binding verbose}" />
+                </StackLayout>
+            </StackLayout>
 
             <!-- Log lines -->
             <Editor Text="{Binding logText}" 

@@ -13,8 +13,13 @@ For a walk-through of how the application is structured, see
 Builds with Visual Studio Community 2019 (tested using MacOS version).
 
 Requires several NuGet packages (Plugin.BLE, Plugin.Permissions, Microcharts, 
-Microcharts.Forms etc), but all should self-download adn install under Visual 
+Microcharts.Forms etc), but all should self-download and install under Visual 
 Studio.
+
+Testing:
+
+- Steema charts
+    - requires [Mono MDK](https://www.mono-project.com/download/vs/)?
 
 ## Android Target Version
 

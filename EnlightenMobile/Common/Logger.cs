@@ -184,6 +184,12 @@ namespace EnlightenMobile
 
                 if (history != null)
                 {
+                    if (history.Length > 4096)
+                    {
+                        // could save to disk or things like that
+                        history.Length = 0;
+                        history.Append("[truncated log above 4k]\n");
+                    }
                     history.Append(msg + "\n");
                     if (liveUpdates)
                         update();

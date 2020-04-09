@@ -1,5 +1,7 @@
 # Version History
 
+- 2020-04-09 0.3.5
+    - added verbose switch to LogView
 - 2020-04-08 0.3.4
     - trying to colorize acquire button
     - added Crc16 check
