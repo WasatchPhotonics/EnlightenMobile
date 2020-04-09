@@ -13,7 +13,7 @@ namespace EnlightenMobile.iOS
     {
         Logger logger = Logger.getInstance();
         
-        PlatformUtil() { }
+        public PlatformUtil() { }
 
         // Make a little pop-up message notification appear (no buttons, it just 
         // fades away after a few seconds).  Currently used when a Measurement 

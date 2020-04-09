@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Plugin.BLE.Abstractions.Contracts;
+using EnlightenMobile.Common;
 
 namespace EnlightenMobile.Models
 {
@@ -37,6 +38,9 @@ namespace EnlightenMobile.Models
 
         public Measurement measurement = new Measurement();
         public string note {get; set;} = "your text here";
+        public bool acquiring;
+        ushort lastCRC;
+        const int MAX_RETRIES = 3;
 
         public uint scansToAverage {get; set;} = 1;
         uint totalPixelsToRead;
@@ -344,18 +348,19 @@ namespace EnlightenMobile.Models
             // for progress bar
             totalPixelsToRead = pixels * scansToAverage;
             totalPixelsRead = 0;
+            acquiring = true;
 
             // take the first spectrum
             double[] spectrum = await takeOneAsync(showProgress);
             if (spectrum is null)
-                return false;
+                return acquiring = false;
 
             // if doing scan averaging (in software), take the rest
             for (int i = 1; i < scansToAverage; i++)
             { 
                 double[] tmp = await takeOneAsync(showProgress);
                 if (tmp is null || tmp.Length != spectrum.Length)
-                    return false;
+                    return acquiring = false;
 
                 for (int j = 0; j < spectrum.Length; j++)
                     spectrum[j] += tmp[j];    
@@ -372,6 +377,7 @@ namespace EnlightenMobile.Models
 
             updateBatteryAsync();
 
+            acquiring = false;
             return true;
         }
 
@@ -418,9 +424,27 @@ namespace EnlightenMobile.Models
 
             var spectrum = new double[pixels];
             UInt16 pixelsRead = 0;
+            var retryCount = 0;
+            bool requestRetry = false;
 
             while (pixelsRead < pixels)
             {
+                if (requestRetry)
+                {
+                    retryCount++;
+                    if (retryCount > MAX_RETRIES)
+                    {
+                        logger.error($"giving up after {MAX_RETRIES} retries");
+                        return null;
+                    }
+
+                    int delayMS = (int)Math.Pow(5, retryCount);
+                    logger.error($"Retry requested, so waiting for {delayMS}ms");
+                    await Task.Delay(delayMS);
+
+                    requestRetry = false;
+                }
+
                 logger.debug($"requesting spectrum packet starting at pixel {pixelsRead}");
                 request = ToBLEData.convert(pixelsRead, len: 2);
                 if (! await spectrumRequestChar.WriteAsync(request))
@@ -433,18 +457,36 @@ namespace EnlightenMobile.Models
 
                 // make sure response length is even, and has both header and at least one pixel of data
                 var responseLen = response.Length;
-                if (responseLen < headerLen + 2 || responseLen % 2 != 0)
+                if (responseLen < headerLen || responseLen % 2 != 0)
                 {
                     logger.error($"received invalid response of {responseLen} bytes");
-                    return null;
+                    requestRetry = true;
+                    continue;
                 }
 
                 // firstPixel is a big-endian UInt16
-                ushort firstPixel = (ushort)((response[0] << 8) | response[1]);
+                short firstPixel = (short)((response[0] << 8) | response[1]);
+                if (firstPixel > 2048 || firstPixel < 0)
+                {
+                    logger.error($"received NACK (firstPixel {firstPixel}, retrying");
+                    requestRetry = true;
+                    continue;
+                }
+
                 var pixelsInPacket = (responseLen - headerLen) / 2;
 
                 logger.debug($"received spectrum packet starting at pixel {firstPixel} with {pixelsInPacket} pixels");
                 logger.hexdump(response);
+
+                var crc = Crc16.checksum(response);
+                if (crc == lastCRC)
+                {
+                    logger.error($"received duplicate CRC 0x{crc:x4}, retrying");
+                    requestRetry = true;
+                    continue;
+                }
+
+                lastCRC = crc;
 
                 for (int i = 0; i < pixelsInPacket; i++)
                 {

@@ -1,5 +1,12 @@
 # Version History
 
+- 2020-04-08 0.3.4
+    - trying to colorize acquire button
+    - added Crc16 check
+    - added retry logic
+    - fixed PlatformUtil() ctor
+    - added Save button on LogView
+    - fixed LogView update
 - 2020-04-08 0.3.3
     - better iOS toast
     - playing with layouts and styles

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Xamarin.Forms;
 
 namespace EnlightenMobile
@@ -8,6 +9,7 @@ namespace EnlightenMobile
     public class PageNav
     {
         static PageNav instance;
+        Logger logger = Logger.getInstance();
 
         // the "TabControl widget"
         public TabbedPage tabbedPage;
@@ -26,14 +28,22 @@ namespace EnlightenMobile
 
         public Page add(string name, Page page)
         {
+            logger.debug($"PageNav.add: {name}");
             return pages[name] = page;
         }
 
         public string currentPageName()
         {
-            foreach (var pair in pages)
-                if (tabbedPage.CurrentPage == pair.Value)
-                    return pair.Key;
+            try
+            {
+                foreach (var pair in pages)
+                    if (tabbedPage.CurrentPage == pair.Value)
+                        return pair.Key;
+            }
+            catch(Exception ex)
+            {
+                logger.error($"PageNav exception: {ex}");
+            }
             return null;
         }
 

@@ -41,12 +41,10 @@ namespace EnlightenMobile.Views
     /// </todo>
     public partial class SpectrometerSettingsView : ContentPage
     {
-        Logger logger = Logger.getInstance();
         ObservableCollection<ViewableSetting> viewableSettings;
 
         public SpectrometerSettingsView()
         {
-            logger.debug("SpectrometerSettingsView: starting ctor");
             InitializeComponent();
 
             viewableSettings = new ObservableCollection<ViewableSetting>();
@@ -56,7 +54,6 @@ namespace EnlightenMobile.Views
                 eeprom.viewableSettings = viewableSettings;
 
             listView.ItemsSource = viewableSettings;
-            logger.debug("SpectrometerSettingsView: finished ctor");
         }
     }
 }

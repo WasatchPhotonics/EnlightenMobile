@@ -43,7 +43,7 @@ namespace EnlightenMobile.ViewModels
 
             // bind closures (method calls) to each Command
             acquireCmd = new Command(() => { _ = doAcquireAsync(); });
-            refreshCmd = new Command(() => { _ = doAcquireAsync(); }); // just re-use prev command?
+            refreshCmd = new Command(() => { _ = doAcquireAsync(); }); 
             saveCmd    = new Command(() => { _ = doSave        (); });
 
             logger.debug("SVM: finished ctor");
@@ -172,12 +172,27 @@ namespace EnlightenMobile.ViewModels
         // Acquire Command
         ////////////////////////////////////////////////////////////////////////
 
+        public string acquireButtonColor
+        {
+            get
+            {
+                // should somehow get this into the XAML itself, or perhaps the
+                // code-behind (which could also set .IsEnabled)
+                return spec.acquiring ? "#ba0a0a" : "#ccc";
+            }
+        }
+
         // invoked by ScopeView when the user clicks "Acquire" 
         public Command acquireCmd { get; }
 
         // the user clicked the "Acquire" button on the Scope View
         async Task<bool> doAcquireAsync()
         {
+            if (spec.acquiring)
+                return false;
+
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(acquireButtonColor)));
+
             // take a fresh Measurement
             var ok = await spec.takeOneAveragedAsync(showProgress);
             if (ok)
@@ -190,6 +205,7 @@ namespace EnlightenMobile.ViewModels
                 checkForBadMeasurement();
             }
 
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(acquireButtonColor)));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(batteryState)));
             showProgress(0);
             isRefreshing = false;

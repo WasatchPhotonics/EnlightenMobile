@@ -2,6 +2,7 @@
 using System.Text;
 using System.IO;
 using System.Globalization;
+using EnlightenMobile.Models;
 
 namespace EnlightenMobile
 {
@@ -79,12 +80,28 @@ namespace EnlightenMobile
                 log(lvl, msg);
         }
 
-        public void save(string pathname)
+        public void save(string pathname=null)
         {
             if (history is null)
             {
                 Console.WriteLine("Can't save w/o history");
                 return;
+            }
+
+            if (pathname is null)
+            {
+                AppSettings appSettings = AppSettings.getInstance();
+                var dir = appSettings.getSavePath();
+                if (dir is null)
+                {
+                    error("no path available to save log");
+                    return;
+                }
+
+                var filename = string.Format("enlighten-mobile-{0}.log", 
+                    DateTime.Now.ToString("yyyyMMdd-HHmmss-ffffff"));
+
+                pathname = $"{dir}/{filename}";
             }
            
             try
@@ -92,6 +109,7 @@ namespace EnlightenMobile
                 TextWriter tw = new StreamWriter(pathname);
                 tw.Write(history);
                 tw.Close();
+                Util.toast($"saved {pathname}");
             }
             catch (Exception e)
             {

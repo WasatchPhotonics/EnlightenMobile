@@ -8,7 +8,6 @@ namespace EnlightenMobile.ViewModels
     public class AppSettingsViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-        Logger logger = Logger.getInstance();
 
         AppSettings appSettings = AppSettings.getInstance();
 

@@ -15,9 +15,9 @@
         <StackLayout Orientation="Vertical" BackgroundColor="#333">
 
             <!-- Page header -->
-            <Image Source="enlightenLOGO" WidthRequest="300"/>
+            <Button Command="{Binding saveCmd}" Text="Save" Margin="30, 10, 30, 10"/>
 
-            <!-- Log lines (would make this readonly if I could) -->
+            <!-- Log lines -->
             <Editor Text="{Binding logText}" 
                     TextColor="#ccc"
                     BackgroundColor="#666"

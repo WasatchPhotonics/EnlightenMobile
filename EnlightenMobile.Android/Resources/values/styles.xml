@@ -57,4 +57,5 @@
 'enlighten_name_t':     '#f79a1c', # the 'T' in ENLIGHTEN (orange)
 'enlighten_name_e2':    '#f84f21', # the 'E' in ENLIGHTEN (orangered)
 'enlighten_name_n2':    '#cd242b', # the 'N' in ENLIGHTEN (red)
+dark red: 0xba0a0a
 -->

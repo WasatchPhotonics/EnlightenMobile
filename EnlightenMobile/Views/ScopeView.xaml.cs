@@ -13,12 +13,10 @@ namespace EnlightenMobile.Views
 
         public ScopeView()
         {
-            logger.debug("ScopeView: starting ctor");
             InitializeComponent();
 
             // needed?
             OnSizeAllocated(Width, Height);
-            logger.debug("ScopeView: finished ctor");
 
             // https://stackoverflow.com/a/26038700/11615696
             var vm = (ScopeViewModel)BindingContext;

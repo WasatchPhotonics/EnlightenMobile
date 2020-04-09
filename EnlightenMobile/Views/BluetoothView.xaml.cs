@@ -44,8 +44,6 @@ namespace EnlightenMobile.Views
 
         public BluetoothView()
         {
-            logger.debug("BluetoothView: starting ctor");
-
             InitializeComponent();
 
             logger.debug("BluetoothView: initializing BLE stuff");
@@ -76,8 +74,6 @@ namespace EnlightenMobile.Views
             guidByName["spectrumRequest"]   = _makeGuid("ff0a");
 
             btnConnect.IsEnabled = false;
-
-            logger.debug("BluetoothView: finished ctor");
         }
 
         ////////////////////////////////////////////////////////////////////////

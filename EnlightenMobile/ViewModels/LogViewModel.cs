@@ -24,6 +24,8 @@ namespace EnlightenMobile.ViewModels
             // give the Logger a callback to let the ViewModel know when the
             // StringBuilder has been updated (probably easier way to do this)
             logger.logChangedDelegate = RaisePropertyChanged;
+
+            saveCmd = new Command(() => { doSave(); });
         } 
 
         public string title
@@ -36,11 +38,23 @@ namespace EnlightenMobile.ViewModels
         public string logText
         {
             get => history.ToString();
+            set 
+            {
+                history.Append(value);
+            }
         }
 
         // this is where Logger text is actually acrued (whether notifications
         // are sent to the GUI or not)
         StringBuilder history = new StringBuilder("Log data");
+
+
+        public Command saveCmd { get; }
+
+        void doSave()
+        {
+            logger.save();
+        }
 
         // this gets called by the Logger via its logChangedDelegate handle
         protected void RaisePropertyChanged()

@@ -16,8 +16,6 @@ namespace EnlightenMobile.Views
 
         public MainPage()
         {
-            logger.debug("MainPage: starting ctor");
-
             // all other Views are implicitly instantiated here; their respective 
             // ViewModels are instantiated as each View calls InitializeComponent
             InitializeComponent();
@@ -31,18 +29,23 @@ namespace EnlightenMobile.Views
                     pageNav.add(child.Title, child);
             }
 
+            CurrentPageChanged += MainPage_CurrentPageChanged;
+
             logger.debug("MainPage: finished ctor");
         }
 
         // a callback for whenever the tab is changed; handy to notify the Logger
         // that it should start issuing notifications on each new log message
-        private void TabbedPage_CurrentPageChanged(object sender, EventArgs e)
+        private void MainPage_CurrentPageChanged(object sender, EventArgs e)
         {
+            if (pageNav is null)
+                return;
+
             var newPageName = pageNav.currentPageName();
 
             // if we just changed to the log page, send an update now, then 
             // updated on each log message
-            logger.liveUpdates = newPageName is null ? false : newPageName == "log";
+            logger.liveUpdates = newPageName is null ? false : newPageName == "Log";
             if (logger.liveUpdates)
                 logger.update();
         }

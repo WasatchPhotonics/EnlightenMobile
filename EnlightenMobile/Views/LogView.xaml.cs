@@ -12,12 +12,9 @@ namespace EnlightenMobile.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class LogView : ContentPage
     {
-        Logger logger = Logger.getInstance();
         public LogView()
         {
-            logger.debug("LogView: starting ctor");
             InitializeComponent();
-            logger.debug("LogView: finished ctor");
         }
     }
 }

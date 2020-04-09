@@ -63,7 +63,7 @@
 
                         <!-- Command buttons -->
                         <StackLayout Orientation="Horizontal">
-                            <Button Text="Acquire" Command="{Binding acquireCmd}" />
+                            <Button Text="Acquire" Command="{Binding acquireCmd}" BackgroundColor="{Binding acquireButtonColor}" />
                             <Button Text="Save" Command="{Binding saveCmd}" />
                         </StackLayout>
 
