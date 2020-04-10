@@ -8,9 +8,9 @@
 
              x:Class="EnlightenMobile.Views.ScopeView"
              xmlns:vm="clr-namespace:EnlightenMobile.ViewModels"
-             xmlns:microcharts="clr-namespace:Microcharts.Forms;assembly=Microcharts.Forms" 
              Title="{Binding title}"
-             BackgroundColor="#333" >
+             BackgroundColor="#333" 
+             xmlns:telerikChart="clr-namespace:Telerik.XamarinForms.Chart;assembly=Telerik.XamarinForms.Chart">
 
     <ContentPage.BindingContext>
         <vm:ScopeViewModel/>
@@ -37,11 +37,21 @@
                 <!-- Page header (when in portrait mode) -->
                 <Image x:Name="logoVertical" Source="enlightenLOGO" WidthRequest="300" BackgroundColor="#333" />
 
-                <!-- the all-important spectral chart -->
-                <microcharts:ChartView x:Name="chart" 
-                                       Chart="{Binding chart}" 
-                                       HorizontalOptions="FillAndExpand"
-                                       VerticalOptions="FillAndExpand"/>
+                <!-- The all-important spectral chart -->
+
+                <telerikChart:RadCartesianChart x:Name="chart">
+                    <telerikChart:RadCartesianChart.HorizontalAxis>
+                        <telerikChart:NumericalAxis />
+                    </telerikChart:RadCartesianChart.HorizontalAxis>
+                    <telerikChart:RadCartesianChart.VerticalAxis>
+                        <telerikChart:NumericalAxis />
+                    </telerikChart:RadCartesianChart.VerticalAxis>
+                    <telerikChart:RadCartesianChart.Series>
+                        <telerikChart:ScatterLineSeries XValueBinding="pixel"
+                                                        YValueBinding="intensity"
+                                                        ItemsSource="{Binding chartData}" />
+                    </telerikChart:RadCartesianChart.Series>
+                </telerikChart:RadCartesianChart>
 
             </StackLayout>
 

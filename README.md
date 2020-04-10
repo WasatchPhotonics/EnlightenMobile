@@ -12,14 +12,19 @@ For a walk-through of how the application is structured, see
 
 Builds with Visual Studio Community 2019 (tested using MacOS version).
 
-Requires several NuGet packages (Plugin.BLE, Plugin.Permissions, Microcharts, 
-Microcharts.Forms etc), but all should self-download and install under Visual 
-Studio.
+Requires several NuGet packages (Plugin.BLE, Plugin.Permissions etc), but all 
+should self-download and install under Visual Studio.
 
-Testing:
+## Telerik ##
 
-- Steema charts
-    - requires [Mono MDK](https://www.mono-project.com/download/vs/)?
+Telerik packages are a little more complex, because they are licensed to 
+individual developers and are provided through a private NuGet server requiring
+authentication.
+
+- Follow Telerik's [instructions](https://docs.telerik.com/devtools/xamarin/installation-and-deployment/telerik-nuget-server#visual-studio-for-mac) 
+  to add their NuGet repository to Visual Studio.
+- Make sure you enter your licensed username (email) and password when configuring 
+  the private source.
 
 ## Android Target Version
 

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Xamarin.Forms;
-using Microcharts;
-using Microcharts.Forms;
 using EnlightenMobile.Models;
 using System.Threading.Tasks;
+using Telerik.XamarinForms;
+using Telerik.XamarinForms.Chart;
 
 namespace EnlightenMobile.ViewModels
 {
@@ -45,6 +46,18 @@ namespace EnlightenMobile.ViewModels
             acquireCmd = new Command(() => { _ = doAcquireAsync(); });
             refreshCmd = new Command(() => { _ = doAcquireAsync(); }); 
             saveCmd    = new Command(() => { _ = doSave        (); });
+
+            chartData = new ObservableCollection<ChartDataPoint>();
+            double halfMax = 50000.0 / 2.0;
+            for (int i = 0; i < 1952; i++)
+            {
+                double intensity = halfMax + halfMax * Math.Sin(i * Math.PI * 2 / 1952.0);
+                ChartDataPoint cdp = new ChartDataPoint() { intensity = intensity,
+                                                            pixel = i,
+                                                            wavelength = 800 + i/2.0,
+                                                            wavenumber = i*1.1 };
+                chartData.Add(cdp);
+            }
 
             logger.debug("SVM: finished ctor");
         } 
@@ -197,10 +210,12 @@ namespace EnlightenMobile.ViewModels
             var ok = await spec.takeOneAveragedAsync(showProgress);
             if (ok)
             {
-                _chart = generateChart();
+                chartData = generateChartData();
 
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(chart)));
+                logger.debug("sending updates on chartData and spectrumMax");
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(chartData)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(spectrumMax)));
+                logger.debug("updates sent");
 
                 checkForBadMeasurement();
             }
@@ -254,42 +269,36 @@ namespace EnlightenMobile.ViewModels
         // Chart
         ////////////////////////////////////////////////////////////////////////
 
-        // The private attribute will be populated asynchronously by the Acquire
-        // Command. After the new chart is built, generateChart() will invoke a
-        // PropertyChangedNotification with the name of this attribute, which
-        // will cause the ScopeView to call this gettor and retrieve the new
-        // chart for display.
-        public Chart chart
-        { 
-            get => _chart;
-        }
-        Chart _chart;
+        public ObservableCollection<ChartDataPoint> chartData { get; set; }
 
-        // convert the Spectrometer's latest Measurement into a Chart
-        private Chart generateChart()
+        private ObservableCollection<ChartDataPoint> generateChartData()
         {
-            // get spectrum
+            if (spec is null)
+                return null;
+
+            // get last-acquired spectrum
             Measurement m = spec.measurement;
+            if (m is null)
+                return null;
 
-            // generate (x, y) datapoints
-            List<Microcharts.Entry> entries = new List<Microcharts.Entry>();
+            if (m.processed is null || spec.wavelengths is null)
+                return null;
 
+            ObservableCollection<ChartDataPoint> data = new ObservableCollection<ChartDataPoint>();
             int count = m.processed.Length;
+            var raman = spec.wavenumbers != null;
             for (int i = 0; i < count; i++)
             {
-                // TODO: include X-axis
-                var intensity = m.processed[i];
-                entries.Add(new Microcharts.Entry((float)intensity) { Color=SkiaSharp.SKColors.Teal });
+                var point = new ChartDataPoint() {
+                    intensity = m.processed[i],
+                    pixel = i,
+                    wavelength = spec.wavelengths[i] };
+                if (raman)
+                    point.wavenumber = spec.wavenumbers[i];
+                data.Add(point);
             }
-
-            // instantiate chart from values
-            LineChart lc = new LineChart() { Entries = entries.ToArray() };
-            lc.PointMode = PointMode.Circle;
-            lc.LineMode = LineMode.Straight;
-            lc.LabelTextSize = 0;
-            lc.BackgroundColor = SkiaSharp.SKColors.Black;
-
-            return lc;
+            logger.debug($"replacing chartData with {chartData.Count} elements");
+            return data;
         }
 
         ////////////////////////////////////////////////////////////////////////

@@ -12,12 +12,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Xamarin.Forms" Version="4.5.0.530" />  
+    <PackageReference Include="Xamarin.Forms" Version="4.5.0.617" />  
     <PackageReference Include="Xamarin.Essentials" Version="1.5.2" />
-    <PackageReference Include="Microcharts" Version="0.7.1" />
     <PackageReference Include="Plugin.Permissions" Version="6.0.1" />
     <PackageReference Include="Plugin.BLE" Version="2.1.1" />
-    <PackageReference Include="Microcharts.Forms" Version="0.7.1" />
-    <PackageReference Include="Steema.TeeChart.NET.STD.Xamarin.Forms" Version="4.2020.3.11" />
+    <PackageReference Include="Telerik.UI.for.Xamarin.Chart.Trial" Version="2020.1.318.1" />
   </ItemGroup>
 </Project>
