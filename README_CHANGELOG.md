@@ -1,7 +1,12 @@
 # Version History
 
+- 2020-04-11 0.3.7
+    - moved from Telerik.Trial to Telerik
+    - added BLEDevice
+    - parsed UUID
+    - working on cross-platform ListView selection color
 - 2020-04-10 0.3.6
-    - moved chart from Microcharts to Telerik for axes, overlays, pan/zoom etc 
+    - moved chart from Microcharts to Telerik.Trial for axes, overlays, pan/zoom etc 
       (layout needs tuning, but works on Droid and iOS)
 - 2020-04-09 0.3.5
     - added verbose switch to LogView

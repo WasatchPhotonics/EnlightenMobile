@@ -4,7 +4,8 @@
     <style name="MainTheme" parent="MainTheme.Base">
     </style>
 
-    <!-- Base theme applied no matter what API -->
+    <!-- Obviously, any colors defined here will only apply to Android... -->
+
     <style name="MainTheme.Base" parent="Theme.AppCompat.Light.DarkActionBar">
         <!--If you are using revision 22.1 please use just windowNoTitle. Without android:-->
         <item name="windowNoTitle">true</item>

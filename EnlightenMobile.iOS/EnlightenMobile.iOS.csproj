@@ -70,6 +70,7 @@
     <None Include="Info.plist" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PlatformUtil.cs" />
+    <Compile Include="Extensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json">
@@ -158,7 +159,7 @@
     <PackageReference Include="Plugin.Permissions">
       <Version>6.0.1</Version>
     </PackageReference>
-    <PackageReference Include="Telerik.UI.for.Xamarin.Chart.Trial">
+    <PackageReference Include="Telerik.UI.for.Xamarin.Primitives">
       <Version>2020.1.318.1</Version>
     </PackageReference>
   </ItemGroup>

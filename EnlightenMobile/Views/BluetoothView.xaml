@@ -32,18 +32,20 @@
             <ListView x:Name="listView" 
                       ItemSelected="listView_ItemSelected" 
                       SeparatorColor="#555" 
-                      BackgroundColor="#333"
+                      BackgroundColor="#333" 
                       Margin="20, 0, 20, 0" 
                       HasUnevenRows="True"> 
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
-                            <StackLayout Orientation="Vertical" MinimumHeightRequest="100">
+                            <StackLayout Orientation="Vertical"
+                                         BackgroundColor="{Binding backgroundColor}"
+                                         MinimumHeightRequest="100">
                                 <StackLayout Orientation="Horizontal">
-                                    <Label TextColor="#27c0a1" Text="{Binding Rssi, StringFormat='RSSI: {0}'}" FontSize="Large"/>
-                                    <Label TextColor="#2994d3" Text="{Binding Name}" FontSize="Large"/>
+                                    <Label TextColor="#27c0a1" Text="{Binding rssi, StringFormat='RSSI: {0}'}" FontSize="Large"/>
+                                    <Label TextColor="#2994d3" Text="{Binding name}" FontSize="Large"/>
                                 </StackLayout>
-                                <Label TextColor="#cccccc" Text="{Binding Id}"/>
+                                <Label TextColor="#cccccc" Text="{Binding id}"/>
                             </StackLayout>
                         </ViewCell>
                     </DataTemplate>

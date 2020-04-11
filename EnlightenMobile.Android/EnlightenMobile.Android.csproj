@@ -62,10 +62,7 @@
     <PackageReference Include="Plugin.BLE">
       <Version>2.1.1</Version>
     </PackageReference>
-    <PackageReference Include="Telerik.UI.for.Xamarin.Chart.Trial">
-      <Version>2020.1.318.1</Version>
-    </PackageReference>
-    <PackageReference Include="Telerik.UI.for.Xamarin.Primitives.Trial">
+    <PackageReference Include="Telerik.UI.for.Xamarin.Primitives">
       <Version>2020.1.318.1</Version>
     </PackageReference>
   </ItemGroup>

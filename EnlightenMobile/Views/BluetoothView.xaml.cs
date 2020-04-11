@@ -23,8 +23,8 @@ namespace EnlightenMobile.Views
         IBluetoothLE ble;
         IAdapter adapter;
 
-        ObservableCollection<IDevice> deviceList;
-        IDevice device;
+        ObservableCollection<BLEDevice> bleDeviceList;
+        BLEDevice bleDevice;
 
         IService service;
 
@@ -52,9 +52,9 @@ namespace EnlightenMobile.Views
             // https://stackoverflow.com/a/59998233/11615696
             ble = CrossBluetoothLE.Current;
             adapter = CrossBluetoothLE.Current.Adapter;
-            deviceList = new ObservableCollection<IDevice>();
+            bleDeviceList = new ObservableCollection<BLEDevice>();
 
-            listView.ItemsSource = deviceList;
+            listView.ItemsSource = bleDeviceList;
 
             adapter.DeviceDiscovered += _bleAdapterDeviceDiscovered;
 
@@ -94,7 +94,7 @@ namespace EnlightenMobile.Views
                     return;
                 }
 
-                deviceList.Clear();
+                bleDeviceList.Clear();
                 if (!ble.Adapter.IsScanning)
                 {
                     logger.debug("starting scan");
@@ -118,14 +118,19 @@ namespace EnlightenMobile.Views
         {
             if (listView.SelectedItem == null)
             {
-                device = null;
+                bleDevice = null;
                 service = null;
                 btnConnect.IsEnabled = false;
                 return;
             }
 
-            device = listView.SelectedItem as IDevice;
-            logger.debug($"selected device {device.Name}");
+            bleDevice = listView.SelectedItem as BLEDevice;
+            logger.debug($"selected device {bleDevice.name}");
+
+            // update color :-(
+            foreach (var dev in bleDeviceList)
+                dev.selected = dev.device.Id == bleDevice.device.Id;
+
             btnConnect.IsEnabled = true;
         }
 
@@ -136,7 +141,7 @@ namespace EnlightenMobile.Views
         private async void btnConnect_Clicked(object sender, EventArgs e)
         {
             initProgress();
-            if (device is null)
+            if (bleDevice is null)
             {
                 logger.error("must select a device before connecting");
                 return;
@@ -149,18 +154,18 @@ namespace EnlightenMobile.Views
                 await adapter.StopScanningForDevicesAsync();
             }
 
-            logger.debug($"attempting connection to {device.Name}");
+            logger.debug($"attempting connection to {bleDevice.name}");
             btnConnect.IsEnabled = false;
             var success = false;
             try
             {
                 // Step 5: actually try to connect
-                await adapter.ConnectToDeviceAsync(device);
+                await adapter.ConnectToDeviceAsync(bleDevice.device);
 
                 // Step 5a: verify connection
                 foreach (var d in adapter.ConnectedDevices)
                 {
-                    if (d == device)
+                    if (d == bleDevice.device)
                     {
                         success = true;
                         break;
@@ -178,18 +183,18 @@ namespace EnlightenMobile.Views
 
             if (!success)
             {
-                logger.error($"failed connection to {device.Name}");
+                logger.error($"failed connection to {bleDevice.name}");
                 btnConnect.IsEnabled = true;
                 initProgress();
                 return;
             }
 
-            logger.info($"successfully connected to {device.Name}");
+            logger.info($"successfully connected to {bleDevice.name}");
             showProgress(.05);
 
             // Step 6: connect to primary service
             logger.debug($"connecting to primary service {primaryServiceId}");
-            service = await device.GetServiceAsync(primaryServiceId);
+            service = await bleDevice.device.GetServiceAsync(primaryServiceId);
             if (service is null)
             {
                 logger.error($"did not find primary service {primaryServiceId}");
@@ -250,9 +255,10 @@ namespace EnlightenMobile.Views
             logger.debug("btnConnect_clicked done");
 
             // btnConnect.IsEnabled = true;
+            showProgress(0);
 
             PageNav nav = PageNav.getInstance();
-            nav.select("scope");
+            nav.select("Scope");
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -285,12 +291,10 @@ namespace EnlightenMobile.Views
                 return;
 
             // not sure if we need to de-dupe or not
-            if (!deviceList.Contains(dev))
-            {
-                // @todo replace dev.Id with UUID
-                logger.debug($"added {dev.Name} (RSSI {dev.Rssi} Id {dev.Id})");
-                deviceList.Add(dev);
-            }
+
+            BLEDevice bd = new BLEDevice(dev);
+            logger.debug($"added {bd.name} (RSSI {bd.rssi} UUID {bd.uuid})");
+            bleDeviceList.Add(bd);
         }
 
         async Task<bool> _requestPermissionsAsync()
