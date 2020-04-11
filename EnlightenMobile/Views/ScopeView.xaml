@@ -39,19 +39,39 @@
 
                 <!-- The all-important spectral chart -->
 
-                <telerikChart:RadCartesianChart x:Name="chart">
+                <telerikChart:RadCartesianChart x:Name="chart"
+                                                HorizontalOptions="FillAndExpand"
+                                                VerticalOptions="FillAndExpand"
+                                                BackgroundColor="#000">
+
+                    <!-- axes -->
                     <telerikChart:RadCartesianChart.HorizontalAxis>
-                        <telerikChart:NumericalAxis />
+                        <telerikChart:NumericalAxis ShowLabels="True"
+                                                    LabelFitMode="MultiLine"
+                                                    LabelTextColor="#999"/>
                     </telerikChart:RadCartesianChart.HorizontalAxis>
                     <telerikChart:RadCartesianChart.VerticalAxis>
-                        <telerikChart:NumericalAxis />
+                        <telerikChart:NumericalAxis ShowLabels="True"
+                                                    LabelFitMode="MultiLine"
+                                                    LabelTextColor="#999"/>
                     </telerikChart:RadCartesianChart.VerticalAxis>
+
+                    <!-- series data -->
                     <telerikChart:RadCartesianChart.Series>
                         <telerikChart:ScatterLineSeries XValueBinding="pixel"
                                                         YValueBinding="intensity"
-                                                        ItemsSource="{Binding chartData}" />
+                                                        Stroke="#27c0a1"
+                                                        ItemsSource="{Binding chartData}" >
+                        </telerikChart:ScatterLineSeries>
                     </telerikChart:RadCartesianChart.Series>
-                </telerikChart:RadCartesianChart>
+
+                    <!-- pan and zoom -->
+                    <telerikChart:RadCartesianChart.ChartBehaviors>
+                        <telerikChart:ChartPanAndZoomBehavior ZoomMode="Both"
+                                                              PanMode="Both" 
+                                                              HandleDoubleTap="True"/>
+                        </telerikChart:RadCartesianChart.ChartBehaviors>
+                    </telerikChart:RadCartesianChart>
 
             </StackLayout>
 

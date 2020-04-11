@@ -1,5 +1,13 @@
 # Version History
 
+- 2020-04-11 0.3.9
+    - device UUID docs
+    - added BLEDevice deviceInfo accessors
+    - Telerik graph fixes
+        - background color
+        - series color
+        - enabled pan & zoom
+        - configured x & y axis labels
 - 2020-04-11 0.3.8
     - fixed ListView selection
     - uuid not working on iOS?

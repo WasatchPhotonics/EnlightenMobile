@@ -45,7 +45,7 @@
                                     <Label TextColor="#27c0a1" Text="{Binding rssi, StringFormat='RSSI: {0}'}" FontSize="Large"/>
                                     <Label TextColor="#2994d3" Text="{Binding name}" FontSize="Large"/>
                                 </StackLayout>
-                                <Label TextColor="#cccccc" Text="{Binding uuid}"/>
+                                <Label TextColor="#cccccc" Text="{Binding id}"/>
                             </StackLayout>
                         </ViewCell>
                     </DataTemplate>

@@ -73,5 +73,13 @@ namespace EnlightenMobile
             }
             return sb.ToString();
         }
+
+        public static string toASCII(byte[] data)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (var b in data)
+                sb.Append((char)b);
+            return sb.ToString();
+        }
     }
 }

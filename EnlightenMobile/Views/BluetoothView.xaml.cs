@@ -250,6 +250,24 @@ namespace EnlightenMobile.Views
             }
             showProgress(.15);
 
+            logger.debug("polling device for other services");
+            var allServices = await bleDevice.device.GetServicesAsync();
+            foreach (var thisService in allServices)
+            {
+                if (thisService.Id == primaryServiceId)
+                    continue;
+
+                logger.debug($"examining service {thisService.Name} (ID {thisService.Id})");
+                var characteristics = await thisService.GetCharacteristicsAsync();
+                foreach (var c in characteristics)
+                { 
+                    // logger.hexdump(c.Value, prefix: $"  {c.Uuid}: {c.Name} = ");
+                    string s = Util.toASCII(c.Value);
+                    logger.debug($"  storing {c.Name} = {s}");
+                    bleDevice.deviceInfo[c.Name] = s;
+                }
+            }
+
             // populate Spectrometer
             logger.debug("initializing spectrometer");
             _ = await spec.initAsync(characteristicsByName, showProgress);
@@ -268,7 +286,7 @@ namespace EnlightenMobile.Views
 
         Guid _makeGuid(string id)
         {
-            // All Wasatch Photonics SiG UUIDs follow this format
+            // All Wasatch Photonics SiG Characteristic UUIDs follow this format
             const string prefix = "D1A7";
             const string suffix = "-AF78-4449-A34F-4DA1AFAF51BC";
             return new Guid(string.Format($"{prefix}{id}{suffix}"));
@@ -279,20 +297,19 @@ namespace EnlightenMobile.Views
         // Model).
         void _bleAdapterDeviceDiscovered(object sender, DeviceEventArgs e)
         {
-            var dev = e.Device; // an IDevice
-            // logger.debug($"discovered {dev.Id}");
-
+            var device = e.Device; // an IDevice
+            
             // ignore anything without a name
-            if (dev.Name is null || dev.Name.Length == 0)
+            if (device.Name is null || device.Name.Length == 0)
                 return;
 
             // ignore anything that doesn't have "WP" or "SiG" in the name
-            var nameLC = dev.Name.ToLower();
+            var nameLC = device.Name.ToLower();
             if (!nameLC.Contains("wp") && !nameLC.Contains("sig"))
                 return;
        
-            BLEDevice bd = new BLEDevice(dev);
-            logger.debug($"discovered {bd.name} (RSSI {bd.rssi} UUID {bd.uuid})");
+            BLEDevice bd = new BLEDevice(device);
+            logger.debug($"discovered {bd.name} (RSSI {bd.rssi} Id {device.Id})");
             bleDeviceList.Add(bd);
         }
 
