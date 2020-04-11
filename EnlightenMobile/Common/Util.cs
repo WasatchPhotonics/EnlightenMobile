@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using Xamarin.Forms;
 using EnlightenMobile.Services;
 
@@ -50,6 +51,27 @@ namespace EnlightenMobile
                     wavenumbers[i] = wavenumber;
             }
             return wavenumbers;
+        }
+
+        // Format a 16-byte array like a standard UUID
+        //
+        // 00000000-0000-1000-8000-00805F9B34FB
+        //  0 1 2 3  4 5  6 7  8 9  a b c d e f
+        //
+        // You'd think something like this would already be in Plugin.BLE, and
+        // probably it is... *shrug*
+        public static string formatUUID(byte[] data)
+        {
+            if (data.Length != 16)
+                return "invalid-uuid";
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < 16; i++)
+            {
+                sb.Append(string.Format("{0:x2}", data[i]));
+                if (i == 3 || i == 5 || i == 7 || i == 9)
+                    sb.Append("-");
+            }
+            return sb.ToString();
         }
     }
 }

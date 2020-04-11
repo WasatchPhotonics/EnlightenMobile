@@ -1,10 +1,13 @@
 # Version History
 
+- 2020-04-11 0.3.8
+    - fixed ListView selection
+    - uuid not working on iOS?
 - 2020-04-11 0.3.7
     - moved from Telerik.Trial to Telerik
     - added BLEDevice
     - parsed UUID
-    - working on cross-platform ListView selection color
+    - working on ListView selection 
 - 2020-04-10 0.3.6
     - moved chart from Microcharts to Telerik.Trial for axes, overlays, pan/zoom etc 
       (layout needs tuning, but works on Droid and iOS)

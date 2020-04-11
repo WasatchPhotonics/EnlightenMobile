@@ -7,10 +7,12 @@ using EnlightenMobile.Common;
 namespace EnlightenMobile.Models
 {
     // Allows the Spectrometer "model" to flow-up progress updates to the 
-    // ScopeViewModel's acquireProgressBar.  Feels like cheating, but I don't
+    // ScopeViewModel's acquireProgressBar.  Feels like cheating, but I didn't
     // know how else to do it.  Would probably be more elegant to give
     // Spectrometer an acquisitionProgress property and raise PropertyChanged 
-    // events from it, to which the ScopeViewModel would be subscribed.
+    // events from it, to which the ScopeViewModel would be subscribed.  This
+    // would probably be done by having Spectrometer implement INotifyPropertyChanged,
+    // then it could notify observers of its acquisitionProgress value.
     public delegate void ProgressBarDelegate(double progress);
 
     // This more-or-less corresponds to WasatchNET.Spectrometer, or 

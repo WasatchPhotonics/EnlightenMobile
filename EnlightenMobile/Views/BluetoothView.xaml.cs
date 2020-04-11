@@ -127,7 +127,8 @@ namespace EnlightenMobile.Views
             bleDevice = listView.SelectedItem as BLEDevice;
             logger.debug($"selected device {bleDevice.name}");
 
-            // update color :-(
+            // update color, because ListView doesn't have a cross-platform
+            // SelectedBackgroundColor property :-(
             foreach (var dev in bleDeviceList)
                 dev.selected = dev.device.Id == bleDevice.device.Id;
 
@@ -289,11 +290,9 @@ namespace EnlightenMobile.Views
             var nameLC = dev.Name.ToLower();
             if (!nameLC.Contains("wp") && !nameLC.Contains("sig"))
                 return;
-
-            // not sure if we need to de-dupe or not
-
+       
             BLEDevice bd = new BLEDevice(dev);
-            logger.debug($"added {bd.name} (RSSI {bd.rssi} UUID {bd.uuid})");
+            logger.debug($"discovered {bd.name} (RSSI {bd.rssi} UUID {bd.uuid})");
             bleDeviceList.Add(bd);
         }
 
