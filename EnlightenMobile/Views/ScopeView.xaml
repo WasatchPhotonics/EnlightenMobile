@@ -9,8 +9,57 @@
              x:Class="EnlightenMobile.Views.ScopeView"
              xmlns:vm="clr-namespace:EnlightenMobile.ViewModels"
              Title="{Binding title}"
-             BackgroundColor="#333" 
-             xmlns:telerikChart="clr-namespace:Telerik.XamarinForms.Chart;assembly=Telerik.XamarinForms.Chart">
+             BackgroundColor="#333"
+             xmlns:telerikDataControls="clr-namespace:Telerik.XamarinForms.DataControls;assembly=Telerik.XamarinForms.DataControls"
+             xmlns:telerikPrimitives="clr-namespace:Telerik.XamarinForms.Primitives;assembly=Telerik.XamarinForms.Primitives"
+             xmlns:telerikChart="clr-namespace:Telerik.XamarinForms.Chart;assembly=Telerik.XamarinForms.Chart"
+             xmlns:telerikInput="clr-namespace:Telerik.XamarinForms.Input;assembly=Telerik.XamarinForms.Input">
+
+    <ContentPage.Resources>
+            <Style TargetType="telerikDataControls:SpinnerItemView" x:Key="ItemStyle">
+                <Setter Property="BackgroundColor" Value="#999"/>
+            </Style>
+            <Style TargetType="telerikDataControls:SpinnerItemView" x:Key="SelectedItemStyle">
+                <Setter Property="BackgroundColor" Value="#ccc"/>
+            </Style>
+            <Style TargetType="Label" x:Key="displayLabelStyle">
+                <Setter Property="TextColor" Value="#ccc"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="Center"/>
+                <Setter Property="HeightRequest" Value="50"/>
+                <Setter Property="BackgroundColor" Value="#555"/>
+                <Setter Property="Padding" Value="2, 15, 2, 15" />
+            </Style>
+            <Style TargetType="telerikInput:PickerPopupHeaderView" x:Key="headerStyle">
+                <Setter Property="BackgroundColor" Value="#444"/>
+                <Setter Property="HeightRequest" Value="50"/>
+                <Setter Property="Margin" Value="0"/>
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="HorizontalOptions" Value="FillAndExpand"/>
+            </Style>
+            <Style TargetType="Label" x:Key="headerLabelStyle">
+                <Setter Property="TextColor" Value="#eee"/>
+                <Setter Property="HorizontalOptions" Value="Center"/>
+                <Setter Property="VerticalOptions" Value="Center"/>
+                <Setter Property="FontSize" Value="Title"/>
+            </Style>
+            <Style TargetType="telerikInput:PickerPopupFooterView" x:Key="footerStyle">
+                <Setter Property="BackgroundColor" Value="Transparent"/>
+            </Style>
+            <Style TargetType="telerikInput:PickerPopupContentView" x:Key="popupViewStyle">
+                <Setter Property="BackgroundColor" Value="#555"/>
+            </Style>
+            <Style TargetType="Button" x:Key="acceptButtonStyle">
+                <Setter Property="BackgroundColor" Value="Transparent"/>
+                <Setter Property="Text" Value="Ok"/>
+                <Setter Property="TextColor" Value="#eee"/>
+            </Style>
+            <Style TargetType="Button" x:Key="cancelButtonStyle">
+                <Setter Property="BackgroundColor" Value="Transparent"/>
+                <Setter Property="Text" Value="Cancel"/>
+                <Setter Property="TextColor" Value="#eee"/>
+            </Style>
+    </ContentPage.Resources>
 
     <ContentPage.BindingContext>
         <vm:ScopeViewModel/>
@@ -32,10 +81,15 @@
 			</Grid.ColumnDefinitions>
 			
             <!-- Chart Block: Keep together (will be "left" in landscape mode) -->
-            <StackLayout Grid.Row="0" Grid.Column="0" x:Name="stackChart" VerticalOptions="FillAndExpand">
-
+            <StackLayout Grid.Row="0"
+                         Grid.Column="0"
+                         x:Name="stackChart"
+                         Spacing="0"
+                         VerticalOptions="FillAndExpand">
+                
                 <!-- Page header (when in portrait mode) -->
-                <Image x:Name="logoVertical" Source="enlightenLOGO" WidthRequest="300" BackgroundColor="#333" />
+                <Image x:Name="logoVertical" Source="enlightenLOGO" WidthRequest="300" BackgroundColor="#333"
+                       Margin="0, 5, 0, 5" />
 
                 <!-- The all-important spectral chart -->
 
@@ -49,7 +103,11 @@
                     <telerikChart:RadCartesianChart.HorizontalAxis>
                         <telerikChart:NumericalAxis ShowLabels="True"
                                                     LabelFitMode="MultiLine"
-                                                    LabelTextColor="#999"/>
+                                                    LabelTextColor="#999"
+                                                    LabelFormat="{Binding xAxisLabelFormat}"
+                                                    Minimum="{Binding xAxisMinimum}"
+                                                    Maximum="{Binding xAxisMaximum}"
+                                                    />
                     </telerikChart:RadCartesianChart.HorizontalAxis>
                     <telerikChart:RadCartesianChart.VerticalAxis>
                         <telerikChart:NumericalAxis ShowLabels="True"
@@ -59,7 +117,8 @@
 
                     <!-- series data -->
                     <telerikChart:RadCartesianChart.Series>
-                        <telerikChart:ScatterLineSeries XValueBinding="pixel"
+                        <!-- I'd like to bind XValueBinding="{Binding xAxisOptionName}", but that doesn't seem allowed -->
+                        <telerikChart:ScatterLineSeries XValueBinding="xValue"
                                                         YValueBinding="intensity"
                                                         Stroke="#27c0a1"
                                                         ItemsSource="{Binding chartData}" >
@@ -71,9 +130,8 @@
                         <telerikChart:ChartPanAndZoomBehavior ZoomMode="Both"
                                                               PanMode="Both" 
                                                               HandleDoubleTap="True"/>
-                        </telerikChart:RadCartesianChart.ChartBehaviors>
-                    </telerikChart:RadCartesianChart>
-
+                    </telerikChart:RadCartesianChart.ChartBehaviors>
+                </telerikChart:RadCartesianChart>
             </StackLayout>
 
             <!-- User Controls: keep together (will be "right" in landscape mode) -->
@@ -88,11 +146,11 @@
 
                         <!-- initialize to Portrait mode (1 col, 2 rows) -->
 			            <Grid.RowDefinitions>
-				            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-				            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-				            <RowDefinition Height="Auto"/>
+				            <RowDefinition Height="Auto"/> <!-- Logo -->
+                            <RowDefinition Height="Auto"/> <!-- ProgressBar -->
+				            <RowDefinition Height="Auto"/> <!-- Buttons -->
+                            <RowDefinition Height="Auto"/> <!-- Acquisition Parameters -->
+				            <RowDefinition Height="Auto"/> <!-- Status Bar -->
 			            </Grid.RowDefinitions>
 			            <Grid.ColumnDefinitions>
 				            <ColumnDefinition Width="*"/>
@@ -102,7 +160,9 @@
                         <Image Grid.Row="0" Grid.Column="0" x:Name="logoHorizontal" WidthRequest="300" Source="enlightenLOGO" IsVisible="False"/>
 
                         <!-- Acquisition ProgressBar -->
-                        <ProgressBar Grid.Row="1" Grid.Column="0" Progress="{Binding acquisitionProgress}" ProgressColor="#2994d3"/>
+                        <ProgressBar Grid.Row="1" Grid.Column="0"
+                                     Progress="{Binding acquisitionProgress}"
+                                     ProgressColor="#2994d3"/>
 
                         <!-- Command buttons -->
                         <StackLayout Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
@@ -144,7 +204,38 @@
                                        Text="{Binding scansToAverage}" 
                                        Placeholder="1" 
                                        Keyboard="Numeric" />
-                            </FlexLayout>    
+                            </FlexLayout>
+
+                            <FlexLayout JustifyContent="SpaceBetween">
+                                <Label Text="X-Axis" />
+                                <telerikInput:RadListPicker Placeholder="x-axis" 
+                                                            ItemsSource="{Binding xAxisOptions}"
+                                                            SelectedItem="{Binding xAxisOption}"
+                                                            DisplayMemberPath="displayName"
+                                                            HorizontalOptions="FillAndExpand"
+                                                            HeightRequest="30"
+                                                            DisplayLabelStyle="{StaticResource displayLabelStyle}"
+                                                            ItemStyle="{StaticResource ItemStyle}"
+                                                            SelectedItemStyle="{StaticResource SelectedItemStyle}">
+                                    <telerikInput:RadListPicker.ItemTemplate>
+                                        <DataTemplate>
+                                            <Label Text="{Binding name}"
+                                                    HorizontalTextAlignment="Center"
+                                                    TextColor="#555" />
+                                        </DataTemplate>
+                                    </telerikInput:RadListPicker.ItemTemplate>
+                                    <telerikInput:RadListPicker.SelectorSettings>
+                                        <telerikInput:PickerPopupSelectorSettings PopupOutsideBackgroundColor="#4A4949F"
+                                                                                  PopupViewStyle="{StaticResource popupViewStyle}"
+                                                                                  HeaderStyle="{StaticResource headerStyle}"
+                                                                                  HeaderLabelText="Select X-Axis"
+                                                                                  HeaderLabelStyle="{StaticResource headerLabelStyle}"
+                                                                                  FooterStyle="{StaticResource footerStyle}"
+                                                                                  AcceptButtonStyle="{StaticResource acceptButtonStyle}"
+                                                                                  CancelButtonStyle="{StaticResource cancelButtonStyle}"/>
+                                    </telerikInput:RadListPicker.SelectorSettings>
+                                </telerikInput:RadListPicker>
+                            </FlexLayout>
 
                             <StackLayout Grid.Row="0" Grid.Column="0" Orientation="Horizontal" HorizontalOptions="FillAndExpand" >
                                 <Label Text="Note"/>

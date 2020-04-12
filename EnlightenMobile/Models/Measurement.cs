@@ -22,27 +22,26 @@ namespace EnlightenMobile.Models
 
         Logger logger = Logger.getInstance();
 
-        public Measurement(Spectrometer spec = null)
+        public Measurement(Spectrometer spec)
         {
             this.spec = spec;
 
-            if (spec is null)
+            if (spec.lastSpectrum is null)
             {
                 // for testing, default measurements with a sine-wave
-                List<double> spectra = new List<double>();
+                raw = new double[spec.pixels];
                 double halfMax = 50000.0 / 2.0;
-                for (int x = 0; x < 1952; x++)
-                    spectra.Add(halfMax + halfMax * Math.Sin(x * Math.PI * 2 / 1952.0));
-                raw = spectra.ToArray();
+                for (int x = 0; x < raw.Length; x++)
+                    raw[x] = halfMax + halfMax * Math.Sin(x * Math.PI * 2 / raw.Length);
             }
             else
             {
                 raw = spec.lastSpectrum;
-                dark = spec.dark;
             }
 
             processed = (double[]) raw.Clone();
 
+            dark = spec.dark;
             applyDark();
            
             var serialNumber = spec is null ? "sim" : spec.eeprom.serialNumber;

@@ -27,7 +27,8 @@ namespace EnlightenMobile.Models
         Dictionary<string, ICharacteristic> characteristicsByName = null;
 
         // hardware model
-        public uint pixels = 1952;
+        public uint pixels;
+        public float laserExcitationNM;
         public EEPROM eeprom = EEPROM.getInstance();
         public Battery battery = new Battery();
 
@@ -38,7 +39,7 @@ namespace EnlightenMobile.Models
         public double[] lastSpectrum;
         public double[] dark;
 
-        public Measurement measurement = new Measurement();
+        public Measurement measurement;
         public string note {get; set;} = "your text here";
         public bool acquiring;
         ushort lastCRC;
@@ -62,7 +63,19 @@ namespace EnlightenMobile.Models
             return instance;
         }
 
-        Spectrometer() { }
+        Spectrometer()
+        {
+            // Provide some test defaults so we can play with the chart etc while
+            // disconnected.  These will all be overwritten when we read an EEPROM.
+            pixels = 1952;
+            laserExcitationNM = 785.0f;
+            wavelengths = new double[pixels];
+            for (int i = 0; i < pixels; i++)
+                wavelengths[i] = laserExcitationNM + 15 + i / 10.0;
+            wavenumbers = Util.wavelengthsToWavenumbers(laserExcitationNM, wavelengths);
+
+            measurement = new Measurement(this);
+        }
 
         public async Task<bool> initAsync(
                 Dictionary<string, ICharacteristic> characteristicsByName, 
@@ -135,13 +148,20 @@ namespace EnlightenMobile.Models
             // post-process EEPROM
             ////////////////////////////////////////////////////////////////////
 
-            logger.debug("computing wavecal");
-            wavelengths = Util.generateWavelengths(eeprom.actualPixelsHoriz, eeprom.wavecalCoeffs);
-            wavenumbers = Util.wavelengthsToWavenumbers(eeprom.laserExcitationWavelengthNMFloat, wavelengths);
+            pixels = eeprom.activePixelsHoriz;
+            laserExcitationNM = eeprom.laserExcitationWavelengthNMFloat;
 
-            logger.debug("used laser excitation {0:f2}nm", eeprom.laserExcitationWavelengthNMFloat);
-            logger.debug("generated wavelengths ({0:f2}, {1:f2})", wavelengths[0], wavelengths[wavelengths.Length-1]);
-            logger.debug("generated wavenumbers ({0:f2}, {1:f2})", wavenumbers[0], wavenumbers[wavenumbers.Length-1]);
+            logger.debug("computing wavecal");
+            wavelengths = Util.generateWavelengths(pixels, eeprom.wavecalCoeffs);
+
+            if (laserExcitationNM > 0)
+                wavenumbers = Util.wavelengthsToWavenumbers(laserExcitationNM, wavelengths);
+            else
+                wavenumbers = null;
+
+            logger.debug("used laser excitation {0:f2}nm", laserExcitationNM);
+            logger.debug("generated wavelengths ({0:f2}, {1:f2})", wavelengths[0], wavelengths[pixels-1]);
+            logger.debug("generated wavenumbers ({0:f2}, {1:f2})", wavenumbers[0], wavenumbers[pixels-1]);
 
             ////////////////////////////////////////////////////////////////////
             // finish initializing Spectrometer 

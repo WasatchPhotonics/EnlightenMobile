@@ -47,17 +47,18 @@ namespace EnlightenMobile.ViewModels
             refreshCmd = new Command(() => { _ = doAcquireAsync(); }); 
             saveCmd    = new Command(() => { _ = doSave        (); });
 
-            chartData = new ObservableCollection<ChartDataPoint>();
-            double halfMax = 50000.0 / 2.0;
-            for (int i = 0; i < 1952; i++)
+            logger.debug("SVM: instantiating XAxisOptions");
+            xAxisOptions = new ObservableCollection<XAxisOption>()
             {
-                double intensity = halfMax + halfMax * Math.Sin(i * Math.PI * 2 / 1952.0);
-                ChartDataPoint cdp = new ChartDataPoint() { intensity = intensity,
-                                                            pixel = i,
-                                                            wavelength = 800 + i/2.0,
-                                                            wavenumber = i*1.1 };
-                chartData.Add(cdp);
-            }
+                // these names must match the fields in ChartDataPoint
+                new XAxisOption() { name = "pixel", unit = "px" },
+                new XAxisOption() { name = "wavelength", unit = "nm" },
+                new XAxisOption() { name = "wavenumber", unit = "cm⁻¹" }
+            };
+            xAxisOption = xAxisOptions[0];
+
+            chartData = new ObservableCollection<ChartDataPoint>();
+            updateChart();
 
             logger.debug("SVM: finished ctor");
         } 
@@ -71,6 +72,51 @@ namespace EnlightenMobile.ViewModels
         public string title
         {
             get => "Scope Mode";
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        // X-Axis
+        ////////////////////////////////////////////////////////////////////////
+
+        public ObservableCollection<XAxisOption> xAxisOptions { get; set; }
+        public XAxisOption xAxisOption
+        {
+            get => _xAxisOption;
+            set
+            {
+                logger.debug($"xAxisOption -> {value}");
+                _xAxisOption = value;
+                updateChart();
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(xAxisLabelFormat)));
+            }
+        }
+        XAxisOption _xAxisOption;
+
+        public double xAxisMinimum
+        {
+            get => _xAxisMinimum;
+            set
+            {
+                _xAxisMinimum = value;
+               PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(xAxisMinimum)));
+            }
+        }
+        double _xAxisMinimum;
+
+        public double xAxisMaximum
+        {
+            get => _xAxisMaximum;
+            set
+            {
+                _xAxisMaximum = value;
+               PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(xAxisMaximum)));
+            }
+        }
+        double _xAxisMaximum;
+
+        public string xAxisLabelFormat
+        {
+            get => xAxisOption.name == "pixel" ? "F0" : "F2";
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -210,13 +256,7 @@ namespace EnlightenMobile.ViewModels
             var ok = await spec.takeOneAveragedAsync(showProgress);
             if (ok)
             {
-                chartData = generateChartData();
-
-                logger.debug("sending updates on chartData and spectrumMax");
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(chartData)));
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(spectrumMax)));
-                logger.debug("updates sent");
-
+                updateChart();
                 checkForBadMeasurement();
             }
 
@@ -226,6 +266,13 @@ namespace EnlightenMobile.ViewModels
             isRefreshing = false;
 
             return ok;
+        }
+
+        void updateChart()
+        {
+            chartData = generateChartData();
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(chartData)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(spectrumMax)));
         }
 
         // This is a callback (delegate) passed down into Spectrometer so it can
@@ -273,31 +320,33 @@ namespace EnlightenMobile.ViewModels
 
         private ObservableCollection<ChartDataPoint> generateChartData()
         {
-            if (spec is null)
-                return null;
+            // use last Measurement from the Spectrometer
+            uint pixels = spec.pixels;
+            double[] intensities = spec.measurement.processed;
 
-            // get last-acquired spectrum
-            Measurement m = spec.measurement;
-            if (m is null)
-                return null;
+            // pick our x-axis
+            double[] xAxis = null;
+            if (xAxisOption.name == "pixel")
+            {
+                xAxis = new double[pixels];
+                for (int i = 0; i < spec.pixels; i++)
+                    xAxis[i] = i;
+            }
+            else if (xAxisOption.name == "wavelength")
+                xAxis = spec.wavelengths;
+            else if (xAxisOption.name == "wavenumber")
+                xAxis = spec.wavenumbers;
 
-            if (m.processed is null || spec.wavelengths is null)
+            if (intensities is null || xAxis is null)
                 return null;
 
             ObservableCollection<ChartDataPoint> data = new ObservableCollection<ChartDataPoint>();
-            int count = m.processed.Length;
-            var raman = spec.wavenumbers != null;
-            for (int i = 0; i < count; i++)
-            {
-                var point = new ChartDataPoint() {
-                    intensity = m.processed[i],
-                    pixel = i,
-                    wavelength = spec.wavelengths[i] };
-                if (raman)
-                    point.wavenumber = spec.wavenumbers[i];
-                data.Add(point);
-            }
-            logger.debug($"replacing chartData with {chartData.Count} elements");
+            for (int i = 0; i < pixels; i++)
+                data.Add(new ChartDataPoint() { intensity = intensities[i], xValue = xAxis[i] });
+
+            xAxisMinimum = xAxis[0];
+            xAxisMaximum = xAxis[pixels-1];
+
             return data;
         }
 

@@ -1,5 +1,7 @@
 # Version History
 
+- 2020-04-12 0.3.11
+    - added selectable Scope x-axis
 - 2020-04-12 0.3.10
     - fixed ScopeView graph overlap on iOS
 - 2020-04-11 0.3.9
