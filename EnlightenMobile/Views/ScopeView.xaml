@@ -24,8 +24,8 @@
 
             <!-- initialize to Portrait mode (1 col, 2 rows) -->
 			<Grid.RowDefinitions>
-				<RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
+				<RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
 			</Grid.RowDefinitions>
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*"/>
@@ -42,6 +42,7 @@
                 <telerikChart:RadCartesianChart x:Name="chart"
                                                 HorizontalOptions="FillAndExpand"
                                                 VerticalOptions="FillAndExpand"
+                                                MinimumHeightRequest="100"
                                                 BackgroundColor="#000">
 
                     <!-- axes -->
@@ -83,21 +84,33 @@
                          Command="{Binding refreshCmd}">
 
                 <ScrollView>
-                    <StackLayout HorizontalOptions="FillAndExpand">
+		            <Grid x:Name="innerGrid" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
 
+                        <!-- initialize to Portrait mode (1 col, 2 rows) -->
+			            <Grid.RowDefinitions>
+				            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+				            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+				            <RowDefinition Height="Auto"/>
+			            </Grid.RowDefinitions>
+			            <Grid.ColumnDefinitions>
+				            <ColumnDefinition Width="*"/>
+			            </Grid.ColumnDefinitions>
+			
                         <!-- Page header if in landscape mode -->
-                        <Image x:Name="logoHorizontal" WidthRequest="300" Source="enlightenLOGO" IsVisible="False"/>
+                        <Image Grid.Row="0" Grid.Column="0" x:Name="logoHorizontal" WidthRequest="300" Source="enlightenLOGO" IsVisible="False"/>
 
                         <!-- Acquisition ProgressBar -->
-                        <ProgressBar Progress="{Binding acquisitionProgress}" ProgressColor="#2994d3"/>
+                        <ProgressBar Grid.Row="1" Grid.Column="0" Progress="{Binding acquisitionProgress}" ProgressColor="#2994d3"/>
 
                         <!-- Command buttons -->
-                        <StackLayout Orientation="Horizontal">
+                        <StackLayout Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
                             <Button Text="Acquire" Command="{Binding acquireCmd}" BackgroundColor="{Binding acquireButtonColor}" />
                             <Button Text="Save" Command="{Binding saveCmd}" />
                         </StackLayout>
 
-                        <StackLayout HorizontalOptions="FillAndExpand" Padding="20, 10, 20, 10">
+                        <StackLayout Grid.Row="3" Grid.Column="0" HorizontalOptions="FillAndExpand" Padding="20, 10, 20, 10">
                             <FlexLayout JustifyContent="SpaceBetween">
                                 <Label  Text="Fire Laser" MinimumWidthRequest="75" />
                                 <Switch IsToggled="{Binding laserEnabled}" />
@@ -133,7 +146,7 @@
                                        Keyboard="Numeric" />
                             </FlexLayout>    
 
-                            <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand" >
+                            <StackLayout Grid.Row="0" Grid.Column="0" Orientation="Horizontal" HorizontalOptions="FillAndExpand" >
                                 <Label Text="Note"/>
                                 <Entry x:Name="entryNote"
                                        Text="{Binding note}" 
@@ -144,12 +157,12 @@
 
 
                         <!-- Status Bar -->
-                        <FlexLayout JustifyContent="SpaceBetween" BackgroundColor="#444" Padding="10">
+                        <FlexLayout Grid.Row="4" Grid.Column="0" JustifyContent="SpaceBetween" BackgroundColor="#444" Padding="10">
                             <Label Text="{Binding spectrumMax}" />
                             <Label Text="{Binding batteryState, StringFormat='Batt: {0}'}" TextColor="{Binding batteryColor}" />
                         </FlexLayout>
 
-                    </StackLayout>
+                    </Grid>
                 </ScrollView>
             </RefreshView>
         </Grid>
