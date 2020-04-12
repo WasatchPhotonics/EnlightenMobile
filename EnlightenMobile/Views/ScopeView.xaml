@@ -16,49 +16,42 @@
              xmlns:telerikInput="clr-namespace:Telerik.XamarinForms.Input;assembly=Telerik.XamarinForms.Input">
 
     <ContentPage.Resources>
-            <Style TargetType="telerikDataControls:SpinnerItemView" x:Key="ItemStyle">
-                <Setter Property="BackgroundColor" Value="#999"/>
-            </Style>
-            <Style TargetType="telerikDataControls:SpinnerItemView" x:Key="SelectedItemStyle">
-                <Setter Property="BackgroundColor" Value="#ccc"/>
-            </Style>
-            <Style TargetType="Label" x:Key="displayLabelStyle">
-                <Setter Property="TextColor" Value="#ccc"/>
-                <Setter Property="VerticalTextAlignment" Value="Center"/>
-                <Setter Property="HorizontalTextAlignment" Value="Center"/>
-                <Setter Property="HeightRequest" Value="50"/>
-                <Setter Property="BackgroundColor" Value="#555"/>
-                <Setter Property="Padding" Value="2, 15, 2, 15" />
-            </Style>
-            <Style TargetType="telerikInput:PickerPopupHeaderView" x:Key="headerStyle">
-                <Setter Property="BackgroundColor" Value="#444"/>
-                <Setter Property="HeightRequest" Value="50"/>
-                <Setter Property="Margin" Value="0"/>
-                <Setter Property="Padding" Value="0"/>
-                <Setter Property="HorizontalOptions" Value="FillAndExpand"/>
-            </Style>
-            <Style TargetType="Label" x:Key="headerLabelStyle">
-                <Setter Property="TextColor" Value="#eee"/>
-                <Setter Property="HorizontalOptions" Value="Center"/>
-                <Setter Property="VerticalOptions" Value="Center"/>
-                <Setter Property="FontSize" Value="Title"/>
-            </Style>
-            <Style TargetType="telerikInput:PickerPopupFooterView" x:Key="footerStyle">
-                <Setter Property="BackgroundColor" Value="Transparent"/>
-            </Style>
-            <Style TargetType="telerikInput:PickerPopupContentView" x:Key="popupViewStyle">
-                <Setter Property="BackgroundColor" Value="#555"/>
-            </Style>
-            <Style TargetType="Button" x:Key="acceptButtonStyle">
-                <Setter Property="BackgroundColor" Value="Transparent"/>
-                <Setter Property="Text" Value="Ok"/>
-                <Setter Property="TextColor" Value="#eee"/>
-            </Style>
-            <Style TargetType="Button" x:Key="cancelButtonStyle">
-                <Setter Property="BackgroundColor" Value="Transparent"/>
-                <Setter Property="Text" Value="Cancel"/>
-                <Setter Property="TextColor" Value="#eee"/>
-            </Style>
+        <Style TargetType="Label" x:Key="displayLabelStyle">
+            <Setter Property="VerticalTextAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="10, 5, 10, 5" />
+            <Setter Property="TextColor" Value="#ccc"/>
+            <Setter Property="BackgroundColor" Value="#555"/>
+            <Setter Property="FontSize" Value="Medium"/>
+        </Style>
+        <Style TargetType="telerikDataControls:SpinnerItemView" x:Key="ItemStyle">
+            <Setter Property="BackgroundColor" Value="#999"/>
+        </Style>
+        <Style TargetType="telerikDataControls:SpinnerItemView" x:Key="SelectedItemStyle">
+            <Setter Property="BackgroundColor" Value="#ccc"/>
+        </Style>
+        <Style TargetType="telerikInput:PickerPopupHeaderView" x:Key="headerStyle">
+            <Setter Property="BackgroundColor" Value="#444"/>
+            <Setter Property="HeightRequest" Value="50"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="HorizontalOptions" Value="FillAndExpand"/>
+        </Style>
+        <Style TargetType="Label" x:Key="headerLabelStyle">
+            <Setter Property="TextColor" Value="#eee"/>
+            <Setter Property="HorizontalOptions" Value="Center"/>
+            <Setter Property="VerticalOptions" Value="Center"/>
+            <Setter Property="FontSize" Value="Title"/>
+        </Style>
+        <Style TargetType="telerikInput:PickerPopupFooterView" x:Key="footerStyle">
+            <Setter Property="BackgroundColor" Value="Transparent"/>
+        </Style>
+        <Style TargetType="telerikInput:PickerPopupContentView" x:Key="popupViewStyle">
+            <Setter Property="BackgroundColor" Value="#555"/>
+        </Style>
+        <Style TargetType="Button" x:Key="pickerButtonStyle">
+            <Setter Property="BackgroundColor" Value="Transparent"/>
+            <Setter Property="TextColor" Value="#eee"/>
+        </Style>
     </ContentPage.Resources>
 
     <ContentPage.BindingContext>
@@ -97,6 +90,7 @@
                                                 HorizontalOptions="FillAndExpand"
                                                 VerticalOptions="FillAndExpand"
                                                 MinimumHeightRequest="100"
+                                                HeightRequest="400"
                                                 BackgroundColor="#000">
 
                     <!-- axes -->
@@ -212,16 +206,14 @@
                                                             ItemsSource="{Binding xAxisOptions}"
                                                             SelectedItem="{Binding xAxisOption}"
                                                             DisplayMemberPath="displayName"
-                                                            HorizontalOptions="FillAndExpand"
-                                                            HeightRequest="30"
                                                             DisplayLabelStyle="{StaticResource displayLabelStyle}"
                                                             ItemStyle="{StaticResource ItemStyle}"
                                                             SelectedItemStyle="{StaticResource SelectedItemStyle}">
                                     <telerikInput:RadListPicker.ItemTemplate>
                                         <DataTemplate>
                                             <Label Text="{Binding name}"
-                                                    HorizontalTextAlignment="Center"
-                                                    TextColor="#555" />
+                                                   HorizontalTextAlignment="Center"
+                                                   TextColor="#555" />
                                         </DataTemplate>
                                     </telerikInput:RadListPicker.ItemTemplate>
                                     <telerikInput:RadListPicker.SelectorSettings>
@@ -231,8 +223,8 @@
                                                                                   HeaderLabelText="Select X-Axis"
                                                                                   HeaderLabelStyle="{StaticResource headerLabelStyle}"
                                                                                   FooterStyle="{StaticResource footerStyle}"
-                                                                                  AcceptButtonStyle="{StaticResource acceptButtonStyle}"
-                                                                                  CancelButtonStyle="{StaticResource cancelButtonStyle}"/>
+                                                                                  AcceptButtonStyle="{StaticResource pickerButtonStyle}"
+                                                                                  CancelButtonStyle="{StaticResource pickerButtonStyle}"/>
                                     </telerikInput:RadListPicker.SelectorSettings>
                                 </telerikInput:RadListPicker>
                             </FlexLayout>

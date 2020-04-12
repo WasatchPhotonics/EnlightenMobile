@@ -1,5 +1,7 @@
 # Version History
 
+- 2020-04-12 0.3.12
+    - Scope x-axis works well on Android and iOS
 - 2020-04-12 0.3.11
     - added selectable Scope x-axis
 - 2020-04-12 0.3.10
