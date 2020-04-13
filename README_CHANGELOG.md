@@ -1,9 +1,13 @@
 # Version History
 
+- 2020-04-13 0.3.13
+    - restyled ListPicker with lighter shades
+    - moved styling to App.xaml for re-use
+    - made modal
 - 2020-04-12 0.3.12
     - Scope x-axis works well on Android and iOS
 - 2020-04-12 0.3.11
-    - added selectable Scope x-axis
+    - added ScopeView xAxis ListPicker
 - 2020-04-12 0.3.10
     - fixed ScopeView graph overlap on iOS
 - 2020-04-11 0.3.9

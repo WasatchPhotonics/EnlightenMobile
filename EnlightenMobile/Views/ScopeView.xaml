@@ -16,42 +16,6 @@
              xmlns:telerikInput="clr-namespace:Telerik.XamarinForms.Input;assembly=Telerik.XamarinForms.Input">
 
     <ContentPage.Resources>
-        <Style TargetType="Label" x:Key="displayLabelStyle">
-            <Setter Property="VerticalTextAlignment" Value="Center"/>
-            <Setter Property="Padding" Value="10, 5, 10, 5" />
-            <Setter Property="TextColor" Value="#ccc"/>
-            <Setter Property="BackgroundColor" Value="#555"/>
-            <Setter Property="FontSize" Value="Medium"/>
-        </Style>
-        <Style TargetType="telerikDataControls:SpinnerItemView" x:Key="ItemStyle">
-            <Setter Property="BackgroundColor" Value="#999"/>
-        </Style>
-        <Style TargetType="telerikDataControls:SpinnerItemView" x:Key="SelectedItemStyle">
-            <Setter Property="BackgroundColor" Value="#ccc"/>
-        </Style>
-        <Style TargetType="telerikInput:PickerPopupHeaderView" x:Key="headerStyle">
-            <Setter Property="BackgroundColor" Value="#444"/>
-            <Setter Property="HeightRequest" Value="50"/>
-            <Setter Property="Margin" Value="0"/>
-            <Setter Property="Padding" Value="0"/>
-            <Setter Property="HorizontalOptions" Value="FillAndExpand"/>
-        </Style>
-        <Style TargetType="Label" x:Key="headerLabelStyle">
-            <Setter Property="TextColor" Value="#eee"/>
-            <Setter Property="HorizontalOptions" Value="Center"/>
-            <Setter Property="VerticalOptions" Value="Center"/>
-            <Setter Property="FontSize" Value="Title"/>
-        </Style>
-        <Style TargetType="telerikInput:PickerPopupFooterView" x:Key="footerStyle">
-            <Setter Property="BackgroundColor" Value="Transparent"/>
-        </Style>
-        <Style TargetType="telerikInput:PickerPopupContentView" x:Key="popupViewStyle">
-            <Setter Property="BackgroundColor" Value="#555"/>
-        </Style>
-        <Style TargetType="Button" x:Key="pickerButtonStyle">
-            <Setter Property="BackgroundColor" Value="Transparent"/>
-            <Setter Property="TextColor" Value="#eee"/>
-        </Style>
     </ContentPage.Resources>
 
     <ContentPage.BindingContext>
@@ -165,33 +129,44 @@
                         </StackLayout>
 
                         <StackLayout Grid.Row="3" Grid.Column="0" HorizontalOptions="FillAndExpand" Padding="20, 10, 20, 10">
+
+                            <!-- laser -->
                             <FlexLayout JustifyContent="SpaceBetween">
                                 <Label  Text="Fire Laser" MinimumWidthRequest="75" />
                                 <Switch IsToggled="{Binding laserEnabled}" />
-                            </FlexLayout>    
+                            </FlexLayout>
+
+                            <!-- dark -->
                             <FlexLayout JustifyContent="SpaceBetween">
                                 <Label  Text="Dark" MinimumWidthRequest="75" />
                                 <Switch IsToggled="{Binding darkEnabled}" />
-                            </FlexLayout>    
+                            </FlexLayout>
+
+                            <!-- alternating -->
                             <FlexLayout JustifyContent="SpaceBetween">
                                 <Label  Text="Alternating" MinimumWidthRequest="75" />
                                 <Switch IsToggled="{Binding alternatingEnabled}" />
                             </FlexLayout>    
 
+                            <!-- integration time -->
                             <FlexLayout JustifyContent="SpaceBetween">
                                 <Label Text="Integration Time (ms)" />
                                 <Entry x:Name="entryIntegrationTimeMS"
                                        Text="{Binding integrationTimeMS}" 
                                        Placeholder="3" 
                                        Keyboard="Numeric" />
-                            </FlexLayout>    
+                            </FlexLayout>
+
+                            <!-- gain -->
                             <FlexLayout JustifyContent="SpaceBetween">
                                 <Label Text="Gain (dB)" />
                                 <Entry x:Name="entryGainDb"
                                        Text="{Binding gainDb}" 
                                        Placeholder="24" 
                                        Keyboard="Numeric" />
-                            </FlexLayout>    
+                            </FlexLayout>
+
+                            <!-- averaging -->
                             <FlexLayout JustifyContent="SpaceBetween">
                                 <Label Text="Scans to Average" />
                                 <Entry x:Name="entryScansToAverage"
@@ -200,15 +175,16 @@
                                        Keyboard="Numeric" />
                             </FlexLayout>
 
+                            <!-- x-axis -->
                             <FlexLayout JustifyContent="SpaceBetween">
                                 <Label Text="X-Axis" />
                                 <telerikInput:RadListPicker Placeholder="x-axis" 
+                                                            DisplayMemberPath="displayName"
                                                             ItemsSource="{Binding xAxisOptions}"
                                                             SelectedItem="{Binding xAxisOption}"
-                                                            DisplayMemberPath="displayName"
-                                                            DisplayLabelStyle="{StaticResource displayLabelStyle}"
-                                                            ItemStyle="{StaticResource ItemStyle}"
-                                                            SelectedItemStyle="{StaticResource SelectedItemStyle}">
+                                                            DisplayLabelStyle="{StaticResource listPickerDisplayLabelStyle}"
+                                                            ItemStyle="{StaticResource listPickerItemStyle}"
+                                                            SelectedItemStyle="{StaticResource listPickerSelectedItemStyle}">
                                     <telerikInput:RadListPicker.ItemTemplate>
                                         <DataTemplate>
                                             <Label Text="{Binding name}"
@@ -217,18 +193,18 @@
                                         </DataTemplate>
                                     </telerikInput:RadListPicker.ItemTemplate>
                                     <telerikInput:RadListPicker.SelectorSettings>
-                                        <telerikInput:PickerPopupSelectorSettings PopupOutsideBackgroundColor="#4A4949F"
-                                                                                  PopupViewStyle="{StaticResource popupViewStyle}"
-                                                                                  HeaderStyle="{StaticResource headerStyle}"
+                                        <telerikInput:PickerPopupSelectorSettings IsPopupModal="True"
                                                                                   HeaderLabelText="Select X-Axis"
-                                                                                  HeaderLabelStyle="{StaticResource headerLabelStyle}"
-                                                                                  FooterStyle="{StaticResource footerStyle}"
-                                                                                  AcceptButtonStyle="{StaticResource pickerButtonStyle}"
-                                                                                  CancelButtonStyle="{StaticResource pickerButtonStyle}"/>
+                                                                                  PopupViewStyle="{StaticResource listPickerPopupViewStyle}"
+                                                                                  HeaderStyle="{StaticResource listPickerHeaderStyle}"
+                                                                                  HeaderLabelStyle="{StaticResource listPickerHeaderLabelStyle}"
+                                                                                  AcceptButtonStyle="{StaticResource listPickerAcceptButtonStyle}"
+                                                                                  CancelButtonStyle="{StaticResource listPickerCancelButtonStyle}"/>
                                     </telerikInput:RadListPicker.SelectorSettings>
                                 </telerikInput:RadListPicker>
                             </FlexLayout>
 
+                            <!-- note -->
                             <StackLayout Grid.Row="0" Grid.Column="0" Orientation="Horizontal" HorizontalOptions="FillAndExpand" >
                                 <Label Text="Note"/>
                                 <Entry x:Name="entryNote"
