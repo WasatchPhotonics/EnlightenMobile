@@ -1,5 +1,7 @@
 # Version History
 
+- 2020-04-13 0.3.15
+    - ScopeView buttonExpander looks good in Android and iOS
 - 2020-04-13 0.3.14
     - added ScopeView buttonExpander to show/hide controls in Landscape (looks good in Android)
 - 2020-04-13 0.3.13

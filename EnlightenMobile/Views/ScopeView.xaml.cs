@@ -11,6 +11,9 @@ namespace EnlightenMobile.Views
         bool lastLandscape;
         bool showingControls = true;
 
+        const string rightArrow = ">>";
+        const string leftArrow = "<<";
+
         Logger logger = Logger.getInstance();
 
         public ScopeView()
@@ -29,7 +32,7 @@ namespace EnlightenMobile.Views
         {
             logger.debug("Clicked the expander button");
             scrollOptions.IsVisible = showingControls = !showingControls;
-            buttonExpander.Text = showingControls ? ">>" : "<<";
+            buttonExpander.Text = showingControls ? rightArrow : leftArrow;
             updateLandscapeGridColumns();
         }
 
@@ -76,7 +79,7 @@ namespace EnlightenMobile.Views
                     // always show controls in portrait
                     showingControls = scrollOptions.IsVisible = true;
                     stackExpander.IsVisible = false;
-                    buttonExpander.Text = ">>";
+                    buttonExpander.Text = rightArrow;
                 }
 
                 logoVertical.IsVisible = !landscape;
@@ -96,7 +99,8 @@ namespace EnlightenMobile.Views
 
             // change Grid to [ chart | expander | controls ]
             if (showingControls)
-            { 
+            {
+                buttonExpander.Text = rightArrow;
                 outerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) } );
                 outerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(0.1, GridUnitType.Star) } );
                 outerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) } );
@@ -104,6 +108,7 @@ namespace EnlightenMobile.Views
             else
             {
                 // not showing controls
+                buttonExpander.Text = leftArrow;
                 outerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) } );
                 outerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(0.05, GridUnitType.Star) } );
                 outerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(0, GridUnitType.Star) } );

@@ -104,9 +104,11 @@
                 <Button x:Name="buttonExpander"
                         Text=">>"
                         TextColor="#999"
-                        Padding="5, 5, 5, 5"
                         Margin="0, 0, 0, 0"
-                        FontSize="Large"
+                        Padding="0, 0, 0, 0"
+                        MinimumWidthRequest="100"
+                        WidthRequest="100"
+                        HeightRequest="100"
                         BackgroundColor="#333"
                         Clicked="buttonExpander_Clicked"/>
             </StackLayout>
