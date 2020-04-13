@@ -3,13 +3,15 @@ using System.ComponentModel;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using EnlightenMobile;
+using Xamarin.Forms.PlatformConfiguration;
+using Xamarin.Forms.PlatformConfiguration.AndroidSpecific;
 
 namespace EnlightenMobile.Views
 {
     // Learn more about making custom code visible in the Xamarin.Forms previewer
     // by visiting https://aka.ms/xamarinforms-previewer
     [DesignTimeVisible(false)]
-    public partial class MainPage : TabbedPage
+    public partial class MainPage : Xamarin.Forms.TabbedPage
     {
         PageNav pageNav = PageNav.getInstance();
         Logger logger = Logger.getInstance();
@@ -19,6 +21,8 @@ namespace EnlightenMobile.Views
             // all other Views are implicitly instantiated here; their respective 
             // ViewModels are instantiated as each View calls InitializeComponent
             InitializeComponent();
+
+            On<Android>().SetIsSwipePagingEnabled(false);
 
             // conditional execution simplifies testing live-updated XAML
             if (pageNav.tabbedPage is null)

@@ -67,8 +67,7 @@
                                                     LabelTextColor="#999"
                                                     LabelFormat="{Binding xAxisLabelFormat}"
                                                     Minimum="{Binding xAxisMinimum}"
-                                                    Maximum="{Binding xAxisMaximum}"
-                                                    />
+                                                    Maximum="{Binding xAxisMaximum}" />
                     </telerikChart:RadCartesianChart.HorizontalAxis>
                     <telerikChart:RadCartesianChart.VerticalAxis>
                         <telerikChart:NumericalAxis ShowLabels="True"
@@ -174,7 +173,9 @@
                                 <Label Text="Integration Time (ms)" />
                                 <Entry x:Name="entryIntegrationTimeMS"
                                        Text="{Binding integrationTimeMS}" 
-                                       Placeholder="3" 
+                                       Placeholder="3"
+                                       WidthRequest="100"
+                                       HorizontalTextAlignment="Center"
                                        Keyboard="Numeric" />
                             </FlexLayout>
 
@@ -183,7 +184,9 @@
                                 <Label Text="Gain (dB)" />
                                 <Entry x:Name="entryGainDb"
                                        Text="{Binding gainDb}" 
-                                       Placeholder="24" 
+                                       Placeholder="24"
+                                       HorizontalTextAlignment="Center"
+                                       WidthRequest="100"
                                        Keyboard="Numeric" />
                             </FlexLayout>
 
@@ -192,7 +195,9 @@
                                 <Label Text="Scans to Average" />
                                 <Entry x:Name="entryScansToAverage"
                                        Text="{Binding scansToAverage}" 
-                                       Placeholder="1" 
+                                       Placeholder="1"
+                                       HorizontalTextAlignment="Center"
+                                       WidthRequest="100"
                                        Keyboard="Numeric" />
                             </FlexLayout>
 

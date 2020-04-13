@@ -26,7 +26,7 @@ namespace EnlightenMobile
         // Public attributes
         ////////////////////////////////////////////////////////////////////////
 
-        public LogLevel level { get; set; } = LogLevel.DEBUG;
+        public LogLevel level { get; set; } = LogLevel.INFO;
 
         public bool liveUpdates;
         public LogChangedDelegate logChangedDelegate;

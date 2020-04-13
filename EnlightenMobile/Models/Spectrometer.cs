@@ -49,6 +49,8 @@ namespace EnlightenMobile.Models
         uint totalPixelsToRead;
         uint totalPixelsRead;
 
+        object bleLock = new object();
+
         // util
         Logger logger = Logger.getInstance();
 
@@ -81,6 +83,8 @@ namespace EnlightenMobile.Models
                 Dictionary<string, ICharacteristic> characteristicsByName, 
                 ProgressBarDelegate showProgress)
         {
+            logger.debug("Initializing Spectrometer");
+
             this.characteristicsByName = characteristicsByName;
 
             ////////////////////////////////////////////////////////////////////
@@ -96,6 +100,7 @@ namespace EnlightenMobile.Models
                 return false;
             }
 
+            logger.debug("reading EEPROM");
             List<byte[]> pages = new List<byte[]>();
             for (int page = 0; page < EEPROM.MAX_PAGES; page++)
             {
@@ -105,14 +110,12 @@ namespace EnlightenMobile.Models
                 {
                     byte[] request = ToBLEData.convert((byte)page, (byte)subpage);
                     logger.debug($"requestEEPROMSubpage: page {page}, subpage {subpage}");
-                    // logger.hexdump(request, "request");
                     bool ok = await eepromCmd.WriteAsync(request);
                     if (!ok)
                     {
                         logger.error($"Failed to write eepromCmd({page}, {subpage})");
                         return false;
                     } 
-                    // logger.debug("successfully wrote request");
 
                     try
                     {
@@ -130,7 +133,7 @@ namespace EnlightenMobile.Models
                 }
                 logger.hexdump(buf, "adding page: ");
                 pages.Add(buf);
-                showProgress(.15 + (page/10.0));
+                showProgress(.15 + .85 * page/8.0);
             }
 
             ////////////////////////////////////////////////////////////////////
@@ -159,9 +162,6 @@ namespace EnlightenMobile.Models
             else
                 wavenumbers = null;
 
-            logger.debug("used laser excitation {0:f2}nm", laserExcitationNM);
-            logger.debug("generated wavelengths ({0:f2}, {1:f2})", wavelengths[0], wavelengths[pixels-1]);
-            logger.debug("generated wavenumbers ({0:f2}, {1:f2})", wavenumbers[0], wavenumbers[pixels-1]);
 
             ////////////////////////////////////////////////////////////////////
             // finish initializing Spectrometer 
@@ -169,15 +169,22 @@ namespace EnlightenMobile.Models
 
             showProgress(1);
 
+            
             logger.debug("finishing spectrometer initialization");
             pixels = eeprom.activePixelsHoriz;
 
+            updateBatteryAsync();
             integrationTimeMS = (ushort)(eeprom.startupIntegrationTimeMS > 0 ? eeprom.startupIntegrationTimeMS : 400);
             gainDb = (byte)Math.Min(31, Math.Round(eeprom.detectorGain));
 
-            updateBatteryAsync();
+            logger.info($"initialized {eeprom.model} {eeprom.serialNumber}");
+            logger.info($"  detector: {eeprom.detectorName}");
+            logger.info($"  pixels: {pixels}");
+            logger.info( "  excitation: {0:f2}nm", laserExcitationNM);
+            logger.info( "  wavelengths: ({0:f2}, {1:f2})", wavelengths[0], wavelengths[pixels-1]);
+            if (wavenumbers != null)
+                logger.info("  wavenumbers: ({0:f2}, {1:f2})", wavenumbers[0], wavenumbers[pixels-1]);
 
-            logger.debug("Spectrometer.initAsync: successfully initialized");
             return true;
         }
 
@@ -192,6 +199,7 @@ namespace EnlightenMobile.Models
             { 
                 _nextIntegrationTimeMS = value;
                 logger.debug($"Spectrometer.integrationTimeMS: next = {value}");
+                _ = syncIntegrationTimeMSAsync();
             }
         }
         ushort _nextIntegrationTimeMS = 3;
@@ -215,16 +223,24 @@ namespace EnlightenMobile.Models
             ushort value = Math.Min((ushort)5000, Math.Max((ushort)3, (ushort)Math.Round((decimal)_nextIntegrationTimeMS)));
             byte[] request = ToBLEData.convert(value, len: 2);
 
-            logger.debug($"Spectrometer.syncIntegrationTimeMSAsync({value})");
+            logger.info($"Spectrometer.syncIntegrationTimeMSAsync({value})");
             logger.hexdump(request, "data: ");
 
             var ok = await characteristic.WriteAsync(request);
             if (ok)
+            { 
                 _lastIntegrationTimeMS = _nextIntegrationTimeMS;
+                pauseAsync();
+            }
             else
                 logger.error($"Failed to set integrationTimeMS {value}");
 
             return ok;
+        }
+
+        async void pauseAsync()
+        {
+            await Task.Delay(10);
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -238,6 +254,8 @@ namespace EnlightenMobile.Models
             { 
                 _nextGainDb = value;
                 logger.debug($"Spectrometer.gainDb: next = {value}");
+                _ = syncGainDbAsync();
+
             }
         }
         ushort _nextGainDb = 24;
@@ -261,12 +279,15 @@ namespace EnlightenMobile.Models
             byte value = Math.Min((byte)31, (byte)Math.Round((decimal)_nextGainDb));
             byte[] request = ToBLEData.convert(value, len: 1);
 
-            logger.debug($"Spectrometer.syncGainDbAsync({value})"); 
+            logger.info($"Spectrometer.syncGainDbAsync({value})"); 
             logger.hexdump(request, "data: ");
 
             var ok = await characteristic.WriteAsync(request);
             if (ok)
+            {
                 _lastGainDb = _nextGainDb;
+                pauseAsync();
+            }
             else
                 logger.error($"Failed to set gainDb {value}");
 
@@ -297,16 +318,17 @@ namespace EnlightenMobile.Models
             }
             byte[] request = ToBLEData.convert(flag);
 
-            logger.debug($"Spectrometer.setLaserEnabledAsync({flag})");
+            logger.info($"Spectrometer.setLaserEnabledAsync({flag})");
             logger.hexdump(request, "data: ");
 
             var ok = await characteristic.WriteAsync(request);
             if (ok)
+            { 
                 _laserEnabled = flag;
+                pauseAsync();
+            }
             else
                 logger.error($"Failed to set laserEnabled {flag}");
-
-            updateBatteryAsync();
 
             return ok;
         }
@@ -332,9 +354,17 @@ namespace EnlightenMobile.Models
                 logger.error("can't find characteristic batteryStatus");
                 return;
             }
+
+            logger.info("reading battery status");
             var response = await characteristic.ReadAsync();
+            if (response is null)
+            {
+                logger.error("failed reading battery");
+                return;
+            }
             logger.hexdump(response, "batteryStatus: ");
             battery.parse(response);
+            pauseAsync();
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -397,6 +427,7 @@ namespace EnlightenMobile.Models
             if (alternatingEnabled)
                 measurement.averageAlternating();
 
+            logger.info($"acquired Measurement {measurement.measurementID}");
             updateBatteryAsync();
 
             acquiring = false;

@@ -31,7 +31,10 @@ namespace EnlightenMobile.ViewModels
             get => "About ENLIGHTEN™";
         }
 
-        public string version => AppSettings.getInstance().version;
+        public string version
+        {
+            get => AppSettings.getInstance().version;
+        }
 
         public ICommand OpenWebCommand { get; }
     }

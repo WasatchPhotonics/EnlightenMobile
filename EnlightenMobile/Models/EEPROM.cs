@@ -763,16 +763,6 @@ namespace EnlightenMobile.Models
                 return false;
             }
 
-            // pages = new List<byte[]>();
-            // for (ushort page = 0; page < MAX_PAGES; page++)
-            // {
-            //     byte[] buf = spectrometer.getCmd2(Opcodes.GET_MODEL_CONFIG, 64, wIndex: page, fakeBufferLengthARM: 8);
-            //     if (buf == null)
-            //         return false;
-            //     pages.Add(buf);
-            //     logger.hexdump(buf, String.Format("read page {0}: ", page));
-            // }
-
             format = pages[0][63];
 
             try
@@ -858,7 +848,7 @@ namespace EnlightenMobile.Models
                     short pixel = ParseData.toInt16(pages[5], i * 2);
                     badPixels[i] = pixel;
                     if (pixel >= 0)
-                        badPixelSet.Add(pixel); // does not throw
+                        badPixelSet.Add(pixel);
                 }
                 badPixelList = new List<short>(badPixelSet);
 
@@ -896,9 +886,9 @@ namespace EnlightenMobile.Models
                 return false;
             }
 
-            registerAll();
-
             enforceReasonableDefaults();
+
+            registerAll();
 
             return true;
         }
@@ -940,7 +930,6 @@ namespace EnlightenMobile.Models
             }
         }
 
-        // renamed from dump()
         void registerAll()
         {
             viewableSettings.Clear();

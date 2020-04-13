@@ -1,5 +1,10 @@
 # Version History
 
+- 2020-04-13 0.3.16
+    - grew ScopeView Entries
+    - added Spectrometer.delayAsync
+    - fixed versioning
+    - added scripts/deploy
 - 2020-04-13 0.3.15
     - ScopeView buttonExpander looks good in Android and iOS
 - 2020-04-13 0.3.14

@@ -29,7 +29,10 @@ namespace EnlightenMobile.Models
         // todo: prompt to auto-connect this device if found on scan
         // public Guid lastConnectedGuid;
 
-        public string version => $"version {VersionTracking.CurrentVersion}";
+        public string version
+        {
+            get => $"version {VersionTracking.CurrentVersion}";
+        }
 
         public string companyURL = "https://wasatchphotonics.com";
 
