@@ -30,8 +30,9 @@
 
             <!-- initialize to Portrait mode (1 col, 2 rows) -->
 			<Grid.RowDefinitions>
-				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
 			</Grid.RowDefinitions>
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*"/>
@@ -48,7 +49,9 @@
                 <Image x:Name="logoVertical" Source="enlightenLOGO" WidthRequest="300" BackgroundColor="#333"
                        Margin="0, 5, 0, 5" />
 
+                <!-- ======================================================= -->
                 <!-- The all-important spectral chart -->
+                <!-- ======================================================= -->
 
                 <telerikChart:RadCartesianChart x:Name="chart"
                                                 HorizontalOptions="FillAndExpand"
@@ -92,8 +95,24 @@
                 </telerikChart:RadCartesianChart>
             </StackLayout>
 
-            <!-- User Controls: keep together (will be "right" in landscape mode) -->
-            <RefreshView Grid.Row="1" 
+            <!-- "Expand / Contract" button (hidden in Portrait, visible in Landscape) -->
+            <StackLayout Grid.Row="1" Grid.Column="0"
+                         x:Name="stackExpander"
+                         VerticalOptions="CenterAndExpand"
+                         HorizontalOptions="CenterAndExpand"
+                         IsVisible="False" >
+                <Button x:Name="buttonExpander"
+                        Text=">>"
+                        TextColor="#999"
+                        Padding="5, 5, 5, 5"
+                        Margin="0, 0, 0, 0"
+                        FontSize="Large"
+                        BackgroundColor="#333"
+                        Clicked="buttonExpander_Clicked"/>
+            </StackLayout>
+
+            <!-- User Controls: keep together (will be "right" (but hideable) in Landscape) -->
+            <RefreshView Grid.Row="2" 
                          Grid.Column="0" 
                          x:Name="scrollOptions"
                          IsRefreshing="{Binding isRefreshing}"
@@ -104,11 +123,11 @@
 
                         <!-- initialize to Portrait mode (1 col, 2 rows) -->
 			            <Grid.RowDefinitions>
-				            <RowDefinition Height="Auto"/> <!-- Logo -->
-                            <RowDefinition Height="Auto"/> <!-- ProgressBar -->
-				            <RowDefinition Height="Auto"/> <!-- Buttons -->
+				            <RowDefinition Height="Auto"/> <!--           Logo         -->
+                            <RowDefinition Height="Auto"/> <!--       ProgressBar      -->
+				            <RowDefinition Height="Auto"/> <!-- Button1 Button2        -->
                             <RowDefinition Height="Auto"/> <!-- Acquisition Parameters -->
-				            <RowDefinition Height="Auto"/> <!-- Status Bar -->
+				            <RowDefinition Height="Auto"/> <!--       Status Bar       -->
 			            </Grid.RowDefinitions>
 			            <Grid.ColumnDefinitions>
 				            <ColumnDefinition Width="*"/>
@@ -213,7 +232,6 @@
                                        HorizontalOptions="FillAndExpand" />
                             </StackLayout>
                         </StackLayout>
-
 
                         <!-- Status Bar -->
                         <FlexLayout Grid.Row="4" Grid.Column="0" JustifyContent="SpaceBetween" BackgroundColor="#444" Padding="10">

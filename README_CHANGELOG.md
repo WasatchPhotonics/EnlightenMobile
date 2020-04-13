@@ -1,5 +1,7 @@
 # Version History
 
+- 2020-04-13 0.3.14
+    - added ScopeView buttonExpander to show/hide controls in Landscape (looks good in Android)
 - 2020-04-13 0.3.13
     - restyled ListPicker with lighter shades
     - moved styling to App.xaml for re-use
