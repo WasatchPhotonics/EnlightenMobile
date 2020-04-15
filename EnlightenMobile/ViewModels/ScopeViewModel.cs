@@ -253,11 +253,19 @@ namespace EnlightenMobile.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(acquireButtonColor)));
 
             // take a fresh Measurement
+            var startTime = DateTime.Now;
             var ok = await spec.takeOneAveragedAsync(showProgress);
             if (ok)
             {
+                // info-level logging so we can QC timing w/o verbose logging
+                var elapsedMS = (DateTime.Now - startTime).TotalMilliseconds;
+                logger.info($"Completed acquisition in {elapsedMS} ms");
+
                 updateChart();
-                checkForBadMeasurement();
+
+                // later we could decide not to graph bad measurements, or not log
+                // elapsed time, but this is fine for now
+                _ = isGoodMeasurement();
             }
 
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(acquireButtonColor)));
@@ -292,11 +300,11 @@ namespace EnlightenMobile.ViewModels
         }
         double _acquisitionProgress;
 
-        void checkForBadMeasurement()
+        bool isGoodMeasurement()
         {
             Measurement m = spec.measurement;
             if (m is null || m.raw is null)
-                return;
+                return false;
 
             var allZero = true;                
             var allHigh = true;                
@@ -304,12 +312,17 @@ namespace EnlightenMobile.ViewModels
             {
                 if (m.raw[i] !=     0) allZero = false;
                 if (m.raw[i] != 65535) allHigh = false;
+
+                // no point checking beyond this point
+                if (!allHigh && !allZero)
+                    return true;
             }
 
             if (allZero)
                 scopeViewNotification?.Invoke("ERROR: spectrum is all zero");
             else if (allHigh)
                 scopeViewNotification?.Invoke("ERROR: spectrum is all 0xff");
+            return !(allZero || allHigh);
         }
 
         ////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,7 @@
 # Version History
 
+- 2020-04-14 0.3.17
+    - able to publish to App Store, but Apple rejects because of Telerik or Xamarin API calls 
 - 2020-04-13 0.3.16
     - grew ScopeView Entries
     - added Spectrometer.delayAsync

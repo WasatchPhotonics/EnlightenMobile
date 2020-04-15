@@ -22,7 +22,9 @@ namespace EnlightenMobile.iOS
         //
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
-            Xamarin.Calabash.Start();
+            // MZ: commenting this out when attempting to resolve some Apple Store issues
+            // Xamarin.Calabash.Start();
+
             global::Xamarin.Forms.Forms.Init();
             LoadApplication(new App());
 

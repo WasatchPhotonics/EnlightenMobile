@@ -21,29 +21,30 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>MinimumOSVersion</key>
-	<string>8.0</string>
+	<string>13.4</string>
 	<key>CFBundleDisplayName</key>
 	<string>Enlighten</string>
-	<key>CFBundleIdentifier</key>
-	<string>com.wasatchphotonics.EnlightenMobile</string>
-	<key>CFBundleVersion</key>
-	<string>1.0</string>
-	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
 	<key>CFBundleName</key>
 	<string>EnlightenMobile</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.wasatchphotonics.EnlightenMobile</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.3.16</string>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/AppIcon.appiconset</string>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>bluetooth-central</string>
-		<string>bluetooth-peripheral</string>
-	</array>
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>App needs BLE to control spectrometer</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>App needs BLE to control spectrometer</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>App needs Location access to use BLE</string>
+	<key>NSLocationAlwaysUsageDescription </key>
+	<string>App needs Location access to use BLE</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Telerik UI for Xamarin uses this</string>
+	<key>CFBundleVersion</key>
+	<string>1.0.2</string>
 </dict>
 </plist>
