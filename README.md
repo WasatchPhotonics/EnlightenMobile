@@ -61,14 +61,7 @@ Essentially:
 
 ## iOS
 
-- When generating screenshots for Apple Store, note that "Save Screenshot"
-  in the Simulator often gives the wrong pixel size, but you can "Copy Screen"
-  and Paste into Photoshop or otherwise to get the full image.
-
-Check these:
-
-- https://www.reddit.com/r/xamarindevelopers/comments/bdlvv3/apple_rejected_my_xamarinforms_ios_app_for_usage/
-
+see [README_IOS.md](README_IOS.md)
 
 ## Final
 
