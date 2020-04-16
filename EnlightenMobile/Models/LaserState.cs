@@ -26,6 +26,7 @@ namespace EnlightenMobile.Models
             }
         }
 
+        // reset to the presumed Peripheral defaults
         void reset()
         {
             type = LaserType.NORMAL;
@@ -34,6 +35,7 @@ namespace EnlightenMobile.Models
             watchdogSec = 10;
         }
 
+        // generate a 4-byte payload to be sent from Central to Peripheral
         public byte[] serialize()
         {
             byte[] data = new byte[4];
@@ -46,6 +48,10 @@ namespace EnlightenMobile.Models
             return data;
         }
 
+        // Parse and validate a 4-byte payload received from Peripheral by Central.
+        //
+        // If any part of the payload does not pass validation, the entire payload
+        // is rejected and application state is unchanged.
         public bool parse(byte[] data)
         {
             if (data.Length != 4)
