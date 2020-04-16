@@ -1,5 +1,8 @@
 # Version History
 
+- 2020-04-?? 0.3.18
+    - changed integration time from ushort to uint
+    - added (not yet using) LaserState
 - 2020-04-14 0.3.17
     - able to publish to App Store, but Apple rejects because of Telerik or Xamarin API calls 
 - 2020-04-13 0.3.16

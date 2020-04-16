@@ -192,7 +192,7 @@ namespace EnlightenMobile.Models
         // integrationTimeMS
         ////////////////////////////////////////////////////////////////////////
 
-        public ushort integrationTimeMS
+        public uint integrationTimeMS
         {
             get => _nextIntegrationTimeMS;
             set 
@@ -202,8 +202,8 @@ namespace EnlightenMobile.Models
                 _ = syncIntegrationTimeMSAsync();
             }
         }
-        ushort _nextIntegrationTimeMS = 3;
-        ushort _lastIntegrationTimeMS = 9999;
+        uint _nextIntegrationTimeMS = 3;
+        uint _lastIntegrationTimeMS = 9999;
 
         async Task<bool> syncIntegrationTimeMSAsync()
         {
@@ -221,7 +221,7 @@ namespace EnlightenMobile.Models
             }
 
             ushort value = Math.Min((ushort)5000, Math.Max((ushort)3, (ushort)Math.Round((decimal)_nextIntegrationTimeMS)));
-            byte[] request = ToBLEData.convert(value, len: 2);
+            byte[] request = ToBLEData.convert(value, len: 4);
 
             logger.info($"Spectrometer.syncIntegrationTimeMSAsync({value})");
             logger.hexdump(request, "data: ");
@@ -473,7 +473,7 @@ namespace EnlightenMobile.Models
             }
 
             // wait for acquisition to complete
-            await Task.Delay(integrationTimeMS);
+            await Task.Delay((int)integrationTimeMS);
 
             var spectrum = new double[pixels];
             UInt16 pixelsRead = 0;
