@@ -16,18 +16,19 @@ namespace EnlightenMobile.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        // A "clean-ish" way for the ViewModel to raise events in the View's
-        // code-behind
-        // https://stackoverflow.com/a/26038700/11615696
-        public delegate void ScopeViewNotification(string msg);
-        public event ScopeViewNotification scopeViewNotification;
+        // So the ScopeViewModel can float-up Toast events to the ScopeView.
+        // This probably could be done using notifications, but I'm not sure I
+        // want to make a "public string toastMessage" Property, and I'm not
+        // sure what the "best practice" architecture would be.
+        public delegate void ToastNotification(string msg);
+        public event ToastNotification notifyToast;
 
         ////////////////////////////////////////////////////////////////////////
         // Private attributes
         ////////////////////////////////////////////////////////////////////////
 
-        Spectrometer spec = null;
-
+        Spectrometer spec;
+        AppSettings appSettings;
         Logger logger = Logger.getInstance();
 
         ////////////////////////////////////////////////////////////////////////
@@ -36,11 +37,10 @@ namespace EnlightenMobile.ViewModels
 
         public ScopeViewModel()
         {
-            logger.debug("SVM: starting ctor");
-
-            logger.debug("SVM: getting Spectrometer instance");
             spec = Spectrometer.getInstance();
-            logger.debug("SVM: back from Spectrometer instance");
+            appSettings = AppSettings.getInstance();
+
+            appSettings.PropertyChanged += handleAppSettingsChange;
 
             // bind closures (method calls) to each Command
             acquireCmd = new Command(() => { _ = doAcquireAsync(); });
@@ -59,9 +59,7 @@ namespace EnlightenMobile.ViewModels
 
             chartData = new ObservableCollection<ChartDataPoint>();
             updateChart();
-
-            logger.debug("SVM: finished ctor");
-        } 
+        }
 
         ////////////////////////////////////////////////////////////////////////
         //
@@ -162,11 +160,28 @@ namespace EnlightenMobile.ViewModels
             }
         }
 
+        public bool darkEnabled
+        {
+            get => spec.dark != null;
+            set => spec.toggleDark();
+        }
+
+        // this can probably be deprecated
+        public bool alternatingEnabled
+        {
+            get => spec.alternatingEnabled;
+            set => spec.alternatingEnabled = value;
+        }
+
         public string note
         {
             get => spec.note;
             set => spec.note = value;
         }
+
+        ////////////////////////////////////////////////////////////////////////
+        // Laser Shenanigans
+        ////////////////////////////////////////////////////////////////////////
 
         public bool laserEnabled
         {
@@ -174,16 +189,36 @@ namespace EnlightenMobile.ViewModels
             set => spec.laserEnabled = value;
         }
 
-        public bool darkEnabled
+        public bool ramanModeEnabled
         {
-            get => spec.dark != null;
-            set => spec.toggleDark();
+            get => spec.ramanModeEnabled;
+            set => spec.ramanModeEnabled = value;
         }
 
-        public bool alternatingEnabled
+        // Provided so the "Laser Enable" Switch is disabled if we're in Raman Mode.
+        //
+        // This probably looks like the most useless Property ever...in fact,
+        // it's strangely messy to invert a boolean in XAML, so here we are.
+        public bool ramanModeDisabled
         {
-            get => spec.alternatingEnabled;
-            set => spec.alternatingEnabled = value;
+            get => !ramanModeEnabled;
+        }
+
+        // Provided so the View can only show/enable certain controls if we're
+        // logged-in.
+        public bool authenticated
+        {
+            get => AppSettings.getInstance().authenticated;
+        }
+
+        // Provided so any changes to AppSettings.authenticated will immediately
+        // take effect on our View.
+        void handleAppSettingsChange(object sender, PropertyChangedEventArgs e)
+        {
+            logger.debug("handleAppSettingsChange: received notification " +
+                "from {0} with arg {1}, so refreshing 'authenticated' bindings",
+                sender.ToString(), e.ToString());
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(authenticated)));
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -319,9 +354,9 @@ namespace EnlightenMobile.ViewModels
             }
 
             if (allZero)
-                scopeViewNotification?.Invoke("ERROR: spectrum is all zero");
+                notifyToast?.Invoke("ERROR: spectrum is all zero");
             else if (allHigh)
-                scopeViewNotification?.Invoke("ERROR: spectrum is all 0xff");
+                notifyToast?.Invoke("ERROR: spectrum is all 0xff");
             return !(allZero || allHigh);
         }
 
@@ -375,7 +410,7 @@ namespace EnlightenMobile.ViewModels
         {
             var ok = spec.measurement.save();
             if (ok)
-                scopeViewNotification?.Invoke($"saved {spec.measurement.filename}");
+                notifyToast?.Invoke($"saved {spec.measurement.filename}");
             return ok;
         }
 

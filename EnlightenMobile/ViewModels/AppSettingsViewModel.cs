@@ -51,5 +51,14 @@ namespace EnlightenMobile.ViewModels
             get => appSettings.saveReference;
             set => appSettings.saveReference = value;
         }
+
+        public string password
+        {
+            get => "••••••••";
+            set
+            {
+                appSettings.authenticate(value);
+            }
+        }
     }
 }

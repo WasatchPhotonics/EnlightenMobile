@@ -79,10 +79,10 @@ a little more like this:
     |         PageNav    Logger    (...)      |
     |_________________________________________|
 
-I use the MVVM where I can and understand how.
+I use the MVVM and notifications where I can and understand how.
 
-One big possible exception is that most of the BLE control logic is actually 
-implemented in the BluetoothView.cs code-behind, rather than (as it probably
-should be) BluetoothViewModel.cs.  That's the way it was in the sample code
-I started with, and I didn't want to break things by moving it.  We can move it 
-if and when it makes sense to do so, but what we have works.
+One big exception is that most of the BLE connection logic is currently 
+implemented in the BluetoothView.cs code-behind, rather than (as it probably 
+should be) BluetoothViewModel.cs.  That's the way it was in the sample code I 
+started with, and I didn't want to break things by moving it.  It probably should
+be moved though.

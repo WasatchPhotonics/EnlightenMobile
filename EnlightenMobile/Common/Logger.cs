@@ -49,36 +49,19 @@ namespace EnlightenMobile
             }
         }
 
-        public bool debugEnabled()
-        {
-            return level <= LogLevel.DEBUG;
-        }
-
+        public bool debugEnabled() => level <= LogLevel.DEBUG;
+        
         public bool error(string fmt, params Object[] obj)
         {
-            if (level <= LogLevel.ERROR)
-                log(LogLevel.ERROR, fmt, obj);
-
+            log(LogLevel.ERROR, fmt, obj);
             return false; // convenient for many cases
         }
 
-        public void info(string fmt, params Object[] obj)
-        {
-            if (level <= LogLevel.INFO)
-                log(LogLevel.INFO, fmt, obj);
-        }
+        public void info(string fmt, params Object[] obj) => log(LogLevel.INFO, fmt, obj);
 
-        public void debug(string fmt, params Object[] obj)
-        {
-            if (level <= LogLevel.DEBUG)
-                log(LogLevel.DEBUG, fmt, obj);
-        }
+        public void debug(string fmt, params Object[] obj) => log(LogLevel.DEBUG, fmt, obj);
 
-        public void logString(LogLevel lvl, string msg)
-        {
-            if (level <= lvl)
-                log(lvl, msg);
-        }
+        public void logString(LogLevel lvl, string msg) => log(lvl, msg);
 
         public void save(string pathname=null)
         {
@@ -117,7 +100,7 @@ namespace EnlightenMobile
             }
         }
 
-        public void hexdump(byte[] buf, string prefix = "")
+        public void hexdump(byte[] buf, string prefix = "", LogLevel lvl=LogLevel.DEBUG)
         {
             string line = "";
             for (int i = 0;  i < buf.Length; i++)
@@ -126,7 +109,7 @@ namespace EnlightenMobile
                 {
                     if (i > 0)
                     {
-                        debug("{0}0x{1}", prefix, line);
+                        log(lvl, "{0}0x{1}", prefix, line);
                         line = "";
                     }
                     line += String.Format("{0:x4}:", i);
@@ -134,7 +117,7 @@ namespace EnlightenMobile
                 line += String.Format(" {0:x2}", buf[i]);
             }
             if (line.Length > 0)
-                debug("{0}0x{1}", prefix, line);
+                log(lvl, "{0}0x{1}", prefix, line);
         }
 
         // log the first n elements of a labeled array 
@@ -170,6 +153,10 @@ namespace EnlightenMobile
 
         void log(LogLevel lvl, string fmt, params Object[] obj)
         {
+            // check whether we're logging this level of message
+            if (lvl < level)
+                return;
+
             string msg = "[Wasatch] " + getTimestamp() + lvl + ": " + String.Format(fmt, obj);
 
             lock (instance)

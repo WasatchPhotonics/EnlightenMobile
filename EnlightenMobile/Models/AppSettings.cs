@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using Xamarin.Forms;
 using Xamarin.Essentials;
 using EnlightenMobile.Services;
@@ -8,9 +9,13 @@ namespace EnlightenMobile.Models
     // This class represents application-wide settings.  It currently corresponds 
     // to ENLIGHTEN's Configuration (enlighten.ini) and SaveOptions classes, and
     // a bit of FileManager and common.py.
-    public class AppSettings
+    public class AppSettings : INotifyPropertyChanged
     {
         static AppSettings instance = null;
+
+        // so it can send out notifications that authentication has changed, to
+        // anyone interested in authentication status
+        public event PropertyChangedEventHandler PropertyChanged;
 
         // where to save spectra on the internet
         public string saveURL;
@@ -84,6 +89,38 @@ namespace EnlightenMobile.Models
         {
             IPlatformUtil platformUtil = DependencyService.Get<IPlatformUtil>();
             return platformUtil.getSavePath();
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        // Authentication
+        ////////////////////////////////////////////////////////////////////////
+
+        // This exposes Production Quality Control (test/verification) operations
+        // normally not exposed to the end-user.
+        //
+        // @warning This mode increases opportunity for laser eye injury due to
+        //          operator error.  Do not enable without cause and appropriate
+        //          Personal Protective Equipment.
+        public bool authenticated
+        {
+            get => _authenticated;
+            set
+            {
+                _authenticated = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(authenticated)));
+            }
+        }
+        bool _authenticated;
+
+        // Obviously this is not a way to conceal genuinely dangerous
+        // functionality in an open-source project.  Programmers can access the
+        // full BLE or USB API all they want.  This is meant to keep casual
+        // users from accidentally enabling dangerous test-mode behaviors by
+        // simply clicking the wrong button.
+        public void authenticate(string password)
+        {
+            const string EXPECTED_PASSWORD = "DangerMan";
+            authenticated = password == EXPECTED_PASSWORD;
         }
     }
 }

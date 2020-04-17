@@ -62,16 +62,16 @@ namespace EnlightenMobile.Views
 
             // characteristics
             logger.debug("BluetoothView: initializing characteristic GUIDs");
-            guidByName["pixels"]            = _makeGuid("ff01");
-            guidByName["integrationTimeMS"] = _makeGuid("ff02");
-            guidByName["gainDb"]            = _makeGuid("ff03");
-            guidByName["laserEnable"]       = _makeGuid("ff04");
-            guidByName["acquireSpectrum"]   = _makeGuid("ff05");
-            guidByName["spectrum"]          = _makeGuid("ff06");
+          //guidByName["pixels"]            = _makeGuid("ff01"); // ENG-0120
+            guidByName["integrationTimeMS"] = _makeGuid("ff02"); // ff01
+            guidByName["gainDb"]            = _makeGuid("ff03"); // ff02
+            guidByName["laserState"]        = _makeGuid("ff04"); // ff03
+            guidByName["acquireSpectrum"]   = _makeGuid("ff05"); // ff04
+            guidByName["readSpectrum"]      = _makeGuid("ff06");
             guidByName["eepromCmd"]         = _makeGuid("ff07");
             guidByName["eepromData"]        = _makeGuid("ff08");
             guidByName["batteryStatus"]     = _makeGuid("ff09");
-            guidByName["spectrumRequest"]   = _makeGuid("ff0a");
+            guidByName["spectrumRequest"]   = _makeGuid("ff0a"); // ff05
 
             btnConnect.IsEnabled = false;
         }

@@ -47,6 +47,23 @@
                         <Label  Text="Save Reference" TextColor="#ccc" VerticalTextAlignment="Center"/>
                         <Switch IsToggled="{Binding saveReference}" HorizontalOptions="EndAndExpand" />
                     </StackLayout>
+
+                    <Label Text="Advanced Features" FontSize="Large"/>
+
+                    <FlexLayout JustifyContent="SpaceBetween">
+                        <Label Text="Password" />
+                        <Entry Text="{Binding password}" 
+                               HorizontalTextAlignment="Center"
+                               WidthRequest="300" />
+                    </FlexLayout>
+                    <FlexLayout JustifyContent="SpaceBetween" IsVisible="{Binding authenticated}">
+                        <Label Text="Laser Watchdog Timeout (sec)" />
+                        <Entry Text="{Binding laserWatchdogTimeoutSec}" 
+                               Placeholder="10"
+                               HorizontalTextAlignment="Center"
+                               WidthRequest="100"
+                               Keyboard="Numeric" />
+                    </FlexLayout>
                 </StackLayout>
             </ScrollView>
         </StackLayout>

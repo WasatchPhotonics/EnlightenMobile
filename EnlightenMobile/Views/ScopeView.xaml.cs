@@ -2,6 +2,7 @@
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using EnlightenMobile.ViewModels;
+using System.Threading.Tasks;
 
 namespace EnlightenMobile.Views
 {
@@ -15,6 +16,7 @@ namespace EnlightenMobile.Views
         const string leftArrow = "<<";
 
         Logger logger = Logger.getInstance();
+        ScopeViewModel svm;
 
         public ScopeView()
         {
@@ -23,9 +25,15 @@ namespace EnlightenMobile.Views
             // needed?
             OnSizeAllocated(Width, Height);
 
+            // ScopeView has numerous View <--> ViewModel interactions, so grab
+            // a handle to the ViewModel
+            svm = (ScopeViewModel)BindingContext;
+
+            // Give the ScopeViewModel an ability to display "toast" messages on
+            // the View (such as "saved foo.csv") by having the View monitor for
+            // notifications, and if one is received
             // https://stackoverflow.com/a/26038700/11615696
-            var vm = (ScopeViewModel)BindingContext;
-            vm.scopeViewNotification += (string msg) => Util.toast(msg, scrollOptions);
+            svm.notifyToast += (string msg) => Util.toast(msg, scrollOptions);
         }
 
         private void buttonExpander_Clicked(object sender, EventArgs e)
@@ -34,6 +42,38 @@ namespace EnlightenMobile.Views
             scrollOptions.IsVisible = showingControls = !showingControls;
             buttonExpander.Text = showingControls ? rightArrow : leftArrow;
             updateLandscapeGridColumns();
+        }
+
+        // Since we use the GUI to provide verification, this is properly
+        // implemented in the View rather than ViewModel.  The confirmed value
+        // is written to the ViewModel at the end.
+        void ramanMode_Toggled(object sender, EventArgs e)
+        {
+            logger.debug("Raman Mode changed on GUI");
+            var enabled = switchRamanMode.IsToggled;
+            if (!enabled)
+            {
+                // if the switch is off, just disable Raman Mode and go
+                svm.ramanModeEnabled = false;
+                return;
+            }
+
+            // apparently we were asked to enable Raman Mode...this deserves
+            // confirmation
+            var confirmed = DisplayAlert("Raman Mode",
+                "Enabling Raman mode means the laser will AUTOMATICALLY fire each " +
+                "time you take a measurement.  Do you wish to continue?",
+                "Yes", "Cancel").Result;
+            if (!confirmed)
+            {
+                // user clicked "Cancel"
+                // disable Raman Mode to be sure
+                svm.ramanModeEnabled = false;
+                return;
+            }
+
+            // apparently they're sure
+            svm.ramanModeEnabled = true;
         }
 
         // This event is used to reformat the ScopeView from Portrait to Landscape 

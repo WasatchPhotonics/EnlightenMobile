@@ -1,8 +1,14 @@
 # Version History
 
-- 2020-04-?? 0.3.18
+- 2020-04-?? 0.4.0
     - changed integration time from ushort to uint
-    - added (not yet using) LaserState
+    - ENG-0120 BLE API updates
+        - added LaserState Model
+        - disable laserEnable Switch in Raman Mode
+        - changed gainDb from byte to unsigned bfloat16
+    - authentication
+        - added password (AppSettings View)
+        - added laserWatchdogSec (AppSettings View)
 - 2020-04-14 0.3.17
     - able to publish to App Store, but Apple rejects because of Telerik or Xamarin API calls 
 - 2020-04-13 0.3.16

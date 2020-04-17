@@ -247,7 +247,10 @@ namespace EnlightenMobile.Models
         // gainDb
         ////////////////////////////////////////////////////////////////////////
 
-        public ushort gainDb
+        // for documentation on the unsigned bfloat16 datatype used by gain, see
+        // https://github.com/WasatchPhotonics/Wasatch.NET/blob/master/WasatchNET/FunkyFloat.cs
+
+        public float gainDb
         {
             get => _nextGainDb;
             set 
@@ -258,8 +261,8 @@ namespace EnlightenMobile.Models
 
             }
         }
-        ushort _nextGainDb = 24;
-        ushort _lastGainDb = 99;
+        float _nextGainDb = 24.0f;
+        float _lastGainDb = 99.0f;
 
         async Task<bool> syncGainDbAsync()
         {
@@ -276,10 +279,20 @@ namespace EnlightenMobile.Models
                 return false;
             }
 
-            byte value = Math.Min((byte)31, (byte)Math.Round((decimal)_nextGainDb));
-            byte[] request = ToBLEData.convert(value, len: 1);
+            byte msb = (byte)Math.Floor(_nextGainDb);
+            byte lsb = (byte)(((byte)Math.Round( (_nextGainDb - msb) * 256.0)) & 0xff);
 
-            logger.info($"Spectrometer.syncGainDbAsync({value})"); 
+            // ENG-0120
+            ushort value = (ushort)((msb << 8) | lsb);
+            ushort len = 2;
+
+            // use this while we're on the old firmware
+            value = msb;
+            len = 1;
+
+            byte[] request = ToBLEData.convert(value, len: len);
+
+            logger.info($"Spectrometer.syncGainDbAsync({_nextGainDb})"); 
             logger.hexdump(request, "data: ");
 
             var ok = await characteristic.WriteAsync(request);
@@ -295,40 +308,90 @@ namespace EnlightenMobile.Models
         }
 
         ////////////////////////////////////////////////////////////////////////
-        // laserEnabled
+        // laserState
         ////////////////////////////////////////////////////////////////////////
 
-        public bool laserEnabled
-        {
-            get => _laserEnabled;
-            set => _ = setLaserEnabledAsync(value);
-        }
-        bool _laserEnabled = false;
+        LaserState laserState = new LaserState();
 
-        async Task<bool> setLaserEnabledAsync(bool flag)
+        public bool ramanModeEnabled
+        {
+            get => laserState.mode == LaserMode.RAMAN;
+            set
+            {
+                laserState.mode = LaserMode.RAMAN;
+                _ = syncLaserStateAsync();
+            }
+        }
+
+        public byte laserWatchdogSec
+        {
+            get => laserState.watchdogSec;
+            set
+            {
+                laserState.watchdogSec = value;
+                _ = syncLaserStateAsync();
+            }
+        }
+
+        async Task<bool> syncLaserStateAsync()
         {
             if (characteristicsByName is null)
                 return false;
 
-            var characteristic = characteristicsByName["laserEnable"];
+            var characteristic = characteristicsByName["laserState"];
+            if (characteristic is null)
+            {
+                logger.error("laserState characteristic not found");
+                return false;
+            }
+
+            byte[] request = laserState.serialize();
+            logger.hexdump(request, "Spectrometer.syncLaserStateAsync: ");
+
+            var ok = await characteristic.WriteAsync(request);
+            if (ok)
+                pauseAsync();
+            else
+                logger.error($"Failed to set laserState");
+
+            return ok;
+        }
+
+        public bool laserEnabled
+        {
+            get => laserState.enabled;
+            set
+            {
+                laserState.enabled = value;
+                _ = syncLaserEnabledAsync(); // for now
+              //_ = syncLaserStateAsync();   // ENG-0120
+            }
+        }
+
+        // @todo deprecate for ENG-0120
+        async Task<bool> syncLaserEnabledAsync()
+        {
+            if (characteristicsByName is null)
+                return false;
+
+            var characteristic = characteristicsByName["laserState"];
             if (characteristic is null)
             {
                 logger.error("can't find laserEnable characteristic");
                 return false;
             }
+
+            var flag = laserState.enabled;
             byte[] request = ToBLEData.convert(flag);
 
-            logger.info($"Spectrometer.setLaserEnabledAsync({flag})");
+            logger.info($"Spectrometer.syncLaserEnabledAsync({flag})");
             logger.hexdump(request, "data: ");
 
             var ok = await characteristic.WriteAsync(request);
             if (ok)
-            { 
-                _laserEnabled = flag;
                 pauseAsync();
-            }
             else
-                logger.error($"Failed to set laserEnabled {flag}");
+                logger.error($"Failed to sync laserEnabled");
 
             return ok;
         }
@@ -457,7 +520,7 @@ namespace EnlightenMobile.Models
                 return null;
             }
 
-            var spectrumChar = characteristicsByName["spectrum"];
+            var spectrumChar = characteristicsByName["readSpectrum"];
             if (spectrumChar is null)
             {
                 logger.error("can't find characteristic spectrum");
