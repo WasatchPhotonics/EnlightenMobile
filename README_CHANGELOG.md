@@ -1,6 +1,6 @@
 # Version History
 
-- 2020-04-?? 0.4.0
+- 2020-04-22 0.4.0
     - changed integration time from ushort to uint
     - ENG-0120 BLE API updates
         - added LaserState Model

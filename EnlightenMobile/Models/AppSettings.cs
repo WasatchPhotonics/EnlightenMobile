@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Text.RegularExpressions;
 using Xamarin.Forms;
 using Xamarin.Essentials;
 using EnlightenMobile.Services;
@@ -9,9 +10,13 @@ namespace EnlightenMobile.Models
     // This class represents application-wide settings.  It currently corresponds 
     // to ENLIGHTEN's Configuration (enlighten.ini) and SaveOptions classes, and
     // a bit of FileManager and common.py.
+    //
+    // @todo split Authentication into its own Model
     public class AppSettings : INotifyPropertyChanged
     {
         static AppSettings instance = null;
+
+        public const string stars = "••••••••";
 
         // so it can send out notifications that authentication has changed, to
         // anyone interested in authentication status
@@ -107,20 +112,38 @@ namespace EnlightenMobile.Models
             set
             {
                 _authenticated = value;
+
+                // notify anyone listening to AppSettings.authenticated, such as
+                // ScopeViewModel (which uses this to decide whether to show the
+                // laserFiring switch, etc)
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(authenticated)));
             }
         }
         bool _authenticated;
 
+        // The user entered a new password on the AppSettingsView, and hit
+        // return, so the View asked the ViewModel to authenticate it.  The
+        // AppSettingsViewModel then asked the Model to authenticate it.
+        //
         // Obviously this is not a way to conceal genuinely dangerous
         // functionality in an open-source project.  Programmers can access the
         // full BLE or USB API all they want.  This is meant to keep casual
         // users from accidentally enabling dangerous test-mode behaviors by
         // simply clicking the wrong button.
-        public void authenticate(string password)
+        public bool authenticate(string password)
         {
+            // do not attempt to authenticate the "bullets" (no change)
+            // if (password == stars)
+            // {
+            //     logger.debug("authenticate: ignoring stars");
+            //     return authenticated;
+            // }
+
             const string EXPECTED_PASSWORD = "DangerMan";
             authenticated = password == EXPECTED_PASSWORD;
+
+            logger.debug($"authenticated = {authenticated}");
+            return authenticated;
         }
     }
 }

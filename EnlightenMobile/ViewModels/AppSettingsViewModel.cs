@@ -54,11 +54,27 @@ namespace EnlightenMobile.ViewModels
 
         public string password
         {
-            get => "••••••••";
+            get => AppSettings.stars;
             set
             {
-                appSettings.authenticate(value);
+                // We are not doing anything here, because we don't want to
+                // process per-character input (which is what the Entry binding
+                // gives us); instead, wait until they hit return, which will
+                // trigger the View's Complete method.  That method will then
+                // call the authenticate() method below.
             }
+        }
+
+        public bool isAuthenticated
+        {
+            get => appSettings.authenticated;
+        }
+
+        // the user entered a new password on the view, so authenticate it
+        public void authenticate(string password)
+        {
+            appSettings.authenticate(password);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(isAuthenticated)));
         }
     }
 }

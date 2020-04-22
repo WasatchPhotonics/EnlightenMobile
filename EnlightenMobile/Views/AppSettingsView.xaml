@@ -3,6 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
              xmlns:vm="clr-namespace:EnlightenMobile.ViewModels"
              x:Class="EnlightenMobile.Views.AppSettingsView"
+             xmlns:telerikDataControls="clr-namespace:Telerik.XamarinForms.DataControls;assembly=Telerik.XamarinForms.DataControls"
+             xmlns:telerikPrimitives="clr-namespace:Telerik.XamarinForms.Primitives;assembly=Telerik.XamarinForms.Primitives"
+             xmlns:telerikChart="clr-namespace:Telerik.XamarinForms.Chart;assembly=Telerik.XamarinForms.Chart"
+             xmlns:telerikInput="clr-namespace:Telerik.XamarinForms.Input;assembly=Telerik.XamarinForms.Input"
+
              Title="{Binding title}"
              BackgroundColor="White">
              <!-- Title="💾" -->
@@ -52,11 +57,14 @@
 
                     <FlexLayout JustifyContent="SpaceBetween">
                         <Label Text="Password" />
-                        <Entry Text="{Binding password}" 
+                        <Entry Text="{Binding password}"
+                               x:Name="entryPassword"
                                HorizontalTextAlignment="Center"
-                               WidthRequest="300" />
+                               Focused="entryPassword_Focused"
+                               Completed="entryPassword_Completed"
+                               WidthRequest="200" />
                     </FlexLayout>
-                    <FlexLayout JustifyContent="SpaceBetween" IsVisible="{Binding authenticated}">
+                    <FlexLayout JustifyContent="SpaceBetween" IsVisible="{Binding isAuthenticated}">
                         <Label Text="Laser Watchdog Timeout (sec)" />
                         <Entry Text="{Binding laserWatchdogTimeoutSec}" 
                                Placeholder="10"

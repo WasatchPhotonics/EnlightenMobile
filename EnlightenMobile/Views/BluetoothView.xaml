@@ -20,7 +20,7 @@
                 <Frame CornerRadius="10" BackgroundColor="#444" Padding="2">
                     <StackLayout Orientation="Horizontal" Padding="2" HorizontalOptions="FillAndExpand">
                         <Button x:Name="btnScan"    Text="Scan"    Clicked="btnScan_Clicked" />
-                        <Button x:Name="btnConnect" Text="Connect" Clicked="btnConnect_Clicked" /> 
+                        <Button x:Name="btnConnect" Text="{Binding buttonConnectText}" Clicked="btnConnect_Clicked" /> 
                     </StackLayout>
                 </Frame>
             </Frame>

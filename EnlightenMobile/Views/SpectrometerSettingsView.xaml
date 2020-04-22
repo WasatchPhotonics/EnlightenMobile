@@ -5,20 +5,41 @@
              x:Class="EnlightenMobile.Views.SpectrometerSettingsView"
              Title="{Binding title}"
              BackgroundColor="#fff">
-             <!-- Title="️⚙️" -->
 
     <ContentPage.BindingContext>
         <vm:SpectrometerSettingsViewModel/>
     </ContentPage.BindingContext>
     
     <ContentPage.Content>
-        <StackLayout Orientation="Vertical" BackgroundColor="#333">
+        <StackLayout Orientation="Vertical" BackgroundColor="#333" Padding="10, 0, 10, 0">
 
             <!-- Page header -->
             <Image Source="enlightenLOGO" WidthRequest="300"/>
 
+            <!-- BLE Device Info -->
+            <Label FontSize="Large" Text="BLE Device Info"/>
+            <StackLayout Margin="10, 0, 10, 0">
+                <FlexLayout JustifyContent="SpaceBetween">
+                    <Label Text="Manufacturer Name"/>
+                    <Label Text="{Binding manufacturerName}"/>
+                </FlexLayout>
+                <FlexLayout JustifyContent="SpaceBetween">
+                    <Label Text="Software Revision"/>
+                    <Label Text="{Binding softwareRevision}"/>
+                </FlexLayout>
+                <FlexLayout JustifyContent="SpaceBetween">
+                    <Label Text="Firmware Revision"/>
+                    <Label Text="{Binding firmwareRevision}"/>
+                </FlexLayout>
+                <FlexLayout JustifyContent="SpaceBetween">
+                    <Label Text="Hardware Revision"/>
+                    <Label Text="{Binding hardwareRevision}"/>
+                </FlexLayout>
+            </StackLayout>
+
             <!-- Scrolling ListView of EEPROM (name, value) tuples -->
-            <ListView x:Name="listView" BackgroundColor="#333" SeparatorColor="#555"> 
+            <Label Text="EEPROM" FontSize="Large" Margin="0, 10, 0, 0"/>
+            <ListView x:Name="listViewEEPROM" BackgroundColor="#333" SeparatorColor="#555"  Margin="10, 0, 10, 0"> 
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>

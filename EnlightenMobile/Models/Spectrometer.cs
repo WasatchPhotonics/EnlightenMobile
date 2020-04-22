@@ -24,13 +24,15 @@ namespace EnlightenMobile.Models
         static Spectrometer instance = null;
 
         // BLE comms
-        Dictionary<string, ICharacteristic> characteristicsByName = null;
+        Dictionary<string, ICharacteristic> characteristicsByName;
 
         // hardware model
         public uint pixels;
         public float laserExcitationNM;
         public EEPROM eeprom = EEPROM.getInstance();
-        public Battery battery = new Battery();
+        public Battery battery;
+
+        public BLEDeviceInfo bleDeviceInfo;
 
         // software state
         public double[] wavelengths;
@@ -40,12 +42,12 @@ namespace EnlightenMobile.Models
         public double[] dark;
 
         public Measurement measurement;
-        public string note {get; set;} = "your text here";
+        public string note {get; set;}
         public bool acquiring;
         ushort lastCRC;
         const int MAX_RETRIES = 3;
 
-        public uint scansToAverage {get; set;} = 1;
+        public uint scansToAverage {get; set;}
         uint totalPixelsToRead;
         uint totalPixelsRead;
 
@@ -67,6 +69,13 @@ namespace EnlightenMobile.Models
 
         Spectrometer()
         {
+            reset();
+            battery = new Battery();
+            bleDeviceInfo = new BLEDeviceInfo();
+        }
+
+        public void reset()
+        { 
             // Provide some test defaults so we can play with the chart etc while
             // disconnected.  These will all be overwritten when we read an EEPROM.
             pixels = 1952;
@@ -75,8 +84,12 @@ namespace EnlightenMobile.Models
             for (int i = 0; i < pixels; i++)
                 wavelengths[i] = laserExcitationNM + 15 + i / 10.0;
             wavenumbers = Util.wavelengthsToWavenumbers(laserExcitationNM, wavelengths);
-
             measurement = new Measurement(this);
+            characteristicsByName = null;
+            note = "your text here";
+            acquiring = false;
+            lastCRC = 0;
+            scansToAverage = 1;
         }
 
         public async Task<bool> initAsync(
@@ -286,10 +299,6 @@ namespace EnlightenMobile.Models
             ushort value = (ushort)((msb << 8) | lsb);
             ushort len = 2;
 
-            // use this while we're on the old firmware
-            value = msb;
-            len = 1;
-
             byte[] request = ToBLEData.convert(value, len: len);
 
             logger.info($"Spectrometer.syncGainDbAsync({_nextGainDb})"); 
@@ -363,12 +372,11 @@ namespace EnlightenMobile.Models
             set
             {
                 laserState.enabled = value;
-                _ = syncLaserEnabledAsync(); // for now
-              //_ = syncLaserStateAsync();   // ENG-0120
+                _ = syncLaserStateAsync();
             }
         }
 
-        // @todo deprecate for ENG-0120
+        /*
         async Task<bool> syncLaserEnabledAsync()
         {
             if (characteristicsByName is null)
@@ -395,6 +403,7 @@ namespace EnlightenMobile.Models
 
             return ok;
         }
+        */
 
         ////////////////////////////////////////////////////////////////////////
         // alternatingEnabled

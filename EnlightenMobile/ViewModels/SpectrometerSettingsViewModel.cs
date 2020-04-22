@@ -17,6 +17,7 @@ namespace EnlightenMobile.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
+        Spectrometer spec = Spectrometer.getInstance();
         Logger logger = Logger.getInstance();
 
         public string title
@@ -24,12 +25,56 @@ namespace EnlightenMobile.ViewModels
             get => "Spectrometer Settings";
         }
 
+        ////////////////////////////////////////////////////////////////////////
+        // BLE Device Info
+        ////////////////////////////////////////////////////////////////////////
+
+        public string manufacturerName
+        {
+            get => spec.bleDeviceInfo.manufacturerName;
+        }
+
+        public string softwareRevision
+        {
+            get => spec.bleDeviceInfo.softwareRevision;
+        }
+
+        public string firmwareRevision
+        {
+            get => spec.bleDeviceInfo.firmwareRevision;
+        }
+
+        public string hardwareRevision
+        {
+            get => spec.bleDeviceInfo.hardwareRevision;
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        // EEPROM
+        ////////////////////////////////////////////////////////////////////////
+
         public ViewableSetting ViewableSetting
         {
             get { return _viewableSetting; }
             set { _viewableSetting = value; }
         }
         ViewableSetting _viewableSetting;
+
+        ////////////////////////////////////////////////////////////////////////
+        // Util
+        ////////////////////////////////////////////////////////////////////////
+
+        // so we can update these from the SpectrometerSettingsView code-behind
+        // on display, after changing spectrometers.
+        public void refresh()
+        {
+            logger.debug("refreshing SpectrometerSettingsViewModel");
+
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(softwareRevision)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(firmwareRevision)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(hardwareRevision)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(manufacturerName)));
+        }
 
         protected void OnPropertyChanged([CallerMemberName] string caller = "")
         {

@@ -206,7 +206,7 @@ namespace EnlightenMobile.ViewModels
 
         // Provided so the View can only show/enable certain controls if we're
         // logged-in.
-        public bool authenticated
+        public bool isAuthenticated
         {
             get => AppSettings.getInstance().authenticated;
         }
@@ -215,10 +215,8 @@ namespace EnlightenMobile.ViewModels
         // take effect on our View.
         void handleAppSettingsChange(object sender, PropertyChangedEventArgs e)
         {
-            logger.debug("handleAppSettingsChange: received notification " +
-                "from {0} with arg {1}, so refreshing 'authenticated' bindings",
-                sender.ToString(), e.ToString());
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(authenticated)));
+            logger.debug($"SVM.handleAppSettingsChange: received notification from {sender}, so refreshing isAuthenticated");
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(isAuthenticated)));
         }
 
         ////////////////////////////////////////////////////////////////////////

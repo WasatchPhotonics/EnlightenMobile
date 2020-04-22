@@ -40,7 +40,7 @@ namespace EnlightenMobile.Models
         Logger logger = Logger.getInstance();
 
         public List<byte[]> pages { get; private set; }
-        public event EventHandler EEPROMChanged;
+        public event EventHandler EEPROMChanged; // not used
 
         public ObservableCollection<ViewableSetting> viewableSettings = null;
 

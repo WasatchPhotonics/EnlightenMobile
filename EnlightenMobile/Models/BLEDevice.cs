@@ -13,9 +13,6 @@ namespace EnlightenMobile.Models
     public class BLEDevice : INotifyPropertyChanged
     {
         public IDevice device;
-
-        // populated from Device Info service characteristics
-        public Dictionary<string, string> deviceInfo = new Dictionary<string, string>();
         
         Logger logger = Logger.getInstance();
 
@@ -66,28 +63,6 @@ namespace EnlightenMobile.Models
         public string id
         {
             get => device.Id.ToString();
-        }
-
-        ////////////////////////////////////////////////////////////////////////
-        // Metadata culled from the "Device Info" service
-        ////////////////////////////////////////////////////////////////////////
-
-        string getDeviceInfo(string key) => deviceInfo.ContainsKey(key) ? deviceInfo[key] : "unknown";
-
-        public string firmwareRevision
-        {
-            get => getDeviceInfo("Firmware Revision String");
-        }
-
-        public string manufacturerName
-        {
-            get => getDeviceInfo("Manufacturer Name String");
-
-        }
-
-        public string hardwareRevision
-        {
-            get => getDeviceInfo("Hardware Revision String");
         }
 
         ////////////////////////////////////////////////////////////////////////

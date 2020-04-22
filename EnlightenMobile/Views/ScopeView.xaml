@@ -196,7 +196,7 @@
                             </FlexLayout>    
 
                             <!-- laser (if not in Raman Mode) -->
-                            <FlexLayout JustifyContent="SpaceBetween" IsVisible="{Binding authenticated}">
+                            <FlexLayout JustifyContent="SpaceBetween" IsVisible="{Binding isAuthenticated}">
                                 <Label  Text="Fire Laser" MinimumWidthRequest="75" />
                                 <Switch IsToggled="{Binding laserEnabled}" IsEnabled="{Binding ramanModeDisabled}"/>
                             </FlexLayout>

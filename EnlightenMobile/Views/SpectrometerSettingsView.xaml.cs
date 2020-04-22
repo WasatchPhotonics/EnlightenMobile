@@ -41,19 +41,36 @@ namespace EnlightenMobile.Views
     /// </todo>
     public partial class SpectrometerSettingsView : ContentPage
     {
-        ObservableCollection<ViewableSetting> viewableSettings;
+        ObservableCollection<ViewableSetting> viewableSettingsEEPROM;
+
+        SpectrometerSettingsViewModel ssvm;
+
+        Logger logger = Logger.getInstance();
 
         public SpectrometerSettingsView()
         {
             InitializeComponent();
 
-            viewableSettings = new ObservableCollection<ViewableSetting>();
+            viewableSettingsEEPROM = new ObservableCollection<ViewableSetting>();
 
             EEPROM eeprom = EEPROM.getInstance();
             if (eeprom != null)
-                eeprom.viewableSettings = viewableSettings;
+                eeprom.viewableSettings = viewableSettingsEEPROM;
 
-            listView.ItemsSource = viewableSettings;
+            listViewEEPROM.ItemsSource = viewableSettingsEEPROM;
+
+            ssvm = (SpectrometerSettingsViewModel)BindingContext;
+        }
+
+        // so the latest BLEDeviceInfo fields will be displayed
+        // 
+        // @todo why does this only fire on the SECOND (and following) times you
+        //       visit this page?
+        protected override void OnAppearing()
+        {
+            logger.debug("displaying SpectrometerSettingsView");
+            base.OnAppearing();
+            ssvm.refresh();
         }
     }
 }

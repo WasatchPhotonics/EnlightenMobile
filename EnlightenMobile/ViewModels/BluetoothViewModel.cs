@@ -20,9 +20,20 @@ namespace EnlightenMobile.ViewModels
             get => "Bluetooth Pairing";
         }
 
-        protected void RaisePropertyChanged([CallerMemberName] string caller = "")
+        public bool paired
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(caller));
+            get => _paired;
+            set
+            {
+                _paired = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(buttonConnectText)));
+            }
+        }
+        bool _paired;
+
+        public string buttonConnectText
+        {
+            get => paired ? "Disconnect" : "Connect";
         }
     }
 }

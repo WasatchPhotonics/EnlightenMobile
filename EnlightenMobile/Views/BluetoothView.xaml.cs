@@ -1,4 +1,5 @@
 ﻿using EnlightenMobile.Models;
+using EnlightenMobile.ViewModels;
 using Plugin.BLE.Abstractions.Contracts;
 using Plugin.BLE.Abstractions.EventArgs;
 using Plugin.BLE.Abstractions.Exceptions;
@@ -35,6 +36,7 @@ namespace EnlightenMobile.Views
 
 
         Spectrometer spec = Spectrometer.getInstance();
+        BluetoothViewModel bvm;
 
         Logger logger = Logger.getInstance();
 
@@ -45,6 +47,8 @@ namespace EnlightenMobile.Views
         public BluetoothView()
         {
             InitializeComponent();
+
+            bvm = (BluetoothViewModel)BindingContext;
 
             logger.debug("BluetoothView: initializing BLE stuff");
 
@@ -62,16 +66,29 @@ namespace EnlightenMobile.Views
 
             // characteristics
             logger.debug("BluetoothView: initializing characteristic GUIDs");
-          //guidByName["pixels"]            = _makeGuid("ff01"); // ENG-0120
-            guidByName["integrationTimeMS"] = _makeGuid("ff02"); // ff01
-            guidByName["gainDb"]            = _makeGuid("ff03"); // ff02
-            guidByName["laserState"]        = _makeGuid("ff04"); // ff03
-            guidByName["acquireSpectrum"]   = _makeGuid("ff05"); // ff04
+            if (true)
+            {
+                // ENG-0120
+                guidByName["integrationTimeMS"] = _makeGuid("ff01");
+                guidByName["gainDb"]            = _makeGuid("ff02"); 
+                guidByName["laserState"]        = _makeGuid("ff03"); 
+                guidByName["acquireSpectrum"]   = _makeGuid("ff04"); 
+                guidByName["spectrumRequest"]   = _makeGuid("ff05"); 
+            }
+            else
+            {
+                // original
+                guidByName["pixels"]            = _makeGuid("ff01");
+                guidByName["integrationTimeMS"] = _makeGuid("ff02"); 
+                guidByName["gainDb"]            = _makeGuid("ff03"); 
+                guidByName["laserState"]        = _makeGuid("ff04"); 
+                guidByName["acquireSpectrum"]   = _makeGuid("ff05"); 
+                guidByName["spectrumRequest"]   = _makeGuid("ff0a"); 
+            }
             guidByName["readSpectrum"]      = _makeGuid("ff06");
             guidByName["eepromCmd"]         = _makeGuid("ff07");
             guidByName["eepromData"]        = _makeGuid("ff08");
             guidByName["batteryStatus"]     = _makeGuid("ff09");
-            guidByName["spectrumRequest"]   = _makeGuid("ff0a"); // ff05
 
             btnConnect.IsEnabled = false;
         }
@@ -139,13 +156,48 @@ namespace EnlightenMobile.Views
         void showProgress(double progress) => Util.updateProgressBar(progressBarConnect, progress);
 
         // Step 4: the user clicked "Connect"
-        private async void btnConnect_Clicked(object sender, EventArgs e)
+        async void btnConnect_Clicked(object sender, EventArgs e)
         {
+            if (bvm.paired)
+            {
+                _ = await doDisconnectAsync();
+                bvm.paired = false;
+            }
+            else
+            { 
+                bvm.paired = await doConnectAsync();
+                btnConnect.IsEnabled = true;
+                if (bvm.paired)
+                    PageNav.getInstance().select("Scope");
+            }
+            initProgress();
+        }
+
+        async Task<bool> doDisconnectAsync()
+        {
+            logger.debug("attempting to disconnect");
+
+            if (bleDevice is null)
+            {
+                logger.error("attempt to disconnect without bleDevice");
+                return false;
+            }
+
+            await adapter.DisconnectDeviceAsync(bleDevice.device);
+            bvm.paired = false;
+            spec.reset();
+            return true;
+        }
+
+        async Task<bool> doConnectAsync()
+        {
+            logger.debug("attempting to connect");
+
             initProgress();
             if (bleDevice is null)
             {
                 logger.error("must select a device before connecting");
-                return;
+                return false;
             }
 
             // recommended to help avoid GattCallback error 133
@@ -177,18 +229,11 @@ namespace EnlightenMobile.Views
             {
                 logger.error("exception connecting to device ({0})", ex.Message);
                 _ = DisplayAlert("Notice", ex.Message.ToString(), "OK");
-                btnConnect.IsEnabled = true;
-                initProgress();
-                return;
+                return false;
             }
 
             if (!success)
-            {
-                logger.error($"failed connection to {bleDevice.name}");
-                btnConnect.IsEnabled = true;
-                initProgress();
-                return;
-            }
+                return logger.error($"failed connection to {bleDevice.name}");
 
             logger.info($"successfully connected to {bleDevice.name}");
             showProgress(.05);
@@ -197,17 +242,13 @@ namespace EnlightenMobile.Views
             logger.debug($"connecting to primary service {primaryServiceId}");
             service = await bleDevice.device.GetServiceAsync(primaryServiceId);
             if (service is null)
-            {
-                logger.error($"did not find primary service {primaryServiceId}");
-                btnConnect.IsEnabled = true;
-                showProgress(0);
-                return;
-            }
+                return logger.error($"did not find primary service {primaryServiceId}");
 
             logger.debug($"found primary service {service}");
 
             // Step 7: read characteristics
             logger.debug("reading characteristics of service {0} ({1})", service.Name, service.Id);
+            characteristicsByName = new Dictionary<string, ICharacteristic>();
             var list = await service.GetCharacteristicsAsync();
             foreach (var c in list)
             {
@@ -230,10 +271,8 @@ namespace EnlightenMobile.Views
 
                 // store it by friendly name
                 characteristicsByName.Add(name, c);
-
             }
 
-            // all done
             logger.debug("Registered characteristics:");
             foreach (var pair in characteristicsByName)
             {
@@ -251,33 +290,57 @@ namespace EnlightenMobile.Views
             showProgress(.15);
 
             logger.debug("polling device for other services");
+            BLEDeviceInfo bdi = new BLEDeviceInfo();
             var allServices = await bleDevice.device.GetServicesAsync();
             foreach (var thisService in allServices)
             {
-                if (thisService.Id == primaryServiceId)
-                    continue;
-
                 logger.debug($"examining service {thisService.Name} (ID {thisService.Id})");
+                if (thisService.Id == primaryServiceId)
+                {
+                    logger.debug("skipping primary service");
+                    continue;
+                }
+
                 var characteristics = await thisService.GetCharacteristicsAsync();
                 foreach (var c in characteristics)
-                { 
-                    // logger.hexdump(c.Value, prefix: $"  {c.Uuid}: {c.Name} = ");
-                    string s = Util.toASCII(c.Value);
-                    logger.debug($"  storing {c.Name} = {s}");
-                    bleDevice.deviceInfo[c.Name] = s;
+                {
+                    var data = await c.ReadAsync();
+                    if (data is null)
+                    {
+                        logger.debug($"can't read {c.Uuid} ({c.Name})");
+                    }
+                    else
+                    {
+                        logger.hexdump(data, prefix: $"  {c.Uuid}: {c.Name} = ");
+                        string s = Util.toASCII(data);
+                        logger.debug($"  found {c.Name} = {s}");
+
+                        if (c.Name == "Manufacturer Name String")
+                            bdi.manufacturerName = s;
+                        else if (c.Name == "Software Revision String")
+                            bdi.softwareRevision = s;
+                        else if (c.Name == "Firmware Revision String")
+                            bdi.firmwareRevision = s;
+                        else if (c.Name == "Hardware Revision String")
+                            bdi.hardwareRevision = s;
+                        else
+                            logger.error($"unrecognized BLE Device Info: {c.Name} = {s}");
+                    }
                 }
             }
+            bdi.dump();
 
             // populate Spectrometer
             logger.debug("initializing spectrometer");
+            spec.bleDeviceInfo = bdi;
             _ = await spec.initAsync(characteristicsByName, showProgress);
+
+            ////////////////////////////////////////////////////////////////////
+            // all done
+            ////////////////////////////////////////////////////////////////////
+
             logger.debug("btnConnect_clicked done");
-
-            // btnConnect.IsEnabled = true;
-            showProgress(0);
-
-            PageNav nav = PageNav.getInstance();
-            nav.select("Scope");
+            return true;
         }
 
         ////////////////////////////////////////////////////////////////////////
