@@ -17,15 +17,17 @@ function checkVersion()
 
     local PROJ="EnlightenMobile.Android/EnlightenMobile.Android.csproj"
     local SLN="EnlightenMobile.sln"
-    local ASM="EnlightenMobile.Android/Properties/AssemblyInfo.cs"
+   #local ASM="EnlightenMobile.Android/Properties/AssemblyInfo.cs"
     local XML="EnlightenMobile.Android/Properties/AndroidManifest.xml"
+
+    local ERROR=false
 
     if grep -q "version = $VERSION" $SLN
     then
         echo "$VERSION found in $SLN"
     else
         echo "ERROR: could not find $VERSION in $SLN"
-        exit 1
+        ERROR=true
     fi
 
     if grep -q "<ReleaseVersion>$VERSION</ReleaseVersion>" $PROJ
@@ -33,7 +35,7 @@ function checkVersion()
         echo "$VERSION found in $PROJ"
     else
         echo "ERROR: could not find $VERSION in $PROJ"
-        exit 1
+        ERROR=true
     fi
     
     if grep -q "android:versionName=\"$VERSION\"" $XML
@@ -41,12 +43,18 @@ function checkVersion()
         echo "$VERSION found in $XML"
     else
         echo "ERROR: could not find $VERSION in $XML"
-        exit 1
+        ERROR=true
     fi
 
     # don't worry about AssemblyInfo for now
     #     [assembly: AssemblyVersion("0.2.5.0")]
     #     [assembly: AssemblyFileVersion("0.2.5.0")]
+
+    if $ERROR
+    then
+        echo "Error(s) encountered, unable to deploy"
+        exit 1
+    fi
 }
 
 function checkGit()

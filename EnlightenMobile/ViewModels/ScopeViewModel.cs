@@ -118,47 +118,62 @@ namespace EnlightenMobile.ViewModels
         }
 
         ////////////////////////////////////////////////////////////////////////
-        // Acquisition Parameters
+        // integrationTimeMS
         ////////////////////////////////////////////////////////////////////////
 
         public string integrationTimeMS 
         {
             get => spec.integrationTimeMS.ToString();
-            set
-            {
-                ushort val = 0;
-                if (UInt16.TryParse(value, out val))
-                    spec.integrationTimeMS = val;
-                else
-                    spec.integrationTimeMS = 3;
-            }
         }
+
+        // the ScopeView's code-behind has registered that a final value has
+        // been entered into the Entry (hit return), so latch it
+        public void setIntegrationTimeMS(string s)
+        {
+            if (UInt32.TryParse(s, out UInt32 value))
+                spec.integrationTimeMS = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(integrationTimeMS)));
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        // gainDb
+        ////////////////////////////////////////////////////////////////////////
 
         public string gainDb
         {
             get => spec.gainDb.ToString();
-            set
-            {
-                ushort val = 0;
-                if (UInt16.TryParse(value, out val))
-                    spec.gainDb = val;
-                else
-                    spec.gainDb = 24;
-            }
         }
+
+        // the ScopeView's code-behind has registered that a final value has
+        // been entered into the Entry (hit return), so latch it
+        public void setGainDb(string s)
+        {
+            if (float.TryParse(s, out float value))
+                spec.gainDb = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(gainDb)));
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        // scansToAverage
+        ////////////////////////////////////////////////////////////////////////
 
         public string scansToAverage
         {
             get => spec.scansToAverage.ToString();
-            set
-            {
-                ushort val = 0;
-                if (UInt16.TryParse(value, out val))
-                    spec.scansToAverage = val;
-                else
-                    spec.scansToAverage = 1;
-            }
         }
+
+        // the ScopeView's code-behind has registered that a final value has
+        // been entered into the Entry (hit return), so latch it
+        public void setScansToAverage(string s)
+        {
+            if (ushort.TryParse(s, out ushort value))
+                spec.scansToAverage = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(scansToAverage)));
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        // misc acquisition parameters
+        ////////////////////////////////////////////////////////////////////////
 
         public bool darkEnabled
         {
@@ -299,6 +314,10 @@ namespace EnlightenMobile.ViewModels
                 // later we could decide not to graph bad measurements, or not log
                 // elapsed time, but this is fine for now
                 _ = isGoodMeasurement();
+            }
+            else
+            {
+                notifyToast?.Invoke("Error reading spectrum");
             }
 
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(acquireButtonColor)));

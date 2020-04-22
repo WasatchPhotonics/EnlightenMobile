@@ -36,7 +36,7 @@ namespace EnlightenMobile.Droid
             string defaultPath = string.Format("{0}/{1}", 
                 Android.OS.Environment.ExternalStorageDirectory.AbsolutePath, 
                 "EnlightenSpectra");
-            logger.debug($"defaultPath = {defaultPath}");
+            logger.debug($"getSavePath: defaultPath = {defaultPath}");
             if (!writeable(defaultPath))
             {
                 logger.error($"getSavePath: unable to write defaultPath {defaultPath}");

@@ -312,23 +312,10 @@ namespace EnlightenMobile.Views
                     else
                     {
                         logger.hexdump(data, prefix: $"  {c.Uuid}: {c.Name} = ");
-                        string s = Util.toASCII(data);
-                        logger.debug($"  found {c.Name} = {s}");
-
-                        if (c.Name == "Manufacturer Name String")
-                            bdi.manufacturerName = s;
-                        else if (c.Name == "Software Revision String")
-                            bdi.softwareRevision = s;
-                        else if (c.Name == "Firmware Revision String")
-                            bdi.firmwareRevision = s;
-                        else if (c.Name == "Hardware Revision String")
-                            bdi.hardwareRevision = s;
-                        else
-                            logger.error($"unrecognized BLE Device Info: {c.Name} = {s}");
+                        bdi.add(c.Name, Util.toASCII(data));
                     }
                 }
             }
-            bdi.dump();
 
             // populate Spectrometer
             logger.debug("initializing spectrometer");

@@ -42,12 +42,14 @@ namespace EnlightenMobile.Models
         public double[] dark;
 
         public Measurement measurement;
-        public string note {get; set;}
+        public string note { get; set; }
+
         public bool acquiring;
         ushort lastCRC;
-        const int MAX_RETRIES = 3;
+        const int MAX_RETRIES = 4;
+        const int THROWAWAY_SPECTRA = 6;
 
-        public uint scansToAverage {get; set;}
+        public uint scansToAverage { get; set; }
         uint totalPixelsToRead;
         uint totalPixelsRead;
 
@@ -175,20 +177,18 @@ namespace EnlightenMobile.Models
             else
                 wavenumbers = null;
 
-
             ////////////////////////////////////////////////////////////////////
             // finish initializing Spectrometer 
             ////////////////////////////////////////////////////////////////////
 
             showProgress(1);
-
             
             logger.debug("finishing spectrometer initialization");
             pixels = eeprom.activePixelsHoriz;
 
             updateBatteryAsync();
-            integrationTimeMS = (ushort)(eeprom.startupIntegrationTimeMS > 0 ? eeprom.startupIntegrationTimeMS : 400);
-            gainDb = (byte)Math.Min(31, Math.Round(eeprom.detectorGain));
+            integrationTimeMS = (ushort)(eeprom.startupIntegrationTimeMS > 0 && eeprom.startupIntegrationTimeMS < 5000 ? eeprom.startupIntegrationTimeMS : 3);
+            gainDb = eeprom.detectorGain;
 
             logger.info($"initialized {eeprom.model} {eeprom.serialNumber}");
             logger.info($"  detector: {eeprom.detectorName}");
@@ -254,6 +254,9 @@ namespace EnlightenMobile.Models
         async void pauseAsync()
         {
             await Task.Delay(10);
+
+            logger.debug("pauseAsync: running GC");
+            GC.Collect();
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -268,10 +271,16 @@ namespace EnlightenMobile.Models
             get => _nextGainDb;
             set 
             { 
-                _nextGainDb = value;
-                logger.debug($"Spectrometer.gainDb: next = {value}");
-                _ = syncGainDbAsync();
-
+                if (value > 0 && value < 256)
+                {
+                    _nextGainDb = value;
+                    logger.debug($"Spectrometer.gainDb: next = {value}");
+                    _ = syncGainDbAsync();
+                }
+                else
+                {
+                    logger.error($"ignoring out-of-range gainDb {value}");
+                }
             }
         }
         float _nextGainDb = 24.0f;
@@ -295,11 +304,12 @@ namespace EnlightenMobile.Models
             byte msb = (byte)Math.Floor(_nextGainDb);
             byte lsb = (byte)(((byte)Math.Round( (_nextGainDb - msb) * 256.0)) & 0xff);
 
-            // ENG-0120
             ushort value = (ushort)((msb << 8) | lsb);
             ushort len = 2;
 
             byte[] request = ToBLEData.convert(value, len: len);
+
+            logger.debug($"converting gain {_nextGainDb:f4} to msb 0x{msb:x2}, lsb 0x{lsb:x2}, value 0x{value:x4}, request {request}");
 
             logger.info($"Spectrometer.syncGainDbAsync({_nextGainDb})"); 
             logger.hexdump(request, "data: ");
@@ -311,7 +321,15 @@ namespace EnlightenMobile.Models
                 pauseAsync();
             }
             else
-                logger.error($"Failed to set gainDb {value}");
+                logger.error($"Failed to set gainDb {value:x4}");
+
+            // kludge
+            if (!ok)
+            {
+                logger.error("KLUDGE: ignoring gainDb failure");
+                ok = true;
+                _lastGainDb = _nextGainDb;
+            }
 
             return ok;
         }
@@ -375,35 +393,6 @@ namespace EnlightenMobile.Models
                 _ = syncLaserStateAsync();
             }
         }
-
-        /*
-        async Task<bool> syncLaserEnabledAsync()
-        {
-            if (characteristicsByName is null)
-                return false;
-
-            var characteristic = characteristicsByName["laserState"];
-            if (characteristic is null)
-            {
-                logger.error("can't find laserEnable characteristic");
-                return false;
-            }
-
-            var flag = laserState.enabled;
-            byte[] request = ToBLEData.convert(flag);
-
-            logger.info($"Spectrometer.syncLaserEnabledAsync({flag})");
-            logger.hexdump(request, "data: ");
-
-            var ok = await characteristic.WriteAsync(request);
-            if (ok)
-                pauseAsync();
-            else
-                logger.error($"Failed to sync laserEnabled");
-
-            return ok;
-        }
-        */
 
         ////////////////////////////////////////////////////////////////////////
         // alternatingEnabled
@@ -502,6 +491,9 @@ namespace EnlightenMobile.Models
             logger.info($"acquired Measurement {measurement.measurementID}");
             updateBatteryAsync();
 
+            logger.debug($"calling GC.Collect({GC.MaxGeneration})");
+            GC.Collect(GC.MaxGeneration);
+
             acquiring = false;
             return true;
         }
@@ -537,6 +529,7 @@ namespace EnlightenMobile.Models
             }
 
             // send acquire command
+            logger.debug("sending SPECTRUM_ACQUIRE");
             byte[] request = ToBLEData.convert(true);
             if (! await acquireChar.WriteAsync(request))
             {
@@ -564,6 +557,13 @@ namespace EnlightenMobile.Models
                     }
 
                     int delayMS = (int)Math.Pow(5, retryCount);
+
+                    // if this is the first retry, assume that the sensor was
+                    // powered-down, and we need to wait for some throwaway
+                    // spectra 
+                    if (retryCount == 1)
+                        delayMS = (int)(integrationTimeMS * THROWAWAY_SPECTRA);
+
                     logger.error($"Retry requested, so waiting for {delayMS}ms");
                     await Task.Delay(delayMS);
 
@@ -638,6 +638,9 @@ namespace EnlightenMobile.Models
             // kludge: first four pixels are zero, so overwrite from 5th
             for (int i = 0; i < 4; i++)
                 spectrum[i] = spectrum[4];
+
+            // kludge: last pixel seems to be 0xff, so re-write from previous
+            spectrum[pixels-1] = spectrum[pixels-2];
 
             return spectrum;
         }

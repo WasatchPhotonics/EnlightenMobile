@@ -29,25 +29,11 @@ namespace EnlightenMobile.ViewModels
         // BLE Device Info
         ////////////////////////////////////////////////////////////////////////
 
-        public string manufacturerName
-        {
-            get => spec.bleDeviceInfo.manufacturerName;
-        }
-
-        public string softwareRevision
-        {
-            get => spec.bleDeviceInfo.softwareRevision;
-        }
-
-        public string firmwareRevision
-        {
-            get => spec.bleDeviceInfo.firmwareRevision;
-        }
-
-        public string hardwareRevision
-        {
-            get => spec.bleDeviceInfo.hardwareRevision;
-        }
+        public string deviceName       { get => spec.bleDeviceInfo.deviceName; }
+        public string manufacturerName { get => spec.bleDeviceInfo.manufacturerName; }
+        public string softwareRevision { get => spec.bleDeviceInfo.softwareRevision; }
+        public string firmwareRevision { get => spec.bleDeviceInfo.firmwareRevision; }
+        public string hardwareRevision { get => spec.bleDeviceInfo.hardwareRevision; }
 
         ////////////////////////////////////////////////////////////////////////
         // EEPROM

@@ -754,6 +754,20 @@ namespace EnlightenMobile.Models
             badPixelSet = new SortedSet<short>();
         }
 
+        bool corruptedPage(byte[] data)
+        {
+            var allZero = true;                
+            var allHigh = true;                
+            for (int i = 0; i < data.Length; i++)
+            {
+                if (data[i] != 0x00) allZero = false;
+                if (data[i] != 0xff) allHigh = false;
+                if (!allHigh && !allZero)
+                    return false;
+            }
+            return true;
+        }
+
         public bool parse(List<byte[]> pages_in)
         {
             pages = pages_in;
@@ -764,6 +778,13 @@ namespace EnlightenMobile.Models
             }
 
             format = pages[0][63];
+
+            // corrupted EEPROM test (comms, battery, unprogrammed)
+            if (corruptedPage(pages[0]))
+            {
+                logger.error("EEPROM page 0 is corrupted or unprogrammed");
+                return false;
+            }
 
             try
             {
@@ -927,6 +948,18 @@ namespace EnlightenMobile.Models
             {
                 logger.error("invalid minIntegrationTimeMS found ({0}), defaulting to 1", minIntegrationTimeMS);
                 minIntegrationTimeMS = 1;
+            }
+
+            if (detectorGain <= 0 || detectorGain >= 256)
+            {
+                logger.error($"invalid gain found ({detectorGain}), defaulting to 24");
+                detectorGain = 24;
+            }
+
+            if (activePixelsHoriz <= 0)
+            {
+                logger.error($"invalid active_pixels_horizontal ({activePixelsHoriz}), defaulting to 1952");
+                activePixelsHoriz = 1952;
             }
         }
 

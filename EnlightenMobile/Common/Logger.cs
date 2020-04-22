@@ -22,6 +22,9 @@ namespace EnlightenMobile
         public StringBuilder history = null;
         private StreamWriter outfile;
 
+        const int AUTOSAVE_SIZE = 1 * 1024 * 1024; // 1MB
+        bool saving;
+
         ////////////////////////////////////////////////////////////////////////
         // Public attributes
         ////////////////////////////////////////////////////////////////////////
@@ -65,6 +68,8 @@ namespace EnlightenMobile
 
         public void save(string pathname=null)
         {
+            Console.WriteLine("Logger.save: starting");
+
             if (history is null)
             {
                 Console.WriteLine("Can't save w/o history");
@@ -81,7 +86,7 @@ namespace EnlightenMobile
                     return;
                 }
 
-                var filename = string.Format("enlighten-mobile-{0}.log", 
+                var filename = string.Format("EnlightenMobile-{0}.log", 
                     DateTime.Now.ToString("yyyyMMdd-HHmmss-ffffff"));
 
                 pathname = $"{dir}/{filename}";
@@ -171,12 +176,14 @@ namespace EnlightenMobile
 
                 if (history != null)
                 {
-                    if (history.Length > 0x8000)
+                    if (history.Length > AUTOSAVE_SIZE && !saving)
                     {
-                        history.Append("[autosaving log after 32k]\n");
-                        save();
+                        saving = true;
+                        history.Append("[autosaving log]\n");
                         history.Clear();
-                        history.Append("[truncated log above 32k]\n");
+                        save();
+                        saving = false;
+                        history.Append("[truncated log after autosave]\n");
                     }
                     history.Append(msg + "\n");
                     if (liveUpdates)

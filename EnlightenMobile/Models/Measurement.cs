@@ -87,6 +87,8 @@ namespace EnlightenMobile.Models
         /// </todo>
         public bool save()
         {
+            logger.debug("Measurement.save: starting");
+
             if (processed is null || raw is null)
             {
                 logger.error("saveAsync: nothing to save");

@@ -20,6 +20,10 @@
             <Label FontSize="Large" Text="BLE Device Info"/>
             <StackLayout Margin="10, 0, 10, 0">
                 <FlexLayout JustifyContent="SpaceBetween">
+                    <Label Text="Device Name"/>
+                    <Label Text="{Binding deviceName}"/>
+                </FlexLayout>
+                <FlexLayout JustifyContent="SpaceBetween">
                     <Label Text="Manufacturer Name"/>
                     <Label Text="{Binding manufacturerName}"/>
                 </FlexLayout>

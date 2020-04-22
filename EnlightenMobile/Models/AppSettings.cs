@@ -61,6 +61,9 @@ namespace EnlightenMobile.Models
 
         AppSettings()
         {
+            logger.info($"EnlightenMobile {version}");
+            logger.info($"hostDescription = {hostDescription}");
+            logger.info($"OS = {os}");
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -92,6 +95,7 @@ namespace EnlightenMobile.Models
 
         public string getSavePath()
         {
+            logger.debug("AppSettings: getSavePath");
             IPlatformUtil platformUtil = DependencyService.Get<IPlatformUtil>();
             return platformUtil.getSavePath();
         }
@@ -132,13 +136,6 @@ namespace EnlightenMobile.Models
         // simply clicking the wrong button.
         public bool authenticate(string password)
         {
-            // do not attempt to authenticate the "bullets" (no change)
-            // if (password == stars)
-            // {
-            //     logger.debug("authenticate: ignoring stars");
-            //     return authenticated;
-            // }
-
             const string EXPECTED_PASSWORD = "DangerMan";
             authenticated = password == EXPECTED_PASSWORD;
 

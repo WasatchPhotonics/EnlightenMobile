@@ -36,6 +36,39 @@ namespace EnlightenMobile.Views
             svm.notifyToast += (string msg) => Util.toast(msg, scrollOptions);
         }
 
+        ////////////////////////////////////////////////////////////////////////
+        // Entries
+        ////////////////////////////////////////////////////////////////////////
+
+        // the user clicked in an Entry, so clear the field
+        void entry_Focused(Object sender, FocusEventArgs e)
+        {
+            var entry = sender as Entry;
+            entry.Text = "";
+        }
+        
+        void entryIntegrationTimeMS_Completed(Object sender, EventArgs e)
+        {
+            var entry = sender as Entry;
+            svm.setIntegrationTimeMS(entry.Text);
+        }
+
+        void entryGainDb_Completed(Object sender, EventArgs e)
+        {
+            var entry = sender as Entry;
+            svm.setGainDb(entry.Text);
+        }
+
+        void entryScansToAverage_Completed(Object sender, EventArgs e)
+        {
+            var entry = sender as Entry;
+            svm.setScansToAverage(entry.Text);
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        // Expand / hide control palette in Landscape mode
+        ////////////////////////////////////////////////////////////////////////
+        
         private void buttonExpander_Clicked(object sender, EventArgs e)
         {
             logger.debug("Clicked the expander button");

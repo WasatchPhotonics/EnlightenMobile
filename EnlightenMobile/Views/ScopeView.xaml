@@ -158,6 +158,8 @@
                                        Placeholder="3"
                                        WidthRequest="100"
                                        HorizontalTextAlignment="Center"
+                                       Focused="entry_Focused"
+                                       Completed="entryIntegrationTimeMS_Completed"
                                        Keyboard="Numeric" />
                             </FlexLayout>
 
@@ -169,6 +171,8 @@
                                        Placeholder="24"
                                        HorizontalTextAlignment="Center"
                                        WidthRequest="100"
+                                       Focused="entry_Focused"
+                                       Completed="entryGainDb_Completed"
                                        Keyboard="Numeric" />
                             </FlexLayout>
 
@@ -179,6 +183,8 @@
                                        Text="{Binding scansToAverage}" 
                                        Placeholder="1"
                                        HorizontalTextAlignment="Center"
+                                       Focused="entry_Focused"
+                                       Completed="entryScansToAverage_Completed"
                                        WidthRequest="100"
                                        Keyboard="Numeric" />
                             </FlexLayout>

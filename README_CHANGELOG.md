@@ -1,5 +1,18 @@
 # Version History
 
+- 2020-04-22 0.4.1
+    - better reporting of spectrum failures
+    - only update integration time, gain, scan averaging on entry complete
+    - fixed recusive bug in logger auto-save
+    - log header
+    - added BLEDeviceInfo.deviceName
+    - check for corrupted EEPROM read
+    - sanity checks for EEPROM detectorGain, activePixelsHoriz
+    - custom retry logic for sensor power-on throwaway spectra
+    - finished porting gainDb to ubfloat16
+    - KLUDGE: ignore gainDb write failures
+    - overwrite last pixel
+    - chasing GC bug (not solved yet)
 - 2020-04-22 0.4.0
     - changed integration time from ushort to uint
     - ENG-0120 BLE API updates
