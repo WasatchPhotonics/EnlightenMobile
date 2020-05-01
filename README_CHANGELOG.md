@@ -1,5 +1,11 @@
 # Version History
 
+- 2020-05-01 0.4.2
+    - fixed firmware revision labels
+    - disable laser if battery < 5%
+    - fixed Raman Mode DisplayAlert (ran on UI thread)
+    - added SVM.isLaserAvailable
+    - added LaserState.dump()
 - 2020-04-22 0.4.1
     - better reporting of spectrum failures
     - only update integration time, gain, scan averaging on entry complete

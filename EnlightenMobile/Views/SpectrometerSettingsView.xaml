@@ -28,11 +28,11 @@
                     <Label Text="{Binding manufacturerName}"/>
                 </FlexLayout>
                 <FlexLayout JustifyContent="SpaceBetween">
-                    <Label Text="Software Revision"/>
+                    <Label Text="BLE FW Revision"/>
                     <Label Text="{Binding softwareRevision}"/>
                 </FlexLayout>
                 <FlexLayout JustifyContent="SpaceBetween">
-                    <Label Text="Firmware Revision"/>
+                    <Label Text="FPGA FW Revision"/>
                     <Label Text="{Binding firmwareRevision}"/>
                 </FlexLayout>
                 <FlexLayout JustifyContent="SpaceBetween">

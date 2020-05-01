@@ -13,6 +13,15 @@ namespace EnlightenMobile.Models
 
         Logger logger = Logger.getInstance();
 
+        public void dump()
+        {
+            logger.debug("LaserState:");
+            logger.debug($"  type = {type}");
+            logger.debug($"  mode = {mode}");
+            logger.debug($"  enabled = {enabled}");
+            logger.debug($"  watchdogSec = {watchdogSec}");
+        }
+
         public LaserState(byte[] data = null)
         {
             reset();
@@ -33,6 +42,7 @@ namespace EnlightenMobile.Models
             mode = LaserMode.MANUAL;
             enabled = false;
             watchdogSec = 10;
+            dump();
         }
 
         // generate a 4-byte payload to be sent from Central to Peripheral
@@ -132,6 +142,8 @@ namespace EnlightenMobile.Models
             mode = newMode;
             enabled = newEnabled;
             watchdogSec = newWatchdog;
+
+            dump();
 
             return true;
         }

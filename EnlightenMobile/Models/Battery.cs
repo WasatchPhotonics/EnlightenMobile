@@ -8,6 +8,8 @@ namespace EnlightenMobile.Models
         ushort raw;
         byte rawLevel;
         byte rawState;
+
+        // valid range should be (0, 100)
         public double level {get; private set; }
         
         bool charging;

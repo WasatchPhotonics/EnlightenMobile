@@ -107,7 +107,7 @@ namespace EnlightenMobile.Views
                 if (!success)
                 {
                     logger.error("can't obtain Location permission");
-                    _ = DisplayAlert("Error", "Can't obtain Location permission", "Ok");
+                    _ = DisplayAlert("Error", "Can't obtain Location permission", "OK");
                     return;
                 }
 
@@ -124,7 +124,7 @@ namespace EnlightenMobile.Views
             }
             catch (Exception ex)
             {
-                _ = DisplayAlert("Exception", ex.Message.ToString(), "Ok");
+                _ = DisplayAlert("Exception", ex.Message.ToString(), "OK");
                 logger.error("caught exception during scan button event: {0}", ex.Message);
             }
             logger.debug("scan complete");

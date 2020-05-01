@@ -80,33 +80,29 @@ namespace EnlightenMobile.Views
         // Since we use the GUI to provide verification, this is properly
         // implemented in the View rather than ViewModel.  The confirmed value
         // is written to the ViewModel at the end.
-        void ramanMode_Toggled(object sender, EventArgs e)
+        async void ramanMode_Toggled(object sender, EventArgs e)
         {
-            logger.debug("Raman Mode changed on GUI");
+            logger.debug("ScopeView: Raman Mode changed on GUI");
             var enabled = switchRamanMode.IsToggled;
             if (!enabled)
             {
                 // if the switch is off, just disable Raman Mode and go
+                logger.debug("ScopeView: disabling Raman Mode in SVM");
                 svm.ramanModeEnabled = false;
                 return;
             }
 
             // apparently we were asked to enable Raman Mode...this deserves
             // confirmation
-            var confirmed = DisplayAlert("Raman Mode",
-                "Enabling Raman mode means the laser will AUTOMATICALLY fire each " +
-                "time you take a measurement.  Do you wish to continue?",
-                "Yes", "Cancel").Result;
+            logger.debug("ScopeView.confirmRamanMode: Raising a DisplayAlert");
+            var confirmed = await DisplayAlert("Raman Mode",
+                    "Enabling Raman mode means the laser will AUTOMATICALLY fire each " +
+                    "time you take a measurement.  Do you wish to continue?",
+                    "Yes", "Cancel");
+            logger.debug($"ScopeView.confirmRamanMode: confirmed = {confirmed}");
+            svm.ramanModeEnabled = confirmed;
             if (!confirmed)
-            {
-                // user clicked "Cancel"
-                // disable Raman Mode to be sure
-                svm.ramanModeEnabled = false;
-                return;
-            }
-
-            // apparently they're sure
-            svm.ramanModeEnabled = true;
+                switchRamanMode.IsToggled = false;
         }
 
         // This event is used to reformat the ScopeView from Portrait to Landscape 

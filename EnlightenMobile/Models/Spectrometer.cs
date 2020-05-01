@@ -345,7 +345,8 @@ namespace EnlightenMobile.Models
             get => laserState.mode == LaserMode.RAMAN;
             set
             {
-                laserState.mode = LaserMode.RAMAN;
+                laserState.mode = value ? LaserMode.RAMAN : LaserMode.MANUAL;
+                logger.debug($"Spectrometer.ramanModeEnabled: laserState.mode = {laserState.mode}");
                 _ = syncLaserStateAsync();
             }
         }
@@ -362,6 +363,9 @@ namespace EnlightenMobile.Models
 
         async Task<bool> syncLaserStateAsync()
         {
+            logger.debug("syncLaserStateAsync: start");
+            laserState.dump();
+
             if (characteristicsByName is null)
                 return false;
 

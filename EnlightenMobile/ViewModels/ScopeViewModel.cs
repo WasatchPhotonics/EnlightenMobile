@@ -207,16 +207,27 @@ namespace EnlightenMobile.ViewModels
         public bool ramanModeEnabled
         {
             get => spec.ramanModeEnabled;
-            set => spec.ramanModeEnabled = value;
+            set
+            {
+                logger.debug($"SVM.ramanModeEnabled: setting Spectrometer.ramanModeEnabled = {value}");
+                spec.ramanModeEnabled = value;
+
+                // as this is based partly on Raman Mode...
+                updateLaserAvailable();
+            }
         }
 
-        // Provided so the "Laser Enable" Switch is disabled if we're in Raman Mode.
-        //
-        // This probably looks like the most useless Property ever...in fact,
-        // it's strangely messy to invert a boolean in XAML, so here we are.
-        public bool ramanModeDisabled
+        // Provided so the "Laser Enable" Switch is disabled if we're in Raman
+        // Mode (or battery is low).
+        public bool laserIsAvailable
         {
-            get => !ramanModeEnabled;
+            get
+            {
+                var available = !ramanModeEnabled && spec.battery.level >= 5;
+                if (!available)
+                    logger.debug($"laser not available because ramanModeEnabled ({ramanModeEnabled}) or bettery < 5 ({spec.battery.level})");
+                return available;
+            }
         }
 
         // Provided so the View can only show/enable certain controls if we're
@@ -232,6 +243,8 @@ namespace EnlightenMobile.ViewModels
         {
             logger.debug($"SVM.handleAppSettingsChange: received notification from {sender}, so refreshing isAuthenticated");
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(isAuthenticated)));
+
+            updateLaserAvailable();
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -325,7 +338,14 @@ namespace EnlightenMobile.ViewModels
             showProgress(0);
             isRefreshing = false;
 
+            updateLaserAvailable();
+
             return ok;
+        }
+
+        public void updateLaserAvailable()
+        { 
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(laserIsAvailable)));
         }
 
         void updateChart()
