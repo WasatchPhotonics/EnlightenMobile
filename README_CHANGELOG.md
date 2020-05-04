@@ -1,5 +1,10 @@
 # Version History
 
+- 2020-05-04 0.4.3
+    - added LaserState.laserDelayMS
+    - override LaserState.watchdogSec and .laserEnable if .mode == RAMAN
+    - enabled Notifications for batteryStatus and laserState characteristics
+    - hopefully fixed laserWatchdogSec binding in AppSettings ViewModel
 - 2020-05-01 0.4.2
     - fixed firmware revision labels
     - disable laser if battery < 5%

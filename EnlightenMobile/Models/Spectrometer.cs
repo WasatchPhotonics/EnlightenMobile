@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using Plugin.BLE.Abstractions.Contracts;
 using EnlightenMobile.Common;
@@ -18,7 +19,7 @@ namespace EnlightenMobile.Models
     // This more-or-less corresponds to WasatchNET.Spectrometer, or 
     // SiGDemo.Spectrometer.  Spectrometer state and logic should be 
     // encapsulated here.
-    public class Spectrometer
+    public class Spectrometer : INotifyPropertyChanged
     {
         // Singleton
         static Spectrometer instance = null;
@@ -52,8 +53,6 @@ namespace EnlightenMobile.Models
         public uint scansToAverage { get; set; }
         uint totalPixelsToRead;
         uint totalPixelsRead;
-
-        object bleLock = new object();
 
         // util
         Logger logger = Logger.getInstance();
@@ -347,6 +346,7 @@ namespace EnlightenMobile.Models
             {
                 laserState.mode = value ? LaserMode.RAMAN : LaserMode.MANUAL;
                 logger.debug($"Spectrometer.ramanModeEnabled: laserState.mode = {laserState.mode}");
+
                 _ = syncLaserStateAsync();
             }
         }
@@ -357,6 +357,26 @@ namespace EnlightenMobile.Models
             set
             {
                 laserState.watchdogSec = value;
+                _ = syncLaserStateAsync();
+            }
+        }
+
+        public bool laserEnabled
+        {
+            get => laserState.enabled;
+            set
+            {
+                laserState.enabled = value;
+                _ = syncLaserStateAsync();
+            }
+        }
+
+        public ushort laserDelayMS
+        {
+            get => laserState.laserDelayMS;
+            set
+            {
+                laserState.laserDelayMS = value;
                 _ = syncLaserStateAsync();
             }
         }
@@ -386,16 +406,6 @@ namespace EnlightenMobile.Models
                 logger.error($"Failed to set laserState");
 
             return ok;
-        }
-
-        public bool laserEnabled
-        {
-            get => laserState.enabled;
-            set
-            {
-                laserState.enabled = value;
-                _ = syncLaserStateAsync();
-            }
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -647,6 +657,34 @@ namespace EnlightenMobile.Models
             spectrum[pixels-1] = spectrum[pixels-2];
 
             return spectrum;
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        // Notifications
+        ////////////////////////////////////////////////////////////////////////
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void processBatteryNotification(byte[] data)
+        {
+            if (data is null)
+                return;
+
+            logger.hexdump(data, "batteryStatus: ");
+            battery.parse(data);
+
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("batteryStatus"));
+        }
+
+        public void processLaserStateNotification(byte[] data)
+        {
+            if (data is null)
+                return;
+
+            logger.hexdump(data, "laserState: ");
+            laserState.parse(data);
+
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("laserState"));
         }
     }
 }

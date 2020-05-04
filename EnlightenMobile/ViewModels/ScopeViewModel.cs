@@ -41,6 +41,7 @@ namespace EnlightenMobile.ViewModels
             appSettings = AppSettings.getInstance();
 
             appSettings.PropertyChanged += handleAppSettingsChange;
+            spec.PropertyChanged += handleSpectrometerChange;
 
             // bind closures (method calls) to each Command
             acquireCmd = new Command(() => { _ = doAcquireAsync(); });
@@ -455,6 +456,27 @@ namespace EnlightenMobile.ViewModels
         protected void OnPropertyChanged([CallerMemberName] string caller = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(caller));
+        }
+
+        // Provided so Spectrometer notifications will immediately take effect on our View.
+        void handleSpectrometerChange(object sender, PropertyChangedEventArgs e)
+        {
+            var name = e.PropertyName;
+            logger.debug($"SVM.handleSpectrometerChange: received notification from {sender} that {name} changed");
+
+            if (name == "batteryStatus")
+            {
+                // "batteryStatus" is the name of the Characteristic, "batteryState" is the name of the SVM property
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(batteryState)));
+            }
+            else if (name == "laserState")
+            {
+                // Is there anything useful to do with this information?
+                //
+                // Basically, if the laser timed-out (in manual mode "Advanced"), 
+                // this should flip the switch back to the proper "off" position.
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(laserEnabled)));
+            }
         }
     }
 }

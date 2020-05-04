@@ -190,19 +190,19 @@
                             </FlexLayout>
 
                             <!-- dark -->
-                            <FlexLayout JustifyContent="SpaceBetween">
+                            <FlexLayout JustifyContent="SpaceBetween" MinimumHeightRequest="80" >
                                 <Label  Text="Dark" MinimumWidthRequest="75" />
                                 <Switch IsToggled="{Binding darkEnabled}" />
                             </FlexLayout>
 
                             <!-- Raman mode -->
-                            <FlexLayout JustifyContent="SpaceBetween">
+                            <FlexLayout JustifyContent="SpaceBetween" MinimumHeightRequest="80">
                                 <Label  Text="Raman Mode" MinimumWidthRequest="75" />
                                 <Switch x:Name="switchRamanMode" Toggled="ramanMode_Toggled" />
                             </FlexLayout>    
 
                             <!-- laser (if not in Raman Mode) -->
-                            <FlexLayout JustifyContent="SpaceBetween" IsVisible="{Binding isAuthenticated}">
+                            <FlexLayout JustifyContent="SpaceBetween" MinimumHeightRequest="80" IsVisible="{Binding isAuthenticated}">
                                 <Label  Text="Fire Laser" MinimumWidthRequest="75" />
                                 <Switch IsToggled="{Binding laserEnabled}" IsEnabled="{Binding laserIsAvailable}"/>
                             </FlexLayout>

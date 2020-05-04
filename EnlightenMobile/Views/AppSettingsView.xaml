@@ -72,6 +72,14 @@
                                WidthRequest="100"
                                Keyboard="Numeric" />
                     </FlexLayout>
+                    <FlexLayout JustifyContent="SpaceBetween" IsVisible="{Binding isAuthenticated}">
+                        <Label Text="Laser Warm-up Delay (ms)" />
+                        <Entry Text="{Binding laserDelayMS}" 
+                               Placeholder="500"
+                               HorizontalTextAlignment="Center"
+                               WidthRequest="100"
+                               Keyboard="Numeric" />
+                    </FlexLayout>
                 </StackLayout>
             </ScrollView>
         </StackLayout>

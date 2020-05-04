@@ -10,6 +10,7 @@ namespace EnlightenMobile.Models
         public LaserMode mode = LaserMode.MANUAL;
         public bool enabled;
         public byte watchdogSec;
+        public ushort laserDelayMS;
 
         Logger logger = Logger.getInstance();
 
@@ -20,6 +21,7 @@ namespace EnlightenMobile.Models
             logger.debug($"  mode = {mode}");
             logger.debug($"  enabled = {enabled}");
             logger.debug($"  watchdogSec = {watchdogSec}");
+            logger.debug($"  laserDelayMS = {laserDelayMS} ms");
         }
 
         public LaserState(byte[] data = null)
@@ -42,29 +44,44 @@ namespace EnlightenMobile.Models
             mode = LaserMode.MANUAL;
             enabled = false;
             watchdogSec = 10;
+            laserDelayMS = 0;
             dump();
         }
 
-        // generate a 4-byte payload to be sent from Central to Peripheral
+        // Generate a 6-byte payload to be sent from Central to Peripheral.  
+        //
+        // We enforce some cross-field logic here, so that we're not actually 
+        // overwrite values in the Spectrometer or LaserState models, so that
+        // when logic constraints are removed, the configured "model" values are 
+        // immediately restored.  I am actually not sure where the best place to
+        // override these is.
         public byte[] serialize()
         {
-            byte[] data = new byte[4];
+            byte[] data = new byte[6];
 
             data[0] = (byte)type;
             data[1] = (byte)mode;
             data[2] = (byte)(enabled ? 1 : 0);
             data[3] = watchdogSec;
+            data[4] = (byte)((laserDelayMS >> 8) & 0xff);
+            data[5] = (byte)( laserDelayMS       & 0xff);
+
+            if (mode == LaserMode.RAMAN)
+            {
+                data[2] = 1; // laserEnable = true
+                data[3] = 0; // watchdogSec = 0
+            }
 
             return data;
         }
 
-        // Parse and validate a 4-byte payload received from Peripheral by Central.
+        // Parse and validate a 6-byte payload received from Peripheral by Central.
         //
         // If any part of the payload does not pass validation, the entire payload
         // is rejected and application state is unchanged.
         public bool parse(byte[] data)
         {
-            if (data.Length != 4)
+            if (data.Length != 6)
             {
                 logger.error($"rejecting LaserState with invalid payload length {data.Length}");
                 return false;
@@ -135,6 +152,13 @@ namespace EnlightenMobile.Models
             }
 
             ////////////////////////////////////////////////////////////////////
+            // Laser Delay
+            ////////////////////////////////////////////////////////////////////
+
+
+            ushort newLaserDelayMS = (ushort)((data[4] << 8) | data[5]);
+
+            ////////////////////////////////////////////////////////////////////
             // all fields validated, accept new values
             ////////////////////////////////////////////////////////////////////
 
@@ -142,6 +166,7 @@ namespace EnlightenMobile.Models
             mode = newMode;
             enabled = newEnabled;
             watchdogSec = newWatchdog;
+            laserDelayMS = newLaserDelayMS;
 
             dump();
 

@@ -30,6 +30,7 @@ namespace EnlightenMobile.Views
         IService service;
 
         Dictionary<string, Guid> guidByName = new Dictionary<string, Guid>();
+        Dictionary<Guid, string> nameByGuid = new Dictionary<Guid, string>();
         Dictionary<string, ICharacteristic> characteristicsByName = new Dictionary<string, ICharacteristic>();
 
         Guid primaryServiceId;
@@ -66,29 +67,20 @@ namespace EnlightenMobile.Views
 
             // characteristics
             logger.debug("BluetoothView: initializing characteristic GUIDs");
-            if (true)
-            {
-                // ENG-0120
-                guidByName["integrationTimeMS"] = _makeGuid("ff01");
-                guidByName["gainDb"]            = _makeGuid("ff02"); 
-                guidByName["laserState"]        = _makeGuid("ff03"); 
-                guidByName["acquireSpectrum"]   = _makeGuid("ff04"); 
-                guidByName["spectrumRequest"]   = _makeGuid("ff05"); 
-            }
-            else
-            {
-                // original
-                guidByName["pixels"]            = _makeGuid("ff01");
-                guidByName["integrationTimeMS"] = _makeGuid("ff02"); 
-                guidByName["gainDb"]            = _makeGuid("ff03"); 
-                guidByName["laserState"]        = _makeGuid("ff04"); 
-                guidByName["acquireSpectrum"]   = _makeGuid("ff05"); 
-                guidByName["spectrumRequest"]   = _makeGuid("ff0a"); 
-            }
+
+            // ENG-0120
+            guidByName["integrationTimeMS"] = _makeGuid("ff01");
+            guidByName["gainDb"]            = _makeGuid("ff02"); 
+            guidByName["laserState"]        = _makeGuid("ff03"); 
+            guidByName["acquireSpectrum"]   = _makeGuid("ff04"); 
+            guidByName["spectrumRequest"]   = _makeGuid("ff05"); 
             guidByName["readSpectrum"]      = _makeGuid("ff06");
             guidByName["eepromCmd"]         = _makeGuid("ff07");
             guidByName["eepromData"]        = _makeGuid("ff08");
             guidByName["batteryStatus"]     = _makeGuid("ff09");
+
+            foreach (var pair in guidByName)
+                nameByGuid[pair.Value] = pair.Key;
 
             btnConnect.IsEnabled = false;
         }
@@ -281,6 +273,9 @@ namespace EnlightenMobile.Views
 
                 logger.debug($"  {c.Uuid} {name}");
 
+                if (c.CanUpdate)
+                    logger.debug("    (supports notifications)");
+
                 // Step 7a: read characteristic descriptors
                 // logger.debug($"    WriteType = {c.WriteType}");
                 // var descriptors = await c.GetDescriptorsAsync();
@@ -322,6 +317,20 @@ namespace EnlightenMobile.Views
             spec.bleDeviceInfo = bdi;
             _ = await spec.initAsync(characteristicsByName, showProgress);
 
+            // start notifications
+            foreach (var pair in characteristicsByName)
+            {
+                var name = pair.Key;
+                var c = pair.Value;
+
+                if (c.CanUpdate && (name == "batteryStatus" || name == "laserState"))
+                {
+                    c.ValueUpdated -= _characteristicUpdated;
+                    c.ValueUpdated += _characteristicUpdated;
+                    _ = c.StartUpdatesAsync();
+                }
+            }
+
             ////////////////////////////////////////////////////////////////////
             // all done
             ////////////////////////////////////////////////////////////////////
@@ -333,6 +342,33 @@ namespace EnlightenMobile.Views
         ////////////////////////////////////////////////////////////////////////
         // Utility methods
         ////////////////////////////////////////////////////////////////////////
+
+        // @todo test
+        private void _characteristicUpdated(object sender, CharacteristicUpdatedEventArgs characteristicUpdatedEventArgs)
+        {
+            var c = characteristicUpdatedEventArgs.Characteristic;
+
+            // faster way to do this using nameByGuid?
+            string name = null;
+            foreach (var pair in characteristicsByName)
+                if (pair.Value.Uuid == c.Uuid)
+                    name = pair.Key;
+
+            if (name is null)
+            {
+                logger.error($"Received update from unknown characteristic ({c.Uuid})"); 
+                return;
+            }
+
+            if (name == "batteryStatus")
+            {
+                spec.processBatteryNotification(c.Value);
+            }
+            else if (name == "laserState")
+            {
+                spec.processLaserStateNotification(c.Value);
+            }
+        }
 
         Guid _makeGuid(string id)
         {
@@ -389,8 +425,8 @@ namespace EnlightenMobile.Views
                 // WHY DOESN'T THIS WORK?!?
                 // I almost feel like I'm working from a cached version of the Plugin.Permissions package...
                 // like if I fully flushed and reinstalled that package, this would be okay.
-		  	 // var status = await CrossPermissions.Current.CheckPermissionStatusAsync<T>(); 
-	           	var status = await CrossPermissions.Current.CheckPermissionStatusAsync(perm);
+		  	  //var status = await CrossPermissions.Current.CheckPermissionStatusAsync<T>(); 
+	            var status = await CrossPermissions.Current.CheckPermissionStatusAsync(perm);
 
                 // if not, prompt the user to authorize it
 				if (status != PermissionStatus.Granted)

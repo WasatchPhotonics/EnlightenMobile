@@ -11,6 +11,8 @@ namespace EnlightenMobile.ViewModels
 
         AppSettings appSettings = AppSettings.getInstance();
 
+        Spectrometer spec = Spectrometer.getInstance();
+
         public string title
         {
             get => "Application Settings";
@@ -52,6 +54,10 @@ namespace EnlightenMobile.ViewModels
             set => appSettings.saveReference = value;
         }
 
+        ////////////////////////////////////////////////////////////////////////
+        // Authentication 
+        ////////////////////////////////////////////////////////////////////////
+
         public string password
         {
             get => AppSettings.stars;
@@ -75,6 +81,22 @@ namespace EnlightenMobile.ViewModels
         {
             appSettings.authenticate(password);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(isAuthenticated)));
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        // Advanced Features
+        ////////////////////////////////////////////////////////////////////////
+
+        public byte laserWatchdogTimeoutSec
+        {
+            get => spec.laserWatchdogSec;
+            set => spec.laserWatchdogSec = value;
+        }
+
+        public ushort laserDelayMS
+        {
+            get => spec.laserDelayMS;
+            set => spec.laserDelayMS = value;
         }
     }
 }
