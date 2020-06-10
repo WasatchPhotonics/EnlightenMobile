@@ -9,8 +9,18 @@ namespace EnlightenMobile.Models
         public LaserType type = LaserType.NORMAL;
         public LaserMode mode = LaserMode.MANUAL;
         public bool enabled;
-        public byte watchdogSec;
-        public ushort laserDelayMS;
+        public byte watchdogSec = 5;
+        public ushort laserDelayMS = 500;
+
+        // While we're working out various timing and stabilization issues in FW,
+        // we're just going to implment Raman Mode in SW.  However, the FW version
+        // will likely come back at some point, so right now we're just kludging
+        // around it.  
+        //
+        // Nevertheless, laserState.mode is still used for internal state; we
+        // just don't send that mode to the FW, or read it back from the FW.
+        // But we do still use it for internal decision-making.
+        public const bool SW_RAMAN_MODE = true;
 
         Logger logger = Logger.getInstance();
 
@@ -44,7 +54,7 @@ namespace EnlightenMobile.Models
             mode = LaserMode.MANUAL;
             enabled = false;
             watchdogSec = 10;
-            laserDelayMS = 0;
+            laserDelayMS = 500;
             dump();
         }
 
@@ -68,8 +78,23 @@ namespace EnlightenMobile.Models
 
             if (mode == LaserMode.RAMAN)
             {
-                data[2] = 1; // laserEnable = true
-                data[3] = 0; // watchdogSec = 0
+                if (SW_RAMAN_MODE)
+                {
+                    // If we're in SW Raman Mode, tell the device we're in 
+                    // Manual Mode
+                    data[1] = (byte)LaserMode.MANUAL;
+
+                    // ignore laserDelayMS, as we'll do it in SW
+                    data[4] = 0;
+                    data[5] = 0;
+                }
+                else
+                {
+                    // If We're in HW Raman Mode, auto-enable the laser and 
+                    // disable the watchdog
+                    data[2] = 1; // laserEnable = true
+                    data[3] = 0; // watchdogSec = 0
+                }
             }
 
             return data;
@@ -163,10 +188,12 @@ namespace EnlightenMobile.Models
             ////////////////////////////////////////////////////////////////////
 
             type = newType;
-            mode = newMode;
             enabled = newEnabled;
             watchdogSec = newWatchdog;
             laserDelayMS = newLaserDelayMS;
+
+            if (!SW_RAMAN_MODE)
+                mode = newMode;
 
             dump();
 

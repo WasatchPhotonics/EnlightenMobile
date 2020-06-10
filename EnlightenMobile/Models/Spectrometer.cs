@@ -50,7 +50,7 @@ namespace EnlightenMobile.Models
         const int MAX_RETRIES = 4;
         const int THROWAWAY_SPECTRA = 6;
 
-        public uint scansToAverage { get; set; }
+        public uint scansToAverage { get; set; } = 1;
         uint totalPixelsToRead;
         uint totalPixelsRead;
 
@@ -133,6 +133,7 @@ namespace EnlightenMobile.Models
 
                     try
                     {
+                        logger.debug("reading eepromData");
                         var response = await eepromData.ReadAsync();
                         // logger.hexdump(response, "response");
 
@@ -185,13 +186,17 @@ namespace EnlightenMobile.Models
             logger.debug("finishing spectrometer initialization");
             pixels = eeprom.activePixelsHoriz;
 
-            updateBatteryAsync();
+            await updateBatteryAsync();
             integrationTimeMS = (ushort)(eeprom.startupIntegrationTimeMS > 0 && eeprom.startupIntegrationTimeMS < 5000 ? eeprom.startupIntegrationTimeMS : 3);
             gainDb = eeprom.detectorGain;
+
+            verticalROIStartLine = eeprom.ROIVertRegionStart[0];
+            verticalROIStopLine = eeprom.ROIVertRegionEnd[0];
 
             logger.info($"initialized {eeprom.model} {eeprom.serialNumber}");
             logger.info($"  detector: {eeprom.detectorName}");
             logger.info($"  pixels: {pixels}");
+            logger.info($"  verticalROI: ({verticalROIStartLine}, {verticalROIStopLine})");
             logger.info( "  excitation: {0:f2}nm", laserExcitationNM);
             logger.info( "  wavelengths: ({0:f2}, {1:f2})", wavelengths[0], wavelengths[pixels-1]);
             if (wavenumbers != null)
@@ -242,7 +247,7 @@ namespace EnlightenMobile.Models
             if (ok)
             { 
                 _lastIntegrationTimeMS = _nextIntegrationTimeMS;
-                pauseAsync();
+                await pauseAsync();
             }
             else
                 logger.error($"Failed to set integrationTimeMS {value}");
@@ -250,12 +255,15 @@ namespace EnlightenMobile.Models
             return ok;
         }
 
-        async void pauseAsync()
+        async Task<bool> pauseAsync()
         {
             await Task.Delay(10);
 
             logger.debug("pauseAsync: running GC");
             GC.Collect();
+            logger.debug("pauseAsync: back from GC");
+
+            return true;
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -317,7 +325,7 @@ namespace EnlightenMobile.Models
             if (ok)
             {
                 _lastGainDb = _nextGainDb;
-                pauseAsync();
+                await pauseAsync();
             }
             else
                 logger.error($"Failed to set gainDb {value:x4}");
@@ -329,6 +337,88 @@ namespace EnlightenMobile.Models
                 ok = true;
                 _lastGainDb = _nextGainDb;
             }
+
+            return ok;
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        // Vertical ROI Start/Stop
+        ////////////////////////////////////////////////////////////////////////
+
+        public ushort verticalROIStartLine
+        {
+            get => _nextVerticalROIStartLine;
+            set 
+            { 
+                if (value > 0 && value < eeprom.activePixelsVert)
+                {
+                    _nextVerticalROIStartLine = value;
+                    logger.debug($"Spectrometer.verticalROIStartLine -> {value}");
+                    _ = syncROI();
+                }
+                else
+                {
+                    logger.error($"ignoring out-of-range start line {value}");
+                }
+            }
+        }
+        ushort _nextVerticalROIStartLine = 200;
+        ushort _lastVerticalROIStartLine = 0;
+
+        public ushort verticalROIStopLine
+        {
+            get => _nextVerticalROIStopLine;
+            set 
+            { 
+                if (value > 0 && value < eeprom.activePixelsVert)
+                {
+                    _nextVerticalROIStopLine = value;
+                    logger.debug($"Spectrometer.verticalROIStopLine -> {value}");
+                    _ = syncROI();
+                }
+                else
+                {
+                    logger.error($"ignoring out-of-range stop line {value}");
+                }
+            }
+        }
+        ushort _nextVerticalROIStopLine = 800;
+        ushort _lastVerticalROIStopLine = 0;
+
+        async Task<bool> syncROI()
+        {
+            if (characteristicsByName is null)
+                return false;
+
+            var characteristic = characteristicsByName["roi"];
+            if (characteristic is null)
+            {
+                logger.error("ROI characteristic not found");
+                return false;
+            }
+
+            if (_nextVerticalROIStartLine == _lastVerticalROIStartLine &&
+                _nextVerticalROIStopLine == _lastVerticalROIStopLine)
+                return false;
+
+            byte[] startData = ToBLEData.convert(verticalROIStartLine, len: 2);
+            byte[] stopData = ToBLEData.convert(verticalROIStopLine, len: 2);
+            byte[] request = new byte[4];
+            Array.Copy(startData, request, 2);
+            Array.Copy(stopData, 0, request, 2, 2);
+
+            logger.info($"Spectrometer.syncROI({verticalROIStartLine}, {verticalROIStopLine})"); 
+            logger.hexdump(request, "data: ");
+
+            var ok = await characteristic.WriteAsync(request);
+            if (ok)
+            {
+                _lastVerticalROIStartLine = _nextVerticalROIStartLine;
+                _lastVerticalROIStopLine = _nextVerticalROIStopLine;
+                await pauseAsync();
+            }
+            else
+                logger.error($"Failed to set ROI ({verticalROIStartLine}, {verticalROIStopLine})");
 
             return ok;
         }
@@ -401,7 +491,7 @@ namespace EnlightenMobile.Models
 
             var ok = await characteristic.WriteAsync(request);
             if (ok)
-                pauseAsync();
+                await pauseAsync();
             else
                 logger.error($"Failed to set laserState");
 
@@ -418,16 +508,16 @@ namespace EnlightenMobile.Models
         // battery
         ////////////////////////////////////////////////////////////////////////
 
-        async public void updateBatteryAsync()
+        async public Task<bool> updateBatteryAsync()
         {
             if (characteristicsByName is null)
-                return;
+                return false;
 
             var characteristic = characteristicsByName["batteryStatus"];
             if (characteristic is null)
             {
                 logger.error("can't find characteristic batteryStatus");
-                return;
+                return false;
             }
 
             logger.info("reading battery status");
@@ -435,11 +525,13 @@ namespace EnlightenMobile.Models
             if (response is null)
             {
                 logger.error("failed reading battery");
-                return;
+                return false;
             }
             logger.hexdump(response, "batteryStatus: ");
             battery.parse(response);
-            pauseAsync();
+            await pauseAsync();
+
+            return true;
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -462,6 +554,9 @@ namespace EnlightenMobile.Models
         // responsible for taking one fully-averaged measurement
         public async Task<bool> takeOneAveragedAsync(ProgressBarDelegate showProgress)
         {
+            // keep this positive for loop sanity
+            scansToAverage = Math.Min(1, scansToAverage);
+
             if (characteristicsByName is null)
                 return false;
 
@@ -477,25 +572,43 @@ namespace EnlightenMobile.Models
             totalPixelsRead = 0;
             acquiring = true;
 
-            // take the first spectrum
-            double[] spectrum = await takeOneAsync(showProgress);
-            if (spectrum is null)
-                return acquiring = false;
+            // TODO: integrate laserDelayMS into showProgress
+            var swRamanMode = laserState.mode == LaserMode.RAMAN && LaserState.SW_RAMAN_MODE;
+            if (swRamanMode)
+            {
+                var sec = (byte)Math.Max(5, (uint)((integrationTimeMS * scansToAverage / 1000.0) + 3));
+                logger.debug($"takeOneAveragedAsync: setting laserWatchdogSec -> {sec}");
+                laserWatchdogSec = (byte)Math.Min(5, (uint)((integrationTimeMS * scansToAverage / 1000.0) + 3));
 
-            // if doing scan averaging (in software), take the rest
-            for (int i = 1; i < scansToAverage; i++)
+                logger.debug("takeOneAveragedAsync: setting laserEnabled = true");
+                laserEnabled = true;
+
+                logger.debug($"takeOneAveragedAsync: waiting {laserState.laserDelayMS}ms");
+                await Task.Delay(laserState.laserDelayMS);
+            }
+
+            double[] spectrum = null;
+            for (int spectrumCount = 0; spectrumCount < scansToAverage; spectrumCount++)
             { 
-                double[] tmp = await takeOneAsync(showProgress);
-                if (tmp is null || tmp.Length != spectrum.Length)
+                bool disableLaserAfterFirstPacket = swRamanMode && spectrumCount + 1 == scansToAverage;
+                double[] tmp = await takeOneAsync(showProgress, disableLaserAfterFirstPacket);
+                if (tmp is null || (spectrum != null && tmp.Length != spectrum.Length))
+                {
+                    if (swRamanMode)
+                        laserEnabled = false;
                     return acquiring = false;
+                }
 
-                for (int j = 0; j < spectrum.Length; j++)
-                    spectrum[j] += tmp[j];    
+                if (spectrum is null)
+                    spectrum = tmp;
+                else
+                    for (int i = 0; i < spectrum.Length; i++)
+                        spectrum[i] += tmp[i];    
             }
 
             if (scansToAverage > 1)
-                for (int j = 0; j < spectrum.Length; j++)
-                    spectrum[j] /= scansToAverage;
+                for (int i = 0; i < spectrum.Length; i++)
+                    spectrum[i] /= scansToAverage;
 
             lastSpectrum = spectrum;
             measurement = new Measurement(this);
@@ -503,7 +616,7 @@ namespace EnlightenMobile.Models
                 measurement.averageAlternating();
 
             logger.info($"acquired Measurement {measurement.measurementID}");
-            updateBatteryAsync();
+            await updateBatteryAsync();
 
             logger.debug($"calling GC.Collect({GC.MaxGeneration})");
             GC.Collect(GC.MaxGeneration);
@@ -514,7 +627,12 @@ namespace EnlightenMobile.Models
 
         // Take one spectrum (of many, if doing scan averaging).  This is private,
         // callers are expected to use takeOneAveragedAsync().
-        private async Task<double[]> takeOneAsync(ProgressBarDelegate showProgress)
+        // 
+        // There is no need to disable the laser if returning NULL, as the caller
+        // will do so anyway.
+        private async Task<double[]> takeOneAsync(
+            ProgressBarDelegate showProgress,
+            bool disableLaserAfterFirstPacket)
         {
             if (characteristicsByName is null)
                 return null;
@@ -543,7 +661,7 @@ namespace EnlightenMobile.Models
             }
 
             // send acquire command
-            logger.debug("sending SPECTRUM_ACQUIRE");
+            logger.debug("takeOneAsync: sending SPECTRUM_ACQUIRE");
             byte[] request = ToBLEData.convert(true);
             if (! await acquireChar.WriteAsync(request))
             {
@@ -551,13 +669,24 @@ namespace EnlightenMobile.Models
                 return null;
             }
 
+            // YOU ARE HERE -- when laserState.laserEnable is true, the app
+            // just hangs here.  We don't get the above "failed to send acquire",
+            // yet nor do we get the following "waiting" message.  
+            //
+            // This is when laserState was last sent as "00 00 01 03 00 00" 
+            // (type normal, mode manual, enabled on, watchdog 3s, delay 0ms)
+            //
+            // Apparently it DOESN'T freeze when laserDelayMS is >0 (e.g. 500ms)
+
             // wait for acquisition to complete
+            logger.debug($"takeOneAsync: waiting {integrationTimeMS}ms");
             await Task.Delay((int)integrationTimeMS);
 
             var spectrum = new double[pixels];
             UInt16 pixelsRead = 0;
             var retryCount = 0;
             bool requestRetry = false;
+            bool haveDisabledLaser = false;
 
             while (pixelsRead < pixels)
             {
@@ -584,7 +713,7 @@ namespace EnlightenMobile.Models
                     requestRetry = false;
                 }
 
-                logger.debug($"requesting spectrum packet starting at pixel {pixelsRead}");
+                logger.debug($"takeOneAsync: requesting spectrum packet starting at pixel {pixelsRead}");
                 request = ToBLEData.convert(pixelsRead, len: 2);
                 if (! await spectrumRequestChar.WriteAsync(request))
                 {
@@ -592,6 +721,7 @@ namespace EnlightenMobile.Models
                     return null;
                 }
 
+                logger.debug("reading spectrumChar");
                 var response = await spectrumChar.ReadAsync();
 
                 // make sure response length is even, and has both header and at least one pixel of data
@@ -627,6 +757,17 @@ namespace EnlightenMobile.Models
 
                 lastCRC = crc;
 
+                // YOU ARE HERE:
+                // This was the original SW Raman Mode design, seems to freeze
+                // the acquisition -- maybe BLE doesn't like being interrupted 
+                // in the middle of a spectrum readout?
+                if (false && disableLaserAfterFirstPacket && !haveDisabledLaser && pixelsInPacket > 0)
+                {
+                    logger.debug("disabling laser after first valid spectrum packet received");
+                    haveDisabledLaser = true;
+                    laserEnabled = false;
+                }
+
                 for (int i = 0; i < pixelsInPacket; i++)
                 {
                     // pixel intensities are little-endian UInt16
@@ -647,6 +788,13 @@ namespace EnlightenMobile.Models
                 }
 
                 showProgress(((double)totalPixelsRead) / totalPixelsToRead);
+            }
+
+            // YOU ARE HERE: kludge at end
+            if (disableLaserAfterFirstPacket && !haveDisabledLaser)
+            {
+                logger.debug("disabling laser after complete spectrum received");
+                laserEnabled = false;
             }
 
             // kludge: first four pixels are zero, so overwrite from 5th

@@ -82,7 +82,7 @@ namespace EnlightenMobile
                 var dir = appSettings.getSavePath();
                 if (dir is null)
                 {
-                    error("no path available to save log");
+                    Console.WriteLine("no path available to save log");
                     return;
                 }
 
@@ -97,11 +97,11 @@ namespace EnlightenMobile
                 TextWriter tw = new StreamWriter(pathname);
                 tw.Write(history);
                 tw.Close();
-                Util.toast($"saved {pathname}");
+                // Util.toast($"saved {pathname}");
             }
             catch (Exception e)
             {
-                error("can't write {0}: {1}", pathname, e.Message);
+                Console.WriteLine("can't write {0}: {1}", pathname, e.Message);
             }
         }
 
@@ -159,7 +159,7 @@ namespace EnlightenMobile
         void log(LogLevel lvl, string fmt, params Object[] obj)
         {
             // check whether we're logging this level of message
-            if (lvl < level)
+            if (lvl < level || saving)
                 return;
 
             string msg = "[Wasatch] " + getTimestamp() + lvl + ": " + String.Format(fmt, obj);
@@ -180,10 +180,10 @@ namespace EnlightenMobile
                     {
                         saving = true;
                         history.Append("[autosaving log]\n");
-                        history.Clear();
                         save();
-                        saving = false;
+                        history.Clear();
                         history.Append("[truncated log after autosave]\n");
+                        saving = false;
                     }
                     history.Append(msg + "\n");
                     if (liveUpdates)

@@ -60,7 +60,7 @@
                         <Entry Text="{Binding password}"
                                x:Name="entryPassword"
                                HorizontalTextAlignment="Center"
-                               Focused="entryPassword_Focused"
+                               Focused="entry_Focused"
                                Completed="entryPassword_Completed"
                                WidthRequest="200" />
                     </FlexLayout>
@@ -78,6 +78,28 @@
                                Placeholder="500"
                                HorizontalTextAlignment="Center"
                                WidthRequest="100"
+                               Keyboard="Numeric" />
+                    </FlexLayout>
+                    <FlexLayout JustifyContent="SpaceBetween" IsVisible="{Binding isAuthenticated}">
+                        <Label Text="Vertical ROI Start Line" />
+                        <Entry x:Name="entryVerticalROIStartLine"
+                               Text="{Binding verticalROIStartLine}" 
+                               Placeholder="200"
+                               HorizontalTextAlignment="Center"
+                               WidthRequest="100"
+                               Focused="entry_Focused"
+                               Completed="entryVerticalROIStartLine_Completed"
+                               Keyboard="Numeric" />
+                    </FlexLayout>
+                    <FlexLayout JustifyContent="SpaceBetween" IsVisible="{Binding isAuthenticated}">
+                        <Label Text="Vertical ROI Stop Line" />
+                        <Entry x:Name="entryVerticalROIStopLine"
+                               Text="{Binding verticalROIStopLine}" 
+                               Placeholder="800"
+                               HorizontalTextAlignment="Center"
+                               WidthRequest="100"
+                               Focused="entry_Focused"
+                               Completed="entryVerticalROIStopLine_Completed"
                                Keyboard="Numeric" />
                     </FlexLayout>
                 </StackLayout>

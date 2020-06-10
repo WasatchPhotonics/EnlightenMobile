@@ -78,6 +78,7 @@ namespace EnlightenMobile.Views
             guidByName["eepromCmd"]         = _makeGuid("ff07");
             guidByName["eepromData"]        = _makeGuid("ff08");
             guidByName["batteryStatus"]     = _makeGuid("ff09");
+            guidByName["roi"]               = _makeGuid("ff0a");
 
             foreach (var pair in guidByName)
                 nameByGuid[pair.Value] = pair.Key;
@@ -299,6 +300,7 @@ namespace EnlightenMobile.Views
                 var characteristics = await thisService.GetCharacteristicsAsync();
                 foreach (var c in characteristics)
                 {
+                    logger.debug($"reading {c.Name}");
                     var data = await c.ReadAsync();
                     if (data is null)
                     {

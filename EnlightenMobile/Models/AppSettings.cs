@@ -95,7 +95,7 @@ namespace EnlightenMobile.Models
 
         public string getSavePath()
         {
-            logger.debug("AppSettings: getSavePath");
+            // logger.debug("AppSettings: getSavePath");
             IPlatformUtil platformUtil = DependencyService.Get<IPlatformUtil>();
             return platformUtil.getSavePath();
         }

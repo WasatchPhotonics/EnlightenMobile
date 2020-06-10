@@ -1,5 +1,8 @@
 # Version History
 
+- 2020-06-10 0.4.4
+    - added VerticalROI
+    - working on SW Raman Mode
 - 2020-05-04 0.4.3
     - added LaserState.laserDelayMS
     - override LaserState.watchdogSec and .laserEnable if .mode == RAMAN

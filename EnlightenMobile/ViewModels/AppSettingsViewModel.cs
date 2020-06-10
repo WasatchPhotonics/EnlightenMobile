@@ -12,6 +12,13 @@ namespace EnlightenMobile.ViewModels
         AppSettings appSettings = AppSettings.getInstance();
 
         Spectrometer spec = Spectrometer.getInstance();
+        Logger logger = Logger.getInstance();
+
+        public AppSettingsViewModel()
+        {
+            laserWatchdogTimeoutSec = spec.laserWatchdogSec;
+            laserDelayMS = spec.laserDelayMS;
+        }
 
         public string title
         {
@@ -97,6 +104,36 @@ namespace EnlightenMobile.ViewModels
         {
             get => spec.laserDelayMS;
             set => spec.laserDelayMS = value;
+        }
+
+        public string verticalROIStartLine
+        {
+            get => spec.verticalROIStartLine.ToString();
+            set { ; }
+        }
+
+        // the View's code-behind has registered that a final value has
+        // been entered into the Entry (hit return), so latch it
+        public void setVerticalROIStartLine(string s)
+        {
+            if (ushort.TryParse(s, out ushort value))
+                spec.verticalROIStartLine = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(verticalROIStartLine)));
+        }
+
+        public string verticalROIStopLine
+        {
+            get => spec.verticalROIStopLine.ToString();
+            set { ; }
+        }
+
+        // the View's code-behind has registered that a final value has
+        // been entered into the Entry (hit return), so latch it
+        public void setVerticalROIStopLine(string s)
+        {
+            if (ushort.TryParse(s, out ushort value))
+                spec.verticalROIStopLine = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(verticalROIStopLine)));
         }
     }
 }

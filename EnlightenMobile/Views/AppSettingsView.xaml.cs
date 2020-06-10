@@ -27,10 +27,23 @@ namespace EnlightenMobile.Views
             asvm.authenticate(password);
         }
 
-        // the user clicked to enter a password, so clear the field
-        void entryPassword_Focused(Object sender, FocusEventArgs e)
+        // the user clicked in an Entry, so clear the field
+        void entry_Focused(Object sender, FocusEventArgs e)
         {
-            entryPassword.Text = "";
+            var entry = sender as Entry;
+            entry.Text = "";
+        }
+        
+        void entryVerticalROIStartLine_Completed(Object sender, EventArgs e)
+        {
+            var entry = sender as Entry;
+            asvm.setVerticalROIStartLine(entry.Text);
+        }
+
+        void entryVerticalROIStopLine_Completed(Object sender, EventArgs e)
+        {
+            var entry = sender as Entry;
+            asvm.setVerticalROIStopLine(entry.Text);
         }
     }
 }

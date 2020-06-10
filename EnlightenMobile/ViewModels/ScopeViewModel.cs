@@ -1,13 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Xamarin.Forms;
 using EnlightenMobile.Models;
 using System.Threading.Tasks;
-using Telerik.XamarinForms;
-using Telerik.XamarinForms.Chart;
 
 namespace EnlightenMobile.ViewModels
 {
@@ -125,6 +122,7 @@ namespace EnlightenMobile.ViewModels
         public string integrationTimeMS 
         {
             get => spec.integrationTimeMS.ToString();
+            set { ; }
         }
 
         // the ScopeView's code-behind has registered that a final value has
@@ -143,6 +141,7 @@ namespace EnlightenMobile.ViewModels
         public string gainDb
         {
             get => spec.gainDb.ToString();
+            set { ; }
         }
 
         // the ScopeView's code-behind has registered that a final value has
@@ -161,6 +160,7 @@ namespace EnlightenMobile.ViewModels
         public string scansToAverage
         {
             get => spec.scansToAverage.ToString();
+            set { ; }
         }
 
         // the ScopeView's code-behind has registered that a final value has
