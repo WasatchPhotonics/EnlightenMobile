@@ -70,15 +70,15 @@ namespace EnlightenMobile.Views
 
             // ENG-0120
             guidByName["integrationTimeMS"] = _makeGuid("ff01");
-            guidByName["gainDb"]            = _makeGuid("ff02"); 
-            guidByName["laserState"]        = _makeGuid("ff03"); 
-            guidByName["acquireSpectrum"]   = _makeGuid("ff04"); 
-            guidByName["spectrumRequest"]   = _makeGuid("ff05"); 
-            guidByName["readSpectrum"]      = _makeGuid("ff06");
-            guidByName["eepromCmd"]         = _makeGuid("ff07");
-            guidByName["eepromData"]        = _makeGuid("ff08");
-            guidByName["batteryStatus"]     = _makeGuid("ff09");
-            guidByName["roi"]               = _makeGuid("ff0a");
+            guidByName["gainDb"] = _makeGuid("ff02");
+            guidByName["laserState"] = _makeGuid("ff03");
+            guidByName["acquireSpectrum"] = _makeGuid("ff04");
+            guidByName["spectrumRequest"] = _makeGuid("ff05");
+            guidByName["readSpectrum"] = _makeGuid("ff06");
+            guidByName["eepromCmd"] = _makeGuid("ff07");
+            guidByName["eepromData"] = _makeGuid("ff08");
+            guidByName["batteryStatus"] = _makeGuid("ff09");
+            guidByName["roi"] = _makeGuid("ff0a");
 
             foreach (var pair in guidByName)
                 nameByGuid[pair.Value] = pair.Key;
@@ -157,7 +157,7 @@ namespace EnlightenMobile.Views
                 bvm.paired = false;
             }
             else
-            { 
+            {
                 bvm.paired = await doConnectAsync();
                 btnConnect.IsEnabled = true;
                 if (bvm.paired)
@@ -248,7 +248,7 @@ namespace EnlightenMobile.Views
                 // match it with an "expected" UUID
                 string name = null;
                 foreach (var pair in guidByName)
-                { 
+                {
                     if (pair.Value == new Guid(c.Uuid))
                     {
                         name = pair.Key;
@@ -358,18 +358,18 @@ namespace EnlightenMobile.Views
 
             if (name is null)
             {
-                logger.error($"Received update from unknown characteristic ({c.Uuid})"); 
+                logger.error($"Received notification from unknown characteristic ({c.Uuid})");
                 return;
             }
 
+            logger.info($"Received notification from {name}");
+
             if (name == "batteryStatus")
-            {
                 spec.processBatteryNotification(c.Value);
-            }
             else if (name == "laserState")
-            {
                 spec.processLaserStateNotification(c.Value);
-            }
+            else
+                logger.error($"no registered processor for {name} notifications");
         }
 
         Guid _makeGuid(string id)
@@ -386,7 +386,7 @@ namespace EnlightenMobile.Views
         void _bleAdapterDeviceDiscovered(object sender, DeviceEventArgs e)
         {
             var device = e.Device; // an IDevice
-            
+
             // ignore anything without a name
             if (device.Name is null || device.Name.Length == 0)
                 return;
@@ -395,21 +395,21 @@ namespace EnlightenMobile.Views
             var nameLC = device.Name.ToLower();
             if (!nameLC.Contains("wp") && !nameLC.Contains("sig"))
                 return;
-       
+
             BLEDevice bd = new BLEDevice(device);
             logger.debug($"discovered {bd.name} (RSSI {bd.rssi} Id {device.Id})");
             bleDeviceList.Add(bd);
         }
 
         async Task<bool> _requestPermissionsAsync()
-		{ 
+        {
             // Recent versions of Android require either coarse- or fine-grained 
             // Location access in order to perform a BLE scan.
-            if (!await _requestPermissionAsync<LocationPermission>(Permission.Location, "Location", 
+            if (!await _requestPermissionAsync<LocationPermission>(Permission.Location, "Location",
                 "Bluetooth requires access to the 'Location' service in order to function."))
                 return false;
 
-            if (!await _requestPermissionAsync<StoragePermission>(Permission.Storage, "Storage", 
+            if (!await _requestPermissionAsync<StoragePermission>(Permission.Storage, "Storage",
                 "App needs to be able to save spectra to local filesystem."))
                 return false;
 
@@ -417,47 +417,52 @@ namespace EnlightenMobile.Views
         }
 
         // @todo figure out why generic CheckPermissionStatusAsync doesn't compile
-        async Task<bool> _requestPermissionAsync<T>(Permission perm, string name, string reason) 
+        async Task<bool> _requestPermissionAsync<T>(Permission perm, string name, string reason)
             where T : BasePermission
         {
-			try
-			{
+            try
+            {
                 // do we already have permission?
 
                 // WHY DOESN'T THIS WORK?!?
                 // I almost feel like I'm working from a cached version of the Plugin.Permissions package...
                 // like if I fully flushed and reinstalled that package, this would be okay.
-		  	  //var status = await CrossPermissions.Current.CheckPermissionStatusAsync<T>(); 
-	            var status = await CrossPermissions.Current.CheckPermissionStatusAsync(perm);
+                //var status = await CrossPermissions.Current.CheckPermissionStatusAsync<T>(); 
+                var status = await CrossPermissions.Current.CheckPermissionStatusAsync(perm);
 
                 // if not, prompt the user to authorize it
-				if (status != PermissionStatus.Granted)
-				{
-					if (await CrossPermissions.Current.ShouldShowRequestPermissionRationaleAsync(perm))
-					{
-						await DisplayAlert($"{name} Permission", reason, "OK");
-					}
+                if (status != PermissionStatus.Granted)
+                {
+                    if (await CrossPermissions.Current.ShouldShowRequestPermissionRationaleAsync(perm))
+                    {
+                        await DisplayAlert($"{name} Permission", reason, "OK");
+                    }
 
-					var result = await CrossPermissions.Current.RequestPermissionsAsync(perm);
-					status = result[perm];
-				}
+                    var result = await CrossPermissions.Current.RequestPermissionsAsync(perm);
+                    status = result[perm];
+                }
 
                 // do we have it now?
-				if (status == PermissionStatus.Granted)
-				{
-					logger.debug($"{name} permission granted");
+                if (status == PermissionStatus.Granted)
+                {
+                    logger.debug($"{name} permission granted");
                     return true;
-				}
-				else if (status != PermissionStatus.Unknown)
-				{
-					return logger.error($"{name} permission denied");
-				}
-			}
-			catch (Exception ex)
-			{
+                }
+                else if (status != PermissionStatus.Unknown)
+                {
+                    return logger.error($"{name} permission denied");
+                }
+            }
+            catch (Exception ex)
+            {
                 return logger.error($"Exception obtaining {name} permission: {ex}");
-			}
+            }
             return false;
-		}
+        }
+
+        void btnReset_Clicked(System.Object sender, System.EventArgs e)
+        {
+            logger.info("try to figure out how to reset BLE?");
+        }
     }
 }

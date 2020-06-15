@@ -7,6 +7,13 @@ namespace EnlightenMobile
 {
     public class Util
     {
+        public static void swap(ref ushort a, ref ushort b)
+        {
+            var tmp = a;
+            a = b;
+            b = tmp;
+        }
+
         // View is there for iOS (Android doesn't need it)
         public static void toast(string msg, View view = null)
         {

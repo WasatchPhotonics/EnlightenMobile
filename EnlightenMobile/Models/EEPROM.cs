@@ -51,6 +51,12 @@ namespace EnlightenMobile.Models
         /////////////////////////////////////////////////////////////////////////       
 
         /////////////////////////////////////////////////////////////////////////       
+        // Collections
+        /////////////////////////////////////////////////////////////////////////       
+
+        public FeatureMask featureMask = new FeatureMask();
+
+        /////////////////////////////////////////////////////////////////////////       
         // Page 0 
         /////////////////////////////////////////////////////////////////////////       
 
@@ -899,7 +905,7 @@ namespace EnlightenMobile.Models
                 else
                     avgResolution = 0.0f;
 
-
+                if (format >= 9)                    featureMask = new FeatureMask(ParseData.toUInt16(pages[0], 39));
             }
             catch (Exception ex)
             {

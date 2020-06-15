@@ -55,7 +55,6 @@ namespace EnlightenMobile.ViewModels
             };
             xAxisOption = xAxisOptions[0];
 
-            chartData = new ObservableCollection<ChartDataPoint>();
             updateChart();
         }
 
@@ -122,7 +121,7 @@ namespace EnlightenMobile.ViewModels
         public string integrationTimeMS 
         {
             get => spec.integrationTimeMS.ToString();
-            set { ; }
+            set { }
         }
 
         // the ScopeView's code-behind has registered that a final value has
@@ -141,7 +140,7 @@ namespace EnlightenMobile.ViewModels
         public string gainDb
         {
             get => spec.gainDb.ToString();
-            set { ; }
+            set { }
         }
 
         // the ScopeView's code-behind has registered that a final value has
@@ -160,7 +159,7 @@ namespace EnlightenMobile.ViewModels
         public string scansToAverage
         {
             get => spec.scansToAverage.ToString();
-            set { ; }
+            set { }
         }
 
         // the ScopeView's code-behind has registered that a final value has
@@ -180,13 +179,6 @@ namespace EnlightenMobile.ViewModels
         {
             get => spec.dark != null;
             set => spec.toggleDark();
-        }
-
-        // this can probably be deprecated
-        public bool alternatingEnabled
-        {
-            get => spec.alternatingEnabled;
-            set => spec.alternatingEnabled = value;
         }
 
         public string note
@@ -335,13 +327,19 @@ namespace EnlightenMobile.ViewModels
             }
 
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(acquireButtonColor)));
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(batteryState)));
+            updateBatteryProperties();
             showProgress(0);
             isRefreshing = false;
 
             updateLaserAvailable();
 
             return ok;
+        }
+
+        void updateBatteryProperties()
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(batteryState)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(batteryColor)));
         }
 
         public void updateLaserAvailable()
@@ -351,7 +349,7 @@ namespace EnlightenMobile.ViewModels
 
         void updateChart()
         {
-            chartData = generateChartData();
+            refreshChartData();
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(chartData)));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(spectrumMax)));
         }
@@ -402,38 +400,70 @@ namespace EnlightenMobile.ViewModels
         // Chart
         ////////////////////////////////////////////////////////////////////////
 
-        public ObservableCollection<ChartDataPoint> chartData { get; set; }
+        public ObservableCollection<ChartDataPoint> chartData { get; set; } = new ObservableCollection<ChartDataPoint>();
 
-        private ObservableCollection<ChartDataPoint> generateChartData()
+        private double[] xAxis;
+        private string lastAxisType;
+
+        private void refreshChartData()
         {
             // use last Measurement from the Spectrometer
             uint pixels = spec.pixels;
             double[] intensities = spec.measurement.processed;
 
             // pick our x-axis
-            double[] xAxis = null;
-            if (xAxisOption.name == "pixel")
+            bool repopulateXAxis = false;
+            if (lastAxisType != null && lastAxisType == xAxisOption.name)
             {
-                xAxis = new double[pixels];
-                for (int i = 0; i < spec.pixels; i++)
-                    xAxis[i] = i;
+                // re-use previous axis
             }
-            else if (xAxisOption.name == "wavelength")
-                xAxis = spec.wavelengths;
-            else if (xAxisOption.name == "wavenumber")
-                xAxis = spec.wavenumbers;
+            else 
+            { 
+                xAxis = null;
+                if (xAxisOption.name == "wavelength")
+                    xAxis = spec.wavelengths;
+                else if (xAxisOption.name == "wavenumber")
+                    xAxis = spec.wavenumbers;
+                else
+                    xAxis = spec.xAxisPixels;
+
+                lastAxisType = xAxisOption.name;
+                repopulateXAxis = true;
+            }
 
             if (intensities is null || xAxis is null)
-                return null;
+                return;
 
-            ObservableCollection<ChartDataPoint> data = new ObservableCollection<ChartDataPoint>();
-            for (int i = 0; i < pixels; i++)
-                data.Add(new ChartDataPoint() { intensity = intensities[i], xValue = xAxis[i] });
+            if (chartData.Count != intensities.Length || true)
+            {
+                // repopulate with fresh points
+                logger.info("populating ChartData");
+                chartData.Clear();
+                for (int i = 0; i < pixels; i++)
+                    chartData.Add(new ChartDataPoint() { intensity = intensities[i], xValue = xAxis[i] });
+            } 
+            else if (repopulateXAxis)
+            {
+                logger.debug("refreshChartData: updating both");
+
+                // update both axes
+                for (int i = 0; i < pixels; i++)
+                {
+                    chartData[i].intensity = intensities[i];
+                    chartData[i].xValue = xAxis[i];
+                }
+            }
+            else
+            {
+                logger.debug("refreshChartData: updating intensities");
+
+                // only update intensities
+                for (int i = 0; i < pixels; i++)
+                    chartData[i].intensity = intensities[i];
+            }
 
             xAxisMinimum = xAxis[0];
             xAxisMaximum = xAxis[pixels-1];
-
-            return data;
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -466,8 +496,7 @@ namespace EnlightenMobile.ViewModels
 
             if (name == "batteryStatus")
             {
-                // "batteryStatus" is the name of the Characteristic, "batteryState" is the name of the SVM property
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(batteryState)));
+                updateBatteryProperties();
             }
             else if (name == "laserState")
             {

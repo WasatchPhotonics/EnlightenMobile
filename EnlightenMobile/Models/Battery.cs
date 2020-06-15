@@ -3,7 +3,7 @@
 namespace EnlightenMobile.Models
 {
     // encapsulate battery processing
-    public class Battery
+    public class Battery 
     {
         ushort raw;
         byte rawLevel;
@@ -13,8 +13,19 @@ namespace EnlightenMobile.Models
         public double level {get; private set; }
         
         bool charging;
+        DateTime? lastChecked;
 
         Logger logger = Logger.getInstance();
+
+        public bool isExpired
+        {
+            get
+            {
+                if (lastChecked is null)
+                    return true;
+                return (DateTime.Now - lastChecked.Value).TotalSeconds >= 60;
+            }
+        }
 
         public void parse(byte[] response)
         {
@@ -41,11 +52,16 @@ namespace EnlightenMobile.Models
             
             charging = (rawState & 1) == 1;
 
+            lastChecked = DateTime.Now;
+
             logger.debug($"Battery.parse: {this}");
         }
 
         override public string ToString()
         {
+            if (lastChecked is null)
+                return "???";
+
             logger.debug("Battery: raw 0x{0:x4} (lvl {1}, st 0x{2:x2}) = {3:f2}", raw, rawLevel, rawState, level);
 
             int intLevel = (int)Math.Round(level);

@@ -1,5 +1,15 @@
 # Version History
 
+- 2020-06-?? 0.4.5
+    - fixed memory leak
+    - added 2x2 binning
+    - improved battery display
+    - disabled some battery updates
+    - seemed to get SW-based Raman Mode working
+    - added placeholder BLE reset button
+    - removed some GC
+    - added WhereAmI (GPS Location)
+    - not tested with latest FW
 - 2020-06-10 0.4.4
     - added VerticalROI
     - working on SW Raman Mode

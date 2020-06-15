@@ -38,6 +38,7 @@ namespace EnlightenMobile.Models
         // software state
         public double[] wavelengths;
         public double[] wavenumbers;
+        public double[] xAxisPixels;
 
         public double[] lastSpectrum;
         public double[] dark;
@@ -55,6 +56,7 @@ namespace EnlightenMobile.Models
         uint totalPixelsRead;
 
         // util
+        WhereAmI whereAmI;
         Logger logger = Logger.getInstance();
 
         ////////////////////////////////////////////////////////////////////////
@@ -85,12 +87,25 @@ namespace EnlightenMobile.Models
             for (int i = 0; i < pixels; i++)
                 wavelengths[i] = laserExcitationNM + 15 + i / 10.0;
             wavenumbers = Util.wavelengthsToWavenumbers(laserExcitationNM, wavelengths);
-            measurement = new Measurement(this);
+            generatePixelAxis();
+
+            if (measurement is null)
+                measurement = new Measurement();
+            measurement.reset();
+            measurement.reload(this);
+
             characteristicsByName = null;
             note = "your text here";
             acquiring = false;
             lastCRC = 0;
             scansToAverage = 1;
+        }
+
+        void generatePixelAxis()
+        {
+            xAxisPixels = new double[pixels];
+            for (int i = 0; i < pixels; i++)
+                xAxisPixels[i] = i;
         }
 
         public async Task<bool> initAsync(
@@ -177,6 +192,8 @@ namespace EnlightenMobile.Models
             else
                 wavenumbers = null;
 
+            generatePixelAxis();
+
             ////////////////////////////////////////////////////////////////////
             // finish initializing Spectrometer 
             ////////////////////////////////////////////////////////////////////
@@ -186,7 +203,7 @@ namespace EnlightenMobile.Models
             logger.debug("finishing spectrometer initialization");
             pixels = eeprom.activePixelsHoriz;
 
-            await updateBatteryAsync();
+            _ = await updateBatteryAsync();
             integrationTimeMS = (ushort)(eeprom.startupIntegrationTimeMS > 0 && eeprom.startupIntegrationTimeMS < 5000 ? eeprom.startupIntegrationTimeMS : 3);
             gainDb = eeprom.detectorGain;
 
@@ -201,6 +218,12 @@ namespace EnlightenMobile.Models
             logger.info( "  wavelengths: ({0:f2}, {1:f2})", wavelengths[0], wavelengths[pixels-1]);
             if (wavenumbers != null)
                 logger.info("  wavenumbers: ({0:f2}, {1:f2})", wavenumbers[0], wavenumbers[pixels-1]);
+
+            // I'm honestly not sure where we should initialize location, but it 
+            // should probably happen after we've successfully connected to a
+            // spectrometer and are ready to take measurements.  Significantly,
+            // at this point we know the user has already granted location privs.
+            whereAmI = WhereAmI.getInstance();
 
             return true;
         }
@@ -255,13 +278,14 @@ namespace EnlightenMobile.Models
             return ok;
         }
 
+        // I no longer remember exactly why this method is here
         async Task<bool> pauseAsync()
         {
             await Task.Delay(10);
 
-            logger.debug("pauseAsync: running GC");
-            GC.Collect();
-            logger.debug("pauseAsync: back from GC");
+            // logger.debug("pauseAsync: running GC");
+            // GC.Collect();
+            // logger.debug("pauseAsync: back from GC");
 
             return true;
         }
@@ -397,12 +421,19 @@ namespace EnlightenMobile.Models
                 return false;
             }
 
+            // noop
             if (_nextVerticalROIStartLine == _lastVerticalROIStartLine &&
                 _nextVerticalROIStopLine == _lastVerticalROIStopLine)
                 return false;
 
-            byte[] startData = ToBLEData.convert(verticalROIStartLine, len: 2);
-            byte[] stopData = ToBLEData.convert(verticalROIStopLine, len: 2);
+            // force ordering
+            var start = verticalROIStartLine;
+            var stop = verticalROIStopLine;
+            if (stop < start)
+                Util.swap(ref start, ref stop);
+
+            byte[] startData = ToBLEData.convert(start, len: 2);
+            byte[] stopData = ToBLEData.convert(stop, len: 2);
             byte[] request = new byte[4];
             Array.Copy(startData, request, 2);
             Array.Copy(stopData, 0, request, 2, 2);
@@ -471,9 +502,17 @@ namespace EnlightenMobile.Models
             }
         }
 
+        bool laserSyncEnabled = true;
+
         async Task<bool> syncLaserStateAsync()
         {
             logger.debug("syncLaserStateAsync: start");
+            if (!laserSyncEnabled)
+            {
+                logger.debug("syncLaserState: skipping");
+                return false;
+            }
+
             laserState.dump();
 
             if (characteristicsByName is null)
@@ -499,17 +538,25 @@ namespace EnlightenMobile.Models
         }
 
         ////////////////////////////////////////////////////////////////////////
-        // alternatingEnabled
-        ////////////////////////////////////////////////////////////////////////
-
-        public bool alternatingEnabled { get; set; }
-
-        ////////////////////////////////////////////////////////////////////////
         // battery
         ////////////////////////////////////////////////////////////////////////
 
         async public Task<bool> updateBatteryAsync()
         {
+            if (battery.level > 0)
+            {
+                logger.debug("updateBatteryAsync: skipping after first read (waiting for notifications)");
+                return false;
+            }
+
+            logger.debug("updateBatteryAsync: starting");
+
+            if (!battery.isExpired)
+            {
+                logger.debug("battery state still valid, skipping");
+                return false;
+            }
+
             if (characteristicsByName is null)
                 return false;
 
@@ -531,6 +578,9 @@ namespace EnlightenMobile.Models
             battery.parse(response);
             await pauseAsync();
 
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("batteryStatus"));
+
+            logger.debug("updateBatteryAsync: done");
             return true;
         }
 
@@ -578,7 +628,12 @@ namespace EnlightenMobile.Models
             {
                 var sec = (byte)Math.Max(5, (uint)((integrationTimeMS * scansToAverage / 1000.0) + 3));
                 logger.debug($"takeOneAveragedAsync: setting laserWatchdogSec -> {sec}");
+
+                // since we're going to sync the laser state immediately after to turn on the laser,
+                // skip this sync
+                laserSyncEnabled = false;
                 laserWatchdogSec = (byte)Math.Min(5, (uint)((integrationTimeMS * scansToAverage / 1000.0) + 3));
+                laserSyncEnabled = true;
 
                 logger.debug("takeOneAveragedAsync: setting laserEnabled = true");
                 laserEnabled = true;
@@ -591,11 +646,21 @@ namespace EnlightenMobile.Models
             for (int spectrumCount = 0; spectrumCount < scansToAverage; spectrumCount++)
             { 
                 bool disableLaserAfterFirstPacket = swRamanMode && spectrumCount + 1 == scansToAverage;
+
                 double[] tmp = await takeOneAsync(showProgress, disableLaserAfterFirstPacket);
+                logger.debug("takeOneAveragedAsync: back from takeOneAsync");
+
                 if (tmp is null || (spectrum != null && tmp.Length != spectrum.Length))
                 {
+                    if (tmp is null)
+                        logger.error("takeOneAveragedAsnc: tmp is null");
+                    else if (spectrum != null && tmp.Length != spectrum.Length)
+                        logger.error($"takeOneAveragedAsnc: length changed ({tmp.Length} != {spectrum.Length})");
+
                     if (swRamanMode)
                         laserEnabled = false;
+
+                    logger.error("takeOneAveragedAsnc: giving up");
                     return acquiring = false;
                 }
 
@@ -610,17 +675,19 @@ namespace EnlightenMobile.Models
                 for (int i = 0; i < spectrum.Length; i++)
                     spectrum[i] /= scansToAverage;
 
+            // MZ: memory leak? [update: no]
             lastSpectrum = spectrum;
-            measurement = new Measurement(this);
-            if (alternatingEnabled)
-                measurement.averageAlternating();
-
+            measurement.reset();
+            measurement.reload(this);
             logger.info($"acquired Measurement {measurement.measurementID}");
-            await updateBatteryAsync();
 
-            logger.debug($"calling GC.Collect({GC.MaxGeneration})");
-            GC.Collect(GC.MaxGeneration);
+            // update battery if needed
+            _ = await updateBatteryAsync();
 
+            // logger.debug($"calling GC.Collect({GC.MaxGeneration})");
+            // GC.Collect(GC.MaxGeneration);
+
+            logger.debug("takeOneAveragedAsync: done");
             acquiring = false;
             return true;
         }
@@ -668,6 +735,7 @@ namespace EnlightenMobile.Models
                 logger.error("failed to send acquire");
                 return null;
             }
+            request = null;
 
             // YOU ARE HERE -- when laserState.laserEnable is true, the app
             // just hangs here.  We don't get the above "failed to send acquire",
@@ -786,6 +854,7 @@ namespace EnlightenMobile.Models
                         break;
                     }
                 }
+                response = null;
 
                 showProgress(((double)totalPixelsRead) / totalPixelsToRead);
             }
@@ -795,6 +864,7 @@ namespace EnlightenMobile.Models
             {
                 logger.debug("disabling laser after complete spectrum received");
                 laserEnabled = false;
+                logger.debug("continuing end-of-spectrum processing after triggering laser disable");
             }
 
             // kludge: first four pixels are zero, so overwrite from 5th
@@ -804,6 +874,10 @@ namespace EnlightenMobile.Models
             // kludge: last pixel seems to be 0xff, so re-write from previous
             spectrum[pixels-1] = spectrum[pixels-2];
 
+            // apply 2x2 binning
+            if (eeprom.featureMask.bin2x2)            {                var smoothed = new double[spectrum.Length];                for (int i = 0; i < spectrum.Length - 1; i++)                    smoothed[i] = (spectrum[i] + spectrum[i + 1]) / 2.0;                smoothed[spectrum.Length - 1] = spectrum[spectrum.Length - 1];                spectrum = smoothed;            }
+
+            logger.debug("Spectrometer.takeOneAsync: returning completed spectrum");
             return spectrum;
         }
 

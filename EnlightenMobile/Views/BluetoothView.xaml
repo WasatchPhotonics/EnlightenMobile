@@ -21,6 +21,7 @@
                     <StackLayout Orientation="Horizontal" Padding="2" HorizontalOptions="FillAndExpand">
                         <Button x:Name="btnScan"    Text="Scan"    Clicked="btnScan_Clicked" />
                         <Button x:Name="btnConnect" Text="{Binding buttonConnectText}" Clicked="btnConnect_Clicked" /> 
+                        <Button x:Name="btnReset"   Text="Reset"   Clicked="btnReset_Clicked" />
                     </StackLayout>
                 </Frame>
             </Frame>

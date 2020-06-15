@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Xamarin.Essentials;
 
 namespace EnlightenMobile.Models
 {
-
-    // corresponds to ENLIGHTEN and WasatchNET's Measurement class
+    // Mostly corresponds to ENLIGHTEN and WasatchNET's Measurement classes,
+    // but right now we're re-using the existing measurement (via reload()) 
+    // whilst tracking down a rogue memory leak.
     public class Measurement
     {
         public double[] raw = null;
@@ -19,10 +21,24 @@ namespace EnlightenMobile.Models
         public DateTime timestamp = DateTime.Now;
         public string filename;
         public string measurementID;
+        public Location location;
 
         Logger logger = Logger.getInstance();
 
-        public Measurement(Spectrometer spec)
+        public void reset()
+        {
+            raw = dark = reference = processed = null;
+            filename = measurementID = null;
+            spec = null;
+        }
+
+        public Measurement()
+        {
+            logger.info("Measurement ctor called");
+            reset();
+        }
+
+        public void reload(Spectrometer spec)
         {
             this.spec = spec;
 
@@ -39,7 +55,7 @@ namespace EnlightenMobile.Models
                 raw = spec.lastSpectrum;
             }
 
-            processed = (double[]) raw.Clone();
+            processed = (double[]) raw.Clone(); // MZ: needed?
 
             dark = spec.dark;
             applyDark();
@@ -49,6 +65,8 @@ namespace EnlightenMobile.Models
                 timestamp.ToString("yyyyMMdd-HHmmss-ffffff"), 
                 serialNumber);
             filename = measurementID + ".csv";
+
+            location = WhereAmI.getInstance().location;
         }
 
         public double max => processed is null ? 0 : processed.Max();
@@ -62,24 +80,6 @@ namespace EnlightenMobile.Models
                 processed[i] -= dark[i];
         }
 
-        public void averageAlternating()
-        {
-            // just do the processed array
-            averageAlternatingArray(processed);
-        }
-
-        // average-over odd pixels from adjascent even neighbors
-        void averageAlternatingArray(double[] a)
-        {
-            if (a is null)
-            {
-                logger.error("can't average null array");
-                return;
-            }
-            for (int i = 1; i + 1 < a.Length; i += 2)
-                a[i] = (a[i - 1] + a[i + 1]) / 2.0;
-        }
-
         /// <returns>true on success</returns>
         /// <todo>
         /// - support full ENLIGHTEN metadata
@@ -89,7 +89,7 @@ namespace EnlightenMobile.Models
         {
             logger.debug("Measurement.save: starting");
 
-            if (processed is null || raw is null)
+            if (processed is null || raw is null || spec is null)
             {
                 logger.error("saveAsync: nothing to save");
                 return false;
@@ -119,6 +119,7 @@ namespace EnlightenMobile.Models
         void writeMetadata(StreamWriter sw)
         { 
             var appSettings = AppSettings.getInstance();
+
             // not the full ENLIGHTEN set, but the key ones for now
             sw.WriteLine("ENLIGHTEN Version, Mobile {0} for {1}", appSettings.version, appSettings.os);
             sw.WriteLine("Measurement ID, {0}", measurementID);
@@ -131,7 +132,10 @@ namespace EnlightenMobile.Models
             sw.WriteLine("Laser Wavelength, {0}", spec.eeprom.laserExcitationWavelengthNMFloat);
             sw.WriteLine("Note, {0}", spec.note);
             sw.WriteLine("Pixel Count, {0}", spec.eeprom.activePixelsHoriz);
+
+            // a few that ENLIGHTEN doesn't have...
             sw.WriteLine("Host Description, {0}", appSettings.hostDescription);
+            sw.WriteLine("Location, {0}", location is null ? "null" : location.ToString());
         }
 
         string render(double[] a, int index, string format="f2")
