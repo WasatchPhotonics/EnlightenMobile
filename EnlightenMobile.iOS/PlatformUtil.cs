@@ -15,6 +15,19 @@ namespace EnlightenMobile.iOS
         
         public PlatformUtil() { }
 
+        // @see https://stackoverflow.com/a/43754366/11615696
+        public bool bluetoothEnabled()
+        {
+            return true;
+        }
+
+        // @see https://stackoverflow.com/a/43754366/11615696
+        public bool enableBluetooth(bool flag)
+        {
+            logger.error("enableBluetooth: begging your pardon, Apple has not graced us with such powers :-(");
+            return false;
+        }
+
         // Make a little pop-up message notification appear (no buttons, it just 
         // fades away after a few seconds).  Currently used when a Measurement 
         // is successfully saved.

@@ -190,24 +190,30 @@
                             </FlexLayout>
 
                             <!-- dark -->
+                            <Label MinimumHeightRequest="12" />
                             <FlexLayout JustifyContent="SpaceBetween" MinimumHeightRequest="80" >
                                 <Label  Text="Dark" MinimumWidthRequest="75" />
-                                <Switch IsToggled="{Binding darkEnabled}" />
+                                <Switch IsToggled="{Binding darkEnabled}" Scale="1.5"/>
                             </FlexLayout>
 
                             <!-- Raman mode -->
-                            <FlexLayout JustifyContent="SpaceBetween" MinimumHeightRequest="80">
-                                <Label  Text="Raman Mode" MinimumWidthRequest="75" />
-                                <Switch x:Name="switchRamanMode" Toggled="ramanMode_Toggled" />
+                            <Label MinimumHeightRequest="12" /> 
+                            <FlexLayout JustifyContent="SpaceBetween">
+                                <Label  Text="Raman Mode" />
+                                <Switch x:Name="switchRamanMode" Toggled="ramanMode_Toggled" Scale="1.5" />
                             </FlexLayout>    
 
                             <!-- laser (if not in Raman Mode) -->
-                            <FlexLayout JustifyContent="SpaceBetween" MinimumHeightRequest="80" IsVisible="{Binding isAuthenticated}">
-                                <Label  Text="Fire Laser" MinimumWidthRequest="75" />
-                                <Switch IsToggled="{Binding laserEnabled}" IsEnabled="{Binding laserIsAvailable}"/>
-                            </FlexLayout>
+                            <StackLayout IsVisible="{Binding isAuthenticated}" Orientation="Vertical">
+                                <Label MinimumHeightRequest="12" />
+                                <FlexLayout JustifyContent="SpaceBetween" MinimumHeightRequest="80">
+                                    <Label  Text="Fire Laser" />
+                                    <Switch IsToggled="{Binding laserEnabled}" IsEnabled="{Binding laserIsAvailable}" />
+                                </FlexLayout>
+                            </StackLayout>
 
                             <!-- x-axis -->
+                            <Label MinimumHeightRequest="12" />
                             <FlexLayout JustifyContent="SpaceBetween">
                                 <Label Text="X-Axis" />
                                 <telerikInput:RadListPicker Placeholder="x-axis" 

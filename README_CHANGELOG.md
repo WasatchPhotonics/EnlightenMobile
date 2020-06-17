@@ -6,10 +6,11 @@
     - improved battery display
     - disabled some battery updates
     - seemed to get SW-based Raman Mode working
-    - added placeholder BLE reset button
     - removed some GC
-    - added WhereAmI (GPS Location)
-    - not tested with latest FW
+    - added WhereAmI geolocation
+    - added timestamp to saved files 
+    - added PlatformUtil.enableBluetooth (Android-only)
+    - added BLE reset button
 - 2020-06-10 0.4.4
     - added VerticalROI
     - working on SW Raman Mode

@@ -4,6 +4,7 @@ using Android.Widget;
 using Java.IO;
 using EnlightenMobile.Services;
 using EnlightenMobile;
+using Android.Bluetooth;
 
 [assembly: Dependency(typeof(EnlightenMobile.Droid.PlatformUtil))]
 namespace EnlightenMobile.Droid
@@ -14,6 +15,34 @@ namespace EnlightenMobile.Droid
         string savePath;
 
         public PlatformUtil() { }
+        
+        public bool bluetoothEnabled()
+        {
+            BluetoothAdapter bluetoothAdapter = BluetoothAdapter.DefaultAdapter;
+            var enabled = bluetoothAdapter.IsEnabled;
+            logger.debug($"PlatformUtil<Android>.bluetoothEnabled = {enabled}");
+            return enabled;
+        }
+
+        // @see https://stackoverflow.com/a/43754366/11615696
+        public bool enableBluetooth(bool flag)
+        {
+            BluetoothAdapter bluetoothAdapter = BluetoothAdapter.DefaultAdapter;
+            var enabled = bluetoothAdapter.IsEnabled;
+            if (flag == enabled)
+            {
+                logger.debug($"enableBluetooth: naught to do! ({flag})");
+                return true;
+            }
+
+            logger.debug($"enableBluetooth: setting {flag}");
+            if (flag)
+                bluetoothAdapter.Enable();
+            else
+                bluetoothAdapter.Disable();
+
+            return true;
+        }
 
         // Make a little pop-up message notification appear (no buttons, it just 
         // fades away after a few seconds).  Currently used when a Measurement 

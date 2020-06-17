@@ -7,5 +7,7 @@ namespace EnlightenMobile.Services
     {
         void toast(string msg, View view = null);
         string getSavePath();
+        bool enableBluetooth(bool flag);
+        bool bluetoothEnabled();
     }
 }

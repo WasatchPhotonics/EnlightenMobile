@@ -14,13 +14,6 @@ namespace EnlightenMobile
             b = tmp;
         }
 
-        // View is there for iOS (Android doesn't need it)
-        public static void toast(string msg, View view = null)
-        {
-            IPlatformUtil platformUtil = DependencyService.Get<IPlatformUtil>();
-            platformUtil.toast(msg, view);
-        }
-
         // only really used by BluetoothView
         public static void updateProgressBar(Xamarin.Forms.ProgressBar pb, double progress)
         {
@@ -88,5 +81,29 @@ namespace EnlightenMobile
                 sb.Append((char)b);
             return sb.ToString();
         }
+
+        ////////////////////////////////////////////////////////////////////////
+        // a lightweight wrapper so other classes don't need to do this
+        ////////////////////////////////////////////////////////////////////////
+
+        public static bool bluetoothEnabled()
+        {
+            IPlatformUtil platformUtil = DependencyService.Get<IPlatformUtil>();
+            return platformUtil.bluetoothEnabled();
+        }
+
+        public static bool enableBluetooth(bool flag)
+        {
+            IPlatformUtil platformUtil = DependencyService.Get<IPlatformUtil>();
+            return platformUtil.enableBluetooth(flag);
+        }
+
+        // View is there for iOS (Android doesn't need it)
+        public static void toast(string msg, View view = null)
+        {
+            IPlatformUtil platformUtil = DependencyService.Get<IPlatformUtil>();
+            platformUtil.toast(msg, view);
+        }
+
     }
 }

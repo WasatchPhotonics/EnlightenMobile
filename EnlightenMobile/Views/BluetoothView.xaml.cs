@@ -8,6 +8,7 @@ using Plugin.Permissions;
 using Plugin.Permissions.Abstractions;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading;
 using System.Threading.Tasks;
 using System;
 using Xamarin.Forms.Xaml;
@@ -460,9 +461,5 @@ namespace EnlightenMobile.Views
             return false;
         }
 
-        void btnReset_Clicked(System.Object sender, System.EventArgs e)
-        {
-            logger.info("try to figure out how to reset BLE?");
-        }
     }
 }

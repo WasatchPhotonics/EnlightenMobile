@@ -130,12 +130,17 @@ namespace EnlightenMobile.Models
             sw.WriteLine("Scan Averaging, {0}", spec.scansToAverage);
             sw.WriteLine("Laser Enable, {0}", spec.laserEnabled);
             sw.WriteLine("Laser Wavelength, {0}", spec.eeprom.laserExcitationWavelengthNMFloat);
+            sw.WriteLine("Timestamp, {0}", timestamp.ToString());
             sw.WriteLine("Note, {0}", spec.note);
             sw.WriteLine("Pixel Count, {0}", spec.eeprom.activePixelsHoriz);
 
+            ////////////////////////////////////////////////////////////////////
             // a few that ENLIGHTEN doesn't have...
+            ////////////////////////////////////////////////////////////////////
+
             sw.WriteLine("Host Description, {0}", appSettings.hostDescription);
-            sw.WriteLine("Location, {0}", location is null ? "null" : location.ToString());
+            if (location != null)
+                sw.WriteLine("Location, \"({0} lat, {1} lon)\"", location.Latitude, location.Longitude);
         }
 
         string render(double[] a, int index, string format="f2")
