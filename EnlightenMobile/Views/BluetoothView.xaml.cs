@@ -14,16 +14,12 @@ using Xamarin.Forms;
 
 namespace EnlightenMobile.Views
 {
-    // Arguably, most of this should go into BluetoothViewModel, if we changed 
-    // the Button.OnClick events to Button.Command bindings. It's not GUI-related
-    // and spends a lot of time talking to the Spectrometer Model.
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class BluetoothView : ContentPage
     {
         IBluetoothLE ble;
         IAdapter adapter;
 
-        // ObservableCollection<BLEDevice> bleDeviceList;
         BLEDevice bleDevice;
 
         IService service;
@@ -33,7 +29,6 @@ namespace EnlightenMobile.Views
         Dictionary<string, ICharacteristic> characteristicsByName = new Dictionary<string, ICharacteristic>();
 
         Guid primaryServiceId;
-
 
         Spectrometer spec = Spectrometer.getInstance();
         BluetoothViewModel bvm;
@@ -56,7 +51,6 @@ namespace EnlightenMobile.Views
             // https://stackoverflow.com/a/59998233/11615696
             ble = CrossBluetoothLE.Current;
             adapter = CrossBluetoothLE.Current.Adapter;
-            // bleDeviceList = new ObservableCollection<BLEDevice>();
 
             listView.ItemsSource = bvm.bleDeviceList;
 
@@ -99,7 +93,7 @@ namespace EnlightenMobile.Views
                 if (!success)
                 {
                     logger.error("can't obtain Location permission");
-                    _ = DisplayAlert("Error", "Can't obtain Location permission", "OK");
+                    await DisplayAlert("Error", "Can't obtain Location permission", "OK");
                     return;
                 }
 
@@ -116,7 +110,7 @@ namespace EnlightenMobile.Views
             }
             catch (Exception ex)
             {
-                _ = DisplayAlert("Exception", ex.Message.ToString(), "OK");
+                await DisplayAlert("Exception", ex.Message.ToString(), "OK");
                 logger.error("caught exception during scan button event: {0}", ex.Message);
             }
             logger.debug("scan complete");
@@ -136,8 +130,8 @@ namespace EnlightenMobile.Views
             bleDevice = listView.SelectedItem as BLEDevice;
             logger.debug($"selected device {bleDevice.name}");
 
-            // update color, because ListView doesn't have a cross-platform
-            // SelectedBackgroundColor property :-(
+            // let devices know which is selected, so they can advertise an 
+            // appropriate row color
             foreach (var dev in bvm.bleDeviceList)
                 dev.selected = dev.device.Id == bleDevice.device.Id;
 
@@ -220,9 +214,12 @@ namespace EnlightenMobile.Views
             catch (DeviceConnectionException ex)
             {
                 logger.error("exception connecting to device ({0})", ex.Message);
-                string msg = $"{ex.Message}\nClick Ok to reset.";
-                _ = DisplayAlert("Notice", msg, "OK");
-                bvm.doResetAsync();
+
+                // kick off the reset WHILE the alert message is running
+                _ = bvm.doResetAsync();
+
+                string msg = $"{ex.Message}\nAutomatically resetting Bluetooth adapter. Click \"Ok\" to re-scan and try again.";
+                await DisplayAlert("Notice", msg, "OK");
                 return false;
             }
 
@@ -426,16 +423,14 @@ namespace EnlightenMobile.Views
                 // WHY DOESN'T THIS WORK?!?
                 // I almost feel like I'm working from a cached version of the Plugin.Permissions package...
                 // like if I fully flushed and reinstalled that package, this would be okay.
-                //var status = await CrossPermissions.Current.CheckPermissionStatusAsync<T>(); 
+                // var status = await CrossPermissions.Current.CheckPermissionStatusAsync<T>(); 
                 var status = await CrossPermissions.Current.CheckPermissionStatusAsync(perm);
 
                 // if not, prompt the user to authorize it
                 if (status != PermissionStatus.Granted)
                 {
                     if (await CrossPermissions.Current.ShouldShowRequestPermissionRationaleAsync(perm))
-                    {
                         await DisplayAlert($"{name} Permission", reason, "OK");
-                    }
 
                     var result = await CrossPermissions.Current.RequestPermissionsAsync(perm);
                     status = result[perm];
@@ -458,6 +453,5 @@ namespace EnlightenMobile.Views
             }
             return false;
         }
-
     }
 }
