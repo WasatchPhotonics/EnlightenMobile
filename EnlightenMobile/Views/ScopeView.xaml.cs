@@ -2,7 +2,6 @@
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using EnlightenMobile.ViewModels;
-using System.Threading.Tasks;
 
 namespace EnlightenMobile.Views
 {
@@ -34,6 +33,8 @@ namespace EnlightenMobile.Views
             // notifications, and if one is received
             // https://stackoverflow.com/a/26038700/11615696
             svm.notifyToast += (string msg) => Util.toast(msg, scrollOptions);
+
+            svm.theChart = chart;
         }
 
         ////////////////////////////////////////////////////////////////////////

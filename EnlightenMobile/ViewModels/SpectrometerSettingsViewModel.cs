@@ -20,6 +20,18 @@ namespace EnlightenMobile.ViewModels
         Spectrometer spec = Spectrometer.getInstance();
         Logger logger = Logger.getInstance();
 
+        public SpectrometerSettingsViewModel()
+        {
+            // as Bluetooth device meta-characteristics are parsed during connection,
+            // catch updates so this view is pre-populated 
+            spec.bleDeviceInfo.PropertyChanged += bleDeviceUpdate;
+        }
+
+        // the BluetoothView code-behind has registered some metadata, so update 
+        // our display properties
+        void bleDeviceUpdate(object sender, PropertyChangedEventArgs e) =>
+            refresh(e.PropertyName);
+
         public string title
         {
             get => "Spectrometer Settings";
@@ -52,14 +64,20 @@ namespace EnlightenMobile.ViewModels
 
         // so we can update these from the SpectrometerSettingsView code-behind
         // on display, after changing spectrometers.
-        public void refresh()
+        public void refresh(string name = null)
         {
-            logger.debug("refreshing SpectrometerSettingsViewModel");
+            logger.debug($"refreshing SpectrometerSettingsViewModel ({name})");
 
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(softwareRevision)));
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(firmwareRevision)));
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(hardwareRevision)));
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(manufacturerName)));
+            if (name != null)
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            else
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(deviceName)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(softwareRevision)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(firmwareRevision)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(hardwareRevision)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(manufacturerName)));
+            }
         }
 
         protected void OnPropertyChanged([CallerMemberName] string caller = "")

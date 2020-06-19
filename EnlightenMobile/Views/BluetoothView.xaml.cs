@@ -7,8 +7,6 @@ using Plugin.BLE;
 using Plugin.Permissions;
 using Plugin.Permissions.Abstractions;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Threading;
 using System.Threading.Tasks;
 using System;
 using Xamarin.Forms.Xaml;
@@ -25,7 +23,7 @@ namespace EnlightenMobile.Views
         IBluetoothLE ble;
         IAdapter adapter;
 
-        ObservableCollection<BLEDevice> bleDeviceList;
+        // ObservableCollection<BLEDevice> bleDeviceList;
         BLEDevice bleDevice;
 
         IService service;
@@ -58,9 +56,9 @@ namespace EnlightenMobile.Views
             // https://stackoverflow.com/a/59998233/11615696
             ble = CrossBluetoothLE.Current;
             adapter = CrossBluetoothLE.Current.Adapter;
-            bleDeviceList = new ObservableCollection<BLEDevice>();
+            // bleDeviceList = new ObservableCollection<BLEDevice>();
 
-            listView.ItemsSource = bleDeviceList;
+            listView.ItemsSource = bvm.bleDeviceList;
 
             adapter.DeviceDiscovered += _bleAdapterDeviceDiscovered;
 
@@ -105,7 +103,7 @@ namespace EnlightenMobile.Views
                     return;
                 }
 
-                bleDeviceList.Clear();
+                bvm.bleDeviceList.Clear();
                 if (!ble.Adapter.IsScanning)
                 {
                     logger.debug("starting scan");
@@ -140,7 +138,7 @@ namespace EnlightenMobile.Views
 
             // update color, because ListView doesn't have a cross-platform
             // SelectedBackgroundColor property :-(
-            foreach (var dev in bleDeviceList)
+            foreach (var dev in bvm.bleDeviceList)
                 dev.selected = dev.device.Id == bleDevice.device.Id;
 
             btnConnect.IsEnabled = true;
@@ -222,7 +220,9 @@ namespace EnlightenMobile.Views
             catch (DeviceConnectionException ex)
             {
                 logger.error("exception connecting to device ({0})", ex.Message);
-                _ = DisplayAlert("Notice", ex.Message.ToString(), "OK");
+                string msg = $"{ex.Message}\nClick Ok to reset.";
+                _ = DisplayAlert("Notice", msg, "OK");
+                bvm.doResetAsync();
                 return false;
             }
 
@@ -287,7 +287,6 @@ namespace EnlightenMobile.Views
             showProgress(.15);
 
             logger.debug("polling device for other services");
-            BLEDeviceInfo bdi = new BLEDeviceInfo();
             var allServices = await bleDevice.device.GetServicesAsync();
             foreach (var thisService in allServices)
             {
@@ -305,19 +304,18 @@ namespace EnlightenMobile.Views
                     var data = await c.ReadAsync();
                     if (data is null)
                     {
-                        logger.debug($"can't read {c.Uuid} ({c.Name})");
+                        logger.error($"can't read {c.Uuid} ({c.Name})");
                     }
                     else
                     {
                         logger.hexdump(data, prefix: $"  {c.Uuid}: {c.Name} = ");
-                        bdi.add(c.Name, Util.toASCII(data));
+                        spec.bleDeviceInfo.add(c.Name, Util.toASCII(data));
                     }
                 }
             }
 
             // populate Spectrometer
             logger.debug("initializing spectrometer");
-            spec.bleDeviceInfo = bdi;
             _ = await spec.initAsync(characteristicsByName, showProgress);
 
             // start notifications
@@ -399,7 +397,7 @@ namespace EnlightenMobile.Views
 
             BLEDevice bd = new BLEDevice(device);
             logger.debug($"discovered {bd.name} (RSSI {bd.rssi} Id {device.Id})");
-            bleDeviceList.Add(bd);
+            bvm.bleDeviceList.Add(bd);
         }
 
         async Task<bool> _requestPermissionsAsync()

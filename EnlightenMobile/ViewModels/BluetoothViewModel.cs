@@ -3,6 +3,8 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Threading;
 using Xamarin.Forms;
+using System.Collections.ObjectModel;
+using EnlightenMobile.Models;
 
 namespace EnlightenMobile.ViewModels
 {
@@ -12,6 +14,8 @@ namespace EnlightenMobile.ViewModels
     public class BluetoothViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public ObservableCollection<BLEDevice> bleDeviceList = new ObservableCollection<BLEDevice>();
 
         Logger logger = Logger.getInstance();
 
@@ -61,9 +65,11 @@ namespace EnlightenMobile.ViewModels
         // ideally, we should probably add some kind of callback hook to an
         // Android "onBluetoothEnabled" event, inside the PlatformService, and
         // float that update back here somehow, but...this will work for now
-        async Task<bool> doResetAsync()
+        public async Task<bool> doResetAsync()
         {
             logger.debug("attempting to disable Bluetooth");
+
+            bleDeviceList.Clear();
             
             if (!Util.enableBluetooth(false))
                 logger.error("Unable to disable Bluetooth");

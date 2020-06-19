@@ -162,11 +162,12 @@ namespace EnlightenMobile
             if (lvl < level || saving)
                 return;
 
-            string msg = "[Wasatch] " + getTimestamp() + lvl + ": " + String.Format(fmt, obj);
+            string msg = getTimestamp() + lvl + ": " + String.Format(fmt, obj);
 
             lock (instance)
             {
-                Console.WriteLine(msg);
+                // Console gets littered with a lot of Xamarin messages, so flag ours
+                Console.WriteLine("[Wasatch] " + msg);
 
                 if (outfile != null)
                 {

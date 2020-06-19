@@ -22,6 +22,8 @@ namespace EnlightenMobile.Views
             // ViewModels are instantiated as each View calls InitializeComponent
             InitializeComponent();
 
+            // page swiping was cool, but it really complicated the pan-and-zoom
+            // finger interaction with the chart  
             On<Android>().SetIsSwipePagingEnabled(false);
 
             // conditional execution simplifies testing live-updated XAML
@@ -49,6 +51,11 @@ namespace EnlightenMobile.Views
 
             // if we just changed to the log page, send an update now, then 
             // updated on each log message
+            //
+            // What exactly is the use-case for updates on each log message? If
+            // we're looking at the log page, what events (spectra, laser etc)
+            // can we trigger?  I can imagine this being marginally useful for
+            // Notify Characteristics, but little else.
             logger.liveUpdates = newPageName is null ? false : newPageName == "Log";
             if (logger.liveUpdates)
                 logger.update();

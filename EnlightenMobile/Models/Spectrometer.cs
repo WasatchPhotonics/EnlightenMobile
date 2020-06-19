@@ -33,7 +33,7 @@ namespace EnlightenMobile.Models
         public EEPROM eeprom = EEPROM.getInstance();
         public Battery battery;
 
-        public BLEDeviceInfo bleDeviceInfo;
+        public BLEDeviceInfo bleDeviceInfo = new BLEDeviceInfo();
 
         // software state
         public double[] wavelengths;
@@ -74,7 +74,6 @@ namespace EnlightenMobile.Models
         {
             reset();
             battery = new Battery();
-            bleDeviceInfo = new BLEDeviceInfo();
         }
 
         public void reset()
@@ -813,7 +812,7 @@ namespace EnlightenMobile.Models
                 var pixelsInPacket = (responseLen - headerLen) / 2;
 
                 logger.debug($"received spectrum packet starting at pixel {firstPixel} with {pixelsInPacket} pixels");
-                logger.hexdump(response);
+                // logger.hexdump(response);
 
                 var crc = Crc16.checksum(response);
                 if (crc == lastCRC)

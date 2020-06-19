@@ -151,21 +151,6 @@ namespace EnlightenMobile.Models
         }
         bool _hasLaser;
 
-        /// <summary>the integral center wavelength of the laser in nanometers, if present</summary>
-        /// <remarks>user-writable</remarks>
-        /// <see cref="Util.wavelengthsToWavenumbers(double, double[])"/>
-        public ushort excitationNM
-        {
-            get { return _excitationNM; }
-            set
-            {
-                EventHandler handler = EEPROMChanged;
-                _excitationNM = value;
-                handler?.Invoke(this, new EventArgs());
-            }
-        }
-        ushort _excitationNM;
-
         /// <summary>the slit width in µm</summary>
         public ushort slitSizeUM
         {
@@ -800,7 +785,7 @@ namespace EnlightenMobile.Models
                 hasCooling = ParseData.toBool(pages[0], 36);
                 hasBattery = ParseData.toBool(pages[0], 37);
                 hasLaser = ParseData.toBool(pages[0], 38);
-                excitationNM = ParseData.toUInt16(pages[0], 39);
+                // excitationNM = ParseData.toUInt16(pages[0], 39); // changed to FeatureMask
                 slitSizeUM = ParseData.toUInt16(pages[0], 41);
 
                 startupIntegrationTimeMS = ParseData.toUInt16(pages[0], 43);
@@ -979,7 +964,8 @@ namespace EnlightenMobile.Models
             register("hasCooling", hasCooling);
             register("hasBattery", hasBattery);
             register("hasLaser", hasLaser);
-            register("excitationNM", excitationNM);
+            register("invertXAxis", featureMask.invertXAxis);
+            register("bin2x2", featureMask.bin2x2);
             register("slitSizeUM", slitSizeUM);
             register("startupIntegrationTimeMS", startupIntegrationTimeMS);
             register("startupDetectorTempDegC", startupDetectorTemperatureDegC);

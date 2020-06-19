@@ -1,10 +1,12 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Xamarin.Forms;
 using EnlightenMobile.Models;
 using System.Threading.Tasks;
+using Telerik.XamarinForms.Chart;
 
 namespace EnlightenMobile.ViewModels
 {
@@ -44,6 +46,8 @@ namespace EnlightenMobile.ViewModels
             acquireCmd = new Command(() => { _ = doAcquireAsync(); });
             refreshCmd = new Command(() => { _ = doAcquireAsync(); }); 
             saveCmd    = new Command(() => { _ = doSave        (); });
+            addCmd     = new Command(() => { _ = doAdd         (); });
+            clearCmd   = new Command(() => { _ = doClear       (); });
 
             logger.debug("SVM: instantiating XAxisOptions");
             xAxisOptions = new ObservableCollection<XAxisOption>()
@@ -240,6 +244,11 @@ namespace EnlightenMobile.ViewModels
             updateLaserAvailable();
         }
 
+        public void updateLaserAvailable()
+        { 
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(laserIsAvailable)));
+        }
+
         ////////////////////////////////////////////////////////////////////////
         // Refresh
         ////////////////////////////////////////////////////////////////////////
@@ -279,6 +288,12 @@ namespace EnlightenMobile.ViewModels
         public string batteryColor
         { 
             get => spec.battery.level > 20 ? "#eee" : "#f33";
+        }
+
+        void updateBatteryProperties()
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(batteryState)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(batteryColor)));
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -336,24 +351,6 @@ namespace EnlightenMobile.ViewModels
             return ok;
         }
 
-        void updateBatteryProperties()
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(batteryState)));
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(batteryColor)));
-        }
-
-        public void updateLaserAvailable()
-        { 
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(laserIsAvailable)));
-        }
-
-        void updateChart()
-        {
-            refreshChartData();
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(chartData)));
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(spectrumMax)));
-        }
-
         // This is a callback (delegate) passed down into Spectrometer so it can
         // update our acquisitionProgress property while reading BLE packets.
         void showProgress(double progress) => acquisitionProgress = progress; 
@@ -400,10 +397,70 @@ namespace EnlightenMobile.ViewModels
         // Chart
         ////////////////////////////////////////////////////////////////////////
 
+        public Command addCmd { get; }
+        public Command clearCmd { get; }
+
+        public RadCartesianChart theChart;
+
         public ObservableCollection<ChartDataPoint> chartData { get; set; } = new ObservableCollection<ChartDataPoint>();
 
-        private double[] xAxis;
-        private string lastAxisType;
+        // declare statically for now; these are individual Properties because 
+        // I don't think I can use databinding against array elements
+        public ObservableCollection<ChartDataPoint> trace0 { get; set; } = new ObservableCollection<ChartDataPoint>();
+        public ObservableCollection<ChartDataPoint> trace1 { get; set; } = new ObservableCollection<ChartDataPoint>();
+        public ObservableCollection<ChartDataPoint> trace2 { get; set; } = new ObservableCollection<ChartDataPoint>();
+        public ObservableCollection<ChartDataPoint> trace3 { get; set; } = new ObservableCollection<ChartDataPoint>();
+        public ObservableCollection<ChartDataPoint> trace4 { get; set; } = new ObservableCollection<ChartDataPoint>();
+        public ObservableCollection<ChartDataPoint> trace5 { get; set; } = new ObservableCollection<ChartDataPoint>();
+        public ObservableCollection<ChartDataPoint> trace6 { get; set; } = new ObservableCollection<ChartDataPoint>();
+        public ObservableCollection<ChartDataPoint> trace7 { get; set; } = new ObservableCollection<ChartDataPoint>();
+
+        double[] xAxis;
+        string lastAxisType;
+        int nextTrace = 0;
+        const int MAX_TRACES = 8;
+
+        ObservableCollection<ChartDataPoint> getTraceData(int trace)
+        {
+            switch(trace)
+            {
+                case 0: return trace0;
+                case 1: return trace1;
+                case 2: return trace2;
+                case 3: return trace3;
+                case 4: return trace4;
+                case 5: return trace5;
+                case 6: return trace6;
+                case 7: return trace7;
+            }
+            return trace0;
+        }
+
+        string getTraceName(int trace)
+        {
+            switch(trace)
+            {
+                case 0: return nameof(trace0);
+                case 1: return nameof(trace1);
+                case 2: return nameof(trace2); 
+                case 3: return nameof(trace3); 
+                case 4: return nameof(trace4); 
+                case 5: return nameof(trace5); 
+                case 6: return nameof(trace6); 
+                case 7: return nameof(trace7); 
+            }
+            return nameof(trace0);
+        }
+
+        void updateChart()
+        {
+            refreshChartData();
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(chartData)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(spectrumMax)));
+        }
+
+        void updateTrace(int trace) => 
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(getTraceName(trace)));
 
         private void refreshChartData()
         {
@@ -412,7 +469,6 @@ namespace EnlightenMobile.ViewModels
             double[] intensities = spec.measurement.processed;
 
             // pick our x-axis
-            bool repopulateXAxis = false;
             if (lastAxisType != null && lastAxisType == xAxisOption.name)
             {
                 // re-use previous axis
@@ -428,42 +484,52 @@ namespace EnlightenMobile.ViewModels
                     xAxis = spec.xAxisPixels;
 
                 lastAxisType = xAxisOption.name;
-                repopulateXAxis = true;
             }
 
             if (intensities is null || xAxis is null)
                 return;
 
-            if (chartData.Count != intensities.Length || true)
-            {
-                // repopulate with fresh points
-                logger.info("populating ChartData");
-                chartData.Clear();
-                for (int i = 0; i < pixels; i++)
-                    chartData.Add(new ChartDataPoint() { intensity = intensities[i], xValue = xAxis[i] });
-            } 
-            else if (repopulateXAxis)
-            {
-                logger.debug("refreshChartData: updating both");
-
-                // update both axes
-                for (int i = 0; i < pixels; i++)
-                {
-                    chartData[i].intensity = intensities[i];
-                    chartData[i].xValue = xAxis[i];
-                }
-            }
-            else
-            {
-                logger.debug("refreshChartData: updating intensities");
-
-                // only update intensities
-                for (int i = 0; i < pixels; i++)
-                    chartData[i].intensity = intensities[i];
-            }
+            logger.info("populating ChartData");
+            chartData.Clear();
+            for (int i = 0; i < pixels; i++)
+                chartData.Add(new ChartDataPoint() { intensity = intensities[i], xValue = xAxis[i] });
 
             xAxisMinimum = xAxis[0];
             xAxisMaximum = xAxis[pixels-1];
+        }
+
+        bool doAdd()
+        { 
+            logger.debug("Add button pressed");
+
+            var name = getTraceName(nextTrace);
+            logger.debug($"Populating trace {name}");
+
+            var data = getTraceData(nextTrace);
+            data.Clear();
+            foreach (var orig in chartData)
+                data.Add(new ChartDataPoint() { xValue = orig.xValue, intensity = orig.intensity });
+
+            updateTrace(nextTrace);
+
+            nextTrace = (nextTrace + 1) % MAX_TRACES;
+
+            return true;
+        }
+
+        bool doClear()
+        {
+            logger.debug("Clear button pressed");
+
+            for (int i = 0; i < MAX_TRACES; i++)
+            {
+                getTraceData(i).Clear();
+                updateTrace(i);
+            }
+
+            nextTrace = 0;
+
+            return true;
         }
 
         ////////////////////////////////////////////////////////////////////////

@@ -1,16 +1,17 @@
 # Version History
 
-- 2020-06-?? 0.4.5
-    - fixed memory leak
-    - added 2x2 binning
-    - improved battery display
+- 2020-06-19 0.4.5
+    - fixed memory leak (re-used rather than recreate ObservableCollection)
+    - added FeatureMask / 2x2 binning
+    - corrected battery display
     - disabled some battery updates
     - seemed to get SW-based Raman Mode working
     - removed some GC
     - added WhereAmI geolocation
     - added timestamp to saved files 
-    - added PlatformUtil.enableBluetooth (Android-only)
-    - added BLE reset button
+    - added and automated BLE reset button for GattCallback error 133 via enableBluetooth
+    - added up to 8 temporary chart traces
+    - fixed SpectrometerSettingsView metadata display on first view
 - 2020-06-10 0.4.4
     - added VerticalROI
     - working on SW Raman Mode

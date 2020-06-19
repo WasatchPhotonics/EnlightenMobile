@@ -81,8 +81,18 @@
                         <telerikChart:ScatterLineSeries XValueBinding="xValue"
                                                         YValueBinding="intensity"
                                                         Stroke="#27c0a1"
-                                                        ItemsSource="{Binding chartData}" >
-                        </telerikChart:ScatterLineSeries>
+                                                        DisplayName="Live"
+                                                        ItemsSource="{Binding chartData}" />
+
+                        <!-- I couldn't find a way to add these programmatically at runtime (and appear on the graph) -->
+                        <telerikChart:ScatterLineSeries DisplayName="Trace #0" Stroke="#f84f21" ItemsSource="{Binding trace0}" XValueBinding="xValue" YValueBinding="intensity" />
+                        <telerikChart:ScatterLineSeries DisplayName="Trace #1" Stroke="#6758c5" ItemsSource="{Binding trace1}" XValueBinding="xValue" YValueBinding="intensity" />
+                        <telerikChart:ScatterLineSeries DisplayName="Trace #2" Stroke="#f7e842" ItemsSource="{Binding trace2}" XValueBinding="xValue" YValueBinding="intensity" />
+                        <telerikChart:ScatterLineSeries DisplayName="Trace #3" Stroke="#4a5da9" ItemsSource="{Binding trace3}" XValueBinding="xValue" YValueBinding="intensity" />
+                        <telerikChart:ScatterLineSeries DisplayName="Trace #4" Stroke="#f79a1c" ItemsSource="{Binding trace4}" XValueBinding="xValue" YValueBinding="intensity" />
+                        <telerikChart:ScatterLineSeries DisplayName="Trace #5" Stroke="#60b34e" ItemsSource="{Binding trace5}" XValueBinding="xValue" YValueBinding="intensity" />
+                        <telerikChart:ScatterLineSeries DisplayName="Trace #6" Stroke="#cd242b" ItemsSource="{Binding trace6}" XValueBinding="xValue" YValueBinding="intensity" />
+                        <telerikChart:ScatterLineSeries DisplayName="Trace #7" Stroke="#2994d3" ItemsSource="{Binding trace7}" XValueBinding="xValue" YValueBinding="intensity" />
                     </telerikChart:RadCartesianChart.Series>
 
                     <!-- pan and zoom -->
@@ -124,11 +134,11 @@
 
                         <!-- initialize to Portrait mode (1 col, 2 rows) -->
 			            <Grid.RowDefinitions>
-				            <RowDefinition Height="Auto"/> <!--           Logo         -->
-                            <RowDefinition Height="Auto"/> <!--       ProgressBar      -->
-				            <RowDefinition Height="Auto"/> <!-- Button1 Button2        -->
+				            <RowDefinition Height="Auto"/> <!--         Logo           -->
+                            <RowDefinition Height="Auto"/> <!--      ProgressBar       -->
+				            <RowDefinition Height="Auto"/> <!-- Acquire Save Add Clear -->
                             <RowDefinition Height="Auto"/> <!-- Acquisition Parameters -->
-				            <RowDefinition Height="Auto"/> <!--       Status Bar       -->
+				            <RowDefinition Height="Auto"/> <!--      Status Bar        -->
 			            </Grid.RowDefinitions>
 			            <Grid.ColumnDefinitions>
 				            <ColumnDefinition Width="*"/>
@@ -143,9 +153,11 @@
                                      ProgressColor="#2994d3"/>
 
                         <!-- Command buttons -->
-                        <StackLayout Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
+                        <StackLayout Grid.Row="2" Grid.Column="0" Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
                             <Button Text="Acquire" Command="{Binding acquireCmd}" BackgroundColor="{Binding acquireButtonColor}" />
                             <Button Text="Save" Command="{Binding saveCmd}" />
+                            <Button Text="Add" Command="{Binding addCmd}" />
+                            <Button Text="Clear" Command="{Binding clearCmd}" />
                         </StackLayout>
 
                         <StackLayout Grid.Row="3" Grid.Column="0" HorizontalOptions="FillAndExpand" Padding="20, 10, 20, 10">
