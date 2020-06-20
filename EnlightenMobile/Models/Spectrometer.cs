@@ -55,6 +55,10 @@ namespace EnlightenMobile.Models
         uint totalPixelsToRead;
         uint totalPixelsRead;
 
+        // so the Model can float-up progress updates to the View for display
+        public delegate void ConnectionProgressNotification(double perc);
+        public event ConnectionProgressNotification showConnectionProgress;
+
         // util
         WhereAmI whereAmI;
         Logger logger = Logger.getInstance();
@@ -107,9 +111,7 @@ namespace EnlightenMobile.Models
                 xAxisPixels[i] = i;
         }
 
-        public async Task<bool> initAsync(
-                Dictionary<string, ICharacteristic> characteristicsByName, 
-                ProgressBarDelegate showProgress)
+        public async Task<bool> initAsync(Dictionary<string, ICharacteristic> characteristicsByName)
         {
             logger.debug("Initializing Spectrometer");
 
@@ -162,7 +164,7 @@ namespace EnlightenMobile.Models
                 }
                 logger.hexdump(buf, "adding page: ");
                 pages.Add(buf);
-                showProgress(.15 + .85 * page/8.0);
+                showConnectionProgress(.15 + .85 * page / EEPROM.MAX_PAGES);
             }
 
             ////////////////////////////////////////////////////////////////////
@@ -197,7 +199,7 @@ namespace EnlightenMobile.Models
             // finish initializing Spectrometer 
             ////////////////////////////////////////////////////////////////////
 
-            showProgress(1);
+            showConnectionProgress(1);
             
             logger.debug("finishing spectrometer initialization");
             pixels = eeprom.activePixelsHoriz;

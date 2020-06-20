@@ -1,5 +1,8 @@
 # Version History
 
+- 2020-06-20 0.5.0
+    - refactored BluetoothView.xaml.cs into BluetoothViewModel.cs where it belonged
+    - doc updates
 - 2020-06-19 0.4.5
     - fixed memory leak (re-used rather than recreate ObservableCollection)
     - added FeatureMask / 2x2 binning

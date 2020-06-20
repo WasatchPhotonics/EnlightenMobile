@@ -19,8 +19,8 @@
             <Frame CornerRadius="10" BackgroundColor="#666" Padding="2">
                 <Frame CornerRadius="10" BackgroundColor="#444" Padding="2">
                     <StackLayout Orientation="Horizontal" Padding="2" HorizontalOptions="FillAndExpand">
-                        <Button x:Name="btnScan"    Text="Scan"    Clicked="btnScan_Clicked" IsEnabled="{Binding bluetoothEnabled}"/>
-                        <Button x:Name="btnConnect" Text="{Binding buttonConnectText}" Clicked="btnConnect_Clicked" /> 
+                        <Button Text="Scan" Command="{Binding scanCmd}" IsEnabled="{Binding bluetoothEnabled}"/>
+                        <Button Text="{Binding buttonConnectText}" Command="{Binding connectCmd}" IsEnabled="{Binding buttonConnectEnabled}" /> 
                         <Button Text="Reset" Command="{Binding resetCmd}" />
                     </StackLayout>
                 </Frame>

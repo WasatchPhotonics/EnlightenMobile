@@ -1,10 +1,10 @@
 # Architecture
 
-The application was based on a GitHub sample project, and uses a MVVM 
-(Model-View-ViewModel) architecture.  I'm not an expert in that (makes my eyes 
-bleed just to read it), but will summarize the basic definition I'm using.  It 
-kinda matters because Xamarin's XAML "binding" functionality is intended to work
-with MVVM structure, and most online tutorials / examples assume you're using it.
+The application was based on a GitHub sample project, and uses the MVVM 
+(Model-View-ViewModel) architecture.  I'm not an expert in that, but will 
+summarize the basic definition I'm using.  It matters because Xamarin's XAML 
+"binding" functionality is expressly designed to work with MVVM structure, and 
+most online tutorials / examples assume you're using it.
 
 I think the short-form of why MVC (Model-View-Controller) was replaced by MVVM is
 that some people saw MVC as this:
@@ -12,15 +12,16 @@ that some people saw MVC as this:
          Controller
             .  
            / \
-    Model <---> View
+     View <---> Model
 
-...when the N-Tier Gods wanted them to see it like this:
+...when evolving practice was converged toward a more directed dataflow like this:
 
-    Model <--> Controller <--> View
+    View <--> Controller <--> Model
 
-So now they gave us this to make it _emphatically_ clear:
+So they renamed things to make this emphatically clear (while also allowing the 
+human operator to act as "Controller" via the View):
 
-    Model <--> ModelView <--> View
+    View <--> ViewModel <--> Model
 
 - Model (Data)
     - Basically, the underlying data regarding Spectrometer state (including the
@@ -30,20 +31,17 @@ So now they gave us this to make it _emphatically_ clear:
 - View (GUI)
     - All the buttons and labels and screen layouts.  These are primarily 
       defined in XAML (similar to Qt's enlighten\_layout.ui XML), with small
-      "code-behind" classes in C# (e.g., ScopeView.xaml has the ScopeView.cs
+      "code-behind" classes in C# (e.g., ScopeView.xaml has the ScopeView.xaml.cs
       code-behind) for programmatic things you just can't do in XML.
 
-- ModelView (Business Logic and Data Display Transformation)
-    - I don't know why they thought it would be clever to call it "ModelView", other 
-      than to make it really, really clear that this goes between the "Model" and the
-      "View".
+- ViewModel (Business Logic and Data Display Transformation)
 
 Xamarin lets View definitions be split across XAML (XML) and "code-behind" C#
 classes, so it looks more like this:
 
-                                  .--- View.xaml
-    Model <--> ModelView <--> View         |
-                                  '--- View.cs
+    View.xaml ----.
+        |          View <--> ViewModel <--> Model
+    View.xaml.cs -'
 
 There are things that are easier to do in XML, and others that are easier to
 do in C#, and some things you can do in either and it's just a matter of 
@@ -59,30 +57,3 @@ can store / act on the new value.
 Likewise, if something changes in the Model, the ViewModel can flow the new
 data back up to the GUI by raising a PropertyChangedNotification with that
 specific "bound" Property name.
-
-I'm still learning how to use notifications propertly, so sometimes in my 
-Model <--> ModelView communications, you'll see I'm still using old-fashioned
-callbacks (okay, delegates and closures).  Some of that can probably be made
-more elegant, I just went with what I knew worked.
-
-Also, there were times that I wanted to pass calls between the ModelView and
-the View's code-behind, and I didn't always see the "intended" way to do that,
-so I cheated to some Singletons (which I know are bad).  So my structure looks
-a little more like this:
-
-                                  .--- View.xaml
-    Model <--> ModelView <--> View         |
-      |            |              '--- View.cs
-      v            |                       |
-     _Common_______v_______________________v__
-    |                                         |
-    |         PageNav    Logger    (...)      |
-    |_________________________________________|
-
-I use the MVVM and notifications where I can and understand how.
-
-One big exception is that most of the BLE connection logic is currently 
-implemented in the BluetoothView.cs code-behind, rather than (as it probably 
-should be) BluetoothViewModel.cs.  That's the way it was in the sample code I 
-started with, and I didn't want to break things by moving it.  It probably should
-be moved though.
