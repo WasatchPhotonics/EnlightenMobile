@@ -76,6 +76,7 @@ namespace EnlightenMobile.Models
 
         public void reset()
         { 
+            logger.debug("Spectrometer.reset: start");
             paired = false;
 
             // Provide some test defaults so we can play with the chart etc while
@@ -100,6 +101,7 @@ namespace EnlightenMobile.Models
             scansToAverage = 1;
 
             battery = new Battery();
+            logger.debug("Spectrometer.reset: done");
         }
 
         void generatePixelAxis()
@@ -257,8 +259,8 @@ namespace EnlightenMobile.Models
             get => _acquiring;
             set
             {
-                acquiring = value;
-                PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(acquiring)));
+                _acquiring = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(acquiring)));
             }
         }
         bool _acquiring;

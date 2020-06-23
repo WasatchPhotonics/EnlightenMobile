@@ -158,7 +158,7 @@
                         <StackLayout Grid.Row="2" Grid.Column="0" 
                                      Orientation="Horizontal" 
                                      HorizontalOptions="CenterAndExpand">
-                            <Button Text="Acquire" Command="{Binding acquireCmd}" 
+                            <Button Text="Acquire" Command="{Binding acquireCmd}"
                                                    TextColor="{Binding acquireButtonTextColor}" 
                                                    BackgroundColor="{Binding acquireButtonBackgroundColor}" />
                             <Button Text="Save" Command="{Binding saveCmd}" />

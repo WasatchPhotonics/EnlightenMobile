@@ -1,8 +1,11 @@
 # Version History
 
-- 2020-06-?? 0.5.1
+- 2020-06-23 1.0.0
     - connection robustness, widget accessibility
     - messaging cleanup
+    - colorized acquire button during acquisition
+    - added SemaphoreSlim around landscape rotation
+    - tested under Android 10
 - 2020-06-20 0.5.0
     - refactored BluetoothView.xaml.cs into BluetoothViewModel.cs where it belonged
     - doc updates

@@ -13,7 +13,6 @@ namespace EnlightenMobile
 
         public App()
         {
-            logger.debug("App: starting ctor");
             InitializeComponent();
 
             // register platform-specific Services here
@@ -21,7 +20,6 @@ namespace EnlightenMobile
 
             VersionTracking.Track();
             MainPage = new MainPage();
-            logger.debug("App: finished ctor");
         }
 
         protected override void OnStart() { }

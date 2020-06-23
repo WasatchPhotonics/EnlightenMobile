@@ -6,20 +6,20 @@ using System.Collections.ObjectModel;
 namespace EnlightenMobile.Models
 {
     // simplified from WasatchNET
-    public class EEPROM 
+    public class EEPROM
     {
-        /////////////////////////////////////////////////////////////////////////       
+        /////////////////////////////////////////////////////////////////////////
         // Singleton
-        /////////////////////////////////////////////////////////////////////////       
+        /////////////////////////////////////////////////////////////////////////
 
         // This wouldn't normally be a Singleton; it is normally an attribute
         // of Spectrometer.  However, since we have a SpectrometerSettingsViewModel
         // that needs to inject its ObservableCollection<ViewableSettings> into
-        // the EEPROM at launch, it seems simplest for now to have EEPROM 
+        // the EEPROM at launch, it seems simplest for now to have EEPROM
         // instantiated at launch, even before BLE connection has occured.
 
         public static EEPROM instance = null;
-        
+
         public static EEPROM getInstance()
         {
             if (instance is null)
@@ -27,9 +27,9 @@ namespace EnlightenMobile.Models
             return instance;
         }
 
-        /////////////////////////////////////////////////////////////////////////       
+        /////////////////////////////////////////////////////////////////////////
         // private attributes
-        /////////////////////////////////////////////////////////////////////////       
+        /////////////////////////////////////////////////////////////////////////
 
         internal const int MAX_PAGES = 8;
         internal const int SUBPAGE_COUNT = 4;
@@ -44,21 +44,21 @@ namespace EnlightenMobile.Models
 
         public ObservableCollection<ViewableSetting> viewableSettings = null;
 
-        /////////////////////////////////////////////////////////////////////////       
+        /////////////////////////////////////////////////////////////////////////
         //
         // public attributes
         //
-        /////////////////////////////////////////////////////////////////////////       
+        /////////////////////////////////////////////////////////////////////////
 
-        /////////////////////////////////////////////////////////////////////////       
+        /////////////////////////////////////////////////////////////////////////
         // Collections
-        /////////////////////////////////////////////////////////////////////////       
+        /////////////////////////////////////////////////////////////////////////
 
         public FeatureMask featureMask = new FeatureMask();
 
-        /////////////////////////////////////////////////////////////////////////       
-        // Page 0 
-        /////////////////////////////////////////////////////////////////////////       
+        /////////////////////////////////////////////////////////////////////////
+        // Page 0
+        /////////////////////////////////////////////////////////////////////////
 
         public byte format
         {
@@ -81,7 +81,7 @@ namespace EnlightenMobile.Models
                 EventHandler handler = EEPROMChanged;
                 _model = value;
                 handler?.Invoke(this, new EventArgs());
-                
+
             }
         }
         string _model;
@@ -224,7 +224,7 @@ namespace EnlightenMobile.Models
             }
         }
         short _detectorOffset;
-        
+
         public float  detectorGainOdd
         {
             get { return _detectorGainOdd; }
@@ -249,14 +249,14 @@ namespace EnlightenMobile.Models
         }
         short _detectorOffsetOdd;
 
-        /////////////////////////////////////////////////////////////////////////       
+        /////////////////////////////////////////////////////////////////////////
         // Page 1
-        /////////////////////////////////////////////////////////////////////////       
+        /////////////////////////////////////////////////////////////////////////
 
         /// <summary>coefficients of a 3rd-order polynomial representing the configured wavelength calibration</summary>
         /// <remarks>
-        /// These are automatically expanded into an accessible array in 
-        /// Spectrometer.wavelengths.  Also see Util.generateWavelengths() for 
+        /// These are automatically expanded into an accessible array in
+        /// Spectrometer.wavelengths.  Also see Util.generateWavelengths() for
         /// the process of expanding the polynomial.
         ///
         /// user-writable
@@ -300,8 +300,8 @@ namespace EnlightenMobile.Models
         byte _intensityCorrectionOrder;
 
         /// <summary>
-        /// These are used to convert the user's desired setpoint in degrees 
-        /// Celsius to raw 12-bit DAC inputs for passing to the detector's 
+        /// These are used to convert the user's desired setpoint in degrees
+        /// Celsius to raw 12-bit DAC inputs for passing to the detector's
         /// Thermo-Electric Cooler (TEC).
         /// </summary>
         /// <remarks>
@@ -332,7 +332,7 @@ namespace EnlightenMobile.Models
                 EventHandler handler = EEPROMChanged;
                 _detectorTempMin = value;
                 handler?.Invoke(this, new EventArgs());
-                
+
             }
         }
         short _detectorTempMin;
@@ -355,13 +355,13 @@ namespace EnlightenMobile.Models
         /// </summary>
         /// <remarks>
         /// These correspond to the fields "Therm to Temp Cal" in Wasatch Model Configuration GUI.
-        /// 
+        ///
         /// Use these when reading the detector temperature.
         ///
         /// Note that the detector thermistor is a read-only device: you can read what temperature
         /// it IS, but you can't tell it what temperature you WANT.  (For that, use the TEC.)
         ///
-        /// Note that there is also a thermistor on the laser.  These calibrated coefficients 
+        /// Note that there is also a thermistor on the laser.  These calibrated coefficients
         /// are for the detector thermistor; the laser thermistor uses hard-coded coefficients
         /// which aren't calibrated or stored on the EEPROM.
         /// </remarks>
@@ -429,9 +429,9 @@ namespace EnlightenMobile.Models
         }
         string _calibrationBy;
 
-        /////////////////////////////////////////////////////////////////////////       
+        /////////////////////////////////////////////////////////////////////////
         // Page 2
-        /////////////////////////////////////////////////////////////////////////       
+        /////////////////////////////////////////////////////////////////////////
 
         public string detectorName
         {
@@ -468,7 +468,7 @@ namespace EnlightenMobile.Models
             }
         }
         ushort _activePixelsVert;
-        
+
         public uint minIntegrationTimeMS
         {
             get { return _minIntegrationTimeMS; }
@@ -541,7 +541,7 @@ namespace EnlightenMobile.Models
             }
         }
         ushort[] _ROIVertRegionStart;
-        
+
         public ushort[] ROIVertRegionEnd
         {
             get { return _ROIVertRegionEnd; }
@@ -571,9 +571,9 @@ namespace EnlightenMobile.Models
         }
         float[] _linearityCoeffs;
 
-        /////////////////////////////////////////////////////////////////////////       
+        /////////////////////////////////////////////////////////////////////////
         // Page 3
-        /////////////////////////////////////////////////////////////////////////       
+        /////////////////////////////////////////////////////////////////////////
 
         // public int deviceLifetimeOperationMinutes { get; private set; }
         // public int laserLifetimeOperationMinutes { get; private set; }
@@ -614,7 +614,7 @@ namespace EnlightenMobile.Models
             }
         }
         float _laserExcitationWavelengthNMFloat;
-        
+
         public float[] laserPowerCoeffs
         {
             get { return _laserPowerCoeffs; }
@@ -639,17 +639,17 @@ namespace EnlightenMobile.Models
         }
         float _avgResolution;
 
-        /////////////////////////////////////////////////////////////////////////       
+        /////////////////////////////////////////////////////////////////////////
         // Page 4
-        /////////////////////////////////////////////////////////////////////////       
+        /////////////////////////////////////////////////////////////////////////
 
         /// <summary>
         /// 64 bytes of unstructured space which the user is free to use however
         /// they see fit.
         /// </summary>
         /// <remarks>
-        /// For convenience, the same raw storage space is also accessible as a 
-        /// null-terminated string via userText. 
+        /// For convenience, the same raw storage space is also accessible as a
+        /// null-terminated string via userText.
         ///
         /// EEPROM versions prior to 4 only had 63 bytes of user data.
         /// </remarks>
@@ -688,9 +688,9 @@ namespace EnlightenMobile.Models
             }
         }
 
-        /////////////////////////////////////////////////////////////////////////       
+        /////////////////////////////////////////////////////////////////////////
         // Page 5
-        /////////////////////////////////////////////////////////////////////////       
+        /////////////////////////////////////////////////////////////////////////
 
         /// <summary>
         /// array of up to 15 "bad" (hot or dead) pixels which software may wish
@@ -725,9 +725,9 @@ namespace EnlightenMobile.Models
         }
         string _productConfiguration;
 
-        /////////////////////////////////////////////////////////////////////////       
+        /////////////////////////////////////////////////////////////////////////
         // private methods
-        /////////////////////////////////////////////////////////////////////////       
+        /////////////////////////////////////////////////////////////////////////
 
         private EEPROM()
         {
@@ -747,8 +747,8 @@ namespace EnlightenMobile.Models
 
         bool corruptedPage(byte[] data)
         {
-            var allZero = true;                
-            var allHigh = true;                
+            var allZero = true;
+            var allHigh = true;
             for (int i = 0; i < data.Length; i++)
             {
                 if (data[i] != 0x00) allZero = false;
@@ -819,7 +819,7 @@ namespace EnlightenMobile.Models
                 detectorName = ParseData.toString(pages[2], 0, 16);
                 activePixelsHoriz = ParseData.toUInt16(pages[2], 16); // note: byte 18 unused
                 activePixelsVert = ParseData.toUInt16(pages[2], 19);
-                minIntegrationTimeMS = ParseData.toUInt16(pages[2], 21); // will overwrite if 
+                minIntegrationTimeMS = ParseData.toUInt16(pages[2], 21); // will overwrite if
                 maxIntegrationTimeMS = ParseData.toUInt16(pages[2], 23); //   format >= 5
                 actualPixelsHoriz = ParseData.toUInt16(pages[2], 25);
                 ROIHorizStart = ParseData.toUInt16(pages[2], 27);
@@ -893,7 +893,7 @@ namespace EnlightenMobile.Models
                 else
                     avgResolution = 0.0f;
 
-                if (format >= 9)                    featureMask = new FeatureMask(ParseData.toUInt16(pages[0], 39));
+                if (format >= 9)                    featureMask = new FeatureMask(ParseData.toUInt16(pages[0], 39));
             }
             catch (Exception ex)
             {
@@ -989,7 +989,7 @@ namespace EnlightenMobile.Models
             register("thermistorBeta", thermistorBeta);
             register("calibrationDate", calibrationDate);
             register("calibrationBy", calibrationBy);
-                                               
+
             register("detectorName", detectorName);
             register("activePixelsHoriz", activePixelsHoriz);
             register("activePixelsVert", activePixelsVert);
@@ -1023,7 +1023,7 @@ namespace EnlightenMobile.Models
         // Added to populate ObservableCollection
         ////////////////////////////////////////////////////////////////////////
 
-        // These functions register each EEPROM attribute's (name, value) pair 
+        // These functions register each EEPROM attribute's (name, value) pair
         // into the ObservableCollection displayed on SpectrometerSettingsView.
 
         void register(string name, bool   value) => register(name, value.ToString());

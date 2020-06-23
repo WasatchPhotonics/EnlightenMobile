@@ -34,7 +34,6 @@ namespace EnlightenMobile.Models
 
         public Measurement()
         {
-            logger.info("Measurement ctor called");
             reset();
         }
 

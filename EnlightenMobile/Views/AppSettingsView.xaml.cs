@@ -11,6 +11,8 @@ namespace EnlightenMobile.Views
     {
         AppSettingsViewModel asvm;
 
+        Logger logger = Logger.getInstance();
+
         public AppSettingsView()
         {
             InitializeComponent();

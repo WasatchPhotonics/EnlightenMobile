@@ -120,24 +120,24 @@ namespace EnlightenMobile.Views
             bool doRotate = false;
             var landscape = width > height;
 
-            logger.debug($"OnSizeAllocated: Width {width}, Height {height}");
-            return;
-            // if (!semRotate.Wait(5))
-            // {
-            //     logger.debug($"OnSizeAllocated: timeout");
-            //     return;
-            // }
+            if (!semRotate.Wait(5))
+            {
+                logger.debug($"OnSizeAllocated: timeout");
+                return;
+            }
 
             if (landscape != lastLandscape)
             {
-                logger.debug($"OnSizeAllocated: rotating from lastLandscape {lastLandscape} to landscape {landscape}");
+                logger.debug($"OnSizeAllocated: Width {width}, Height {height}");
+                logger.debug($"OnSizeAllocated: rotated from lastLandscape {lastLandscape} to landscape {landscape}");
                 lastLandscape = landscape;
                 doRotate = true;
             }
-            // semRotate.Release();
+            semRotate.Release();
 
             if (doRotate)
             {
+                logger.debug($"OnSizeAllocated: performing rotation");
                 if (landscape)
                 {
                     // transition to Landscape
@@ -176,10 +176,6 @@ namespace EnlightenMobile.Views
                 logoHorizontal.IsVisible = landscape;
 
                 logger.debug("OnSizeAllocated: rotation complete");
-
-                logger.debug("OnSizeAllocated: refreshing all");
-                svm.refreshAll();
-                logger.debug("OnSizeAllocated: done refreshing all");
             }
         }
 

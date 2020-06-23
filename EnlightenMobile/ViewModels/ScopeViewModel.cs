@@ -49,7 +49,6 @@ namespace EnlightenMobile.ViewModels
             addCmd     = new Command(() => { _ = doAdd         (); });
             clearCmd   = new Command(() => { _ = doClear       (); });
 
-            logger.debug("SVM: instantiating XAxisOptions");
             xAxisOptions = new ObservableCollection<XAxisOption>()
             {
                 // these names must match the fields in ChartDataPoint
@@ -601,41 +600,18 @@ namespace EnlightenMobile.ViewModels
         }
 
         // testing kludge
-        public void refreshAll()
+        void refreshAll_NOT_USED()
         {
-            return;
-
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(title)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(paired)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(xAxisOptions)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(xAxisOption)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(xAxisMinimum)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(xAxisMaximum)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(xAxisLabelFormat)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(integrationTimeMS)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(gainDb)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(scansToAverage)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(darkEnabled)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(note)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(laserEnabled)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(ramanModeEnabled)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(laserIsAvailable)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(isAuthenticated)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(isRefreshing)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(spectrumMax)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(batteryState)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(batteryColor)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(acquireButtonBackgroundColor)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(acquireButtonTextColor)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(chartData)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(trace0)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(trace1)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(trace2)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(trace3)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(trace4)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(trace5)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(trace6)));
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(trace7)));
+            // there's probably a way to iterate over Properties via Reflection
+            string[] names = {
+                "title", "paired", "xAxisOptions", "xAxisOption", "xAxisMinimum", "xAxisMaximum",
+                "xAxisLabelFormat", "integrationTimeMS", "gainDb", "scansToAverage", "darkEnabled",
+                "note", "laserEnabled", "ramanModeEnabled", "laserIsAvailable", "isAuthenticated",
+                "isRefreshing", "spectrumMax", "batteryState", "batteryColor", "acquireButtonBackgroundColor",
+                "acquireButtonTextColor", "chartData", "trace0", "trace1", "trace2", "trace3", "trace4",
+                "trace5", "trace6", "trace7" };
+            foreach (var name in names)
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
 }
