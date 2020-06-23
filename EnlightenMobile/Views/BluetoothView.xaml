@@ -1,6 +1,6 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
              xmlns:vm="clr-namespace:EnlightenMobile.ViewModels"
              x:Class="EnlightenMobile.Views.BluetoothView" 
              Title="{Binding title}">
@@ -21,13 +21,13 @@
                     <StackLayout Orientation="Horizontal" Padding="2" HorizontalOptions="FillAndExpand">
                         <Button Text="Scan" Command="{Binding scanCmd}" IsEnabled="{Binding bluetoothEnabled}"/>
                         <Button Text="{Binding buttonConnectText}" Command="{Binding connectCmd}" IsEnabled="{Binding buttonConnectEnabled}" /> 
-                        <Button Text="Reset" Command="{Binding resetCmd}" />
                     </StackLayout>
                 </Frame>
             </Frame>
 
             <!-- Connection ProgressBar -->
-            <ProgressBar x:Name="progressBarConnect" ProgressColor="#2994d3" />
+            <ProgressBar Progress="{Binding connectionProgress}"
+                         ProgressColor="#2994d3" />
 
             <!-- List of discovered BLE devices -->
             <ListView x:Name="listView" 

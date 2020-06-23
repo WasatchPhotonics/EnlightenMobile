@@ -79,12 +79,12 @@ namespace EnlightenMobile.Models
         {
             get
             {
-                var model = DeviceInfo.Model; // SMG-950U, iPhone10,6 etc
-                var manuf = DeviceInfo.Manufacturer; // Samsung, Apple etc
-                var name = DeviceInfo.Name; // "Mark's iPhone" etc
+                var model   = DeviceInfo.Model;         // SMG-950U, iPhone10,6 etc
+                var manuf   = DeviceInfo.Manufacturer;  // Samsung, Apple etc
+                var name    = DeviceInfo.Name;          // "Mark's iPhone" etc
                 var version = DeviceInfo.VersionString; // 7.0 etc
-                var os = DeviceInfo.Platform; // Android, iOS etc
-                // var idiom = DeviceInfo.Idiom; // Phone, Tablet, Watch, TV etc
+                var os      = DeviceInfo.Platform;      // Android, iOS etc
+
                 return $"{name} ({manuf} {model} running {os} {version})";
             }
         }
@@ -95,7 +95,6 @@ namespace EnlightenMobile.Models
 
         public string getSavePath()
         {
-            // logger.debug("AppSettings: getSavePath");
             IPlatformUtil platformUtil = DependencyService.Get<IPlatformUtil>();
             return platformUtil.getSavePath();
         }

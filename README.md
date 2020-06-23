@@ -38,6 +38,10 @@ Essentially:
 - Target -> Release 
 - Build -> Archive for Publishing -> Sign and Distribute -> Ad-Hoc
 
+Note that you must have physically selected the Android project, or a file
+in that project, in the Solution pane, for the correct "Archive for Publishing"
+option to appear under the Build menu.
+
 ## iOS
 
 see [README_IOS](README_IOS.md)

@@ -1,5 +1,8 @@
 # Version History
 
+- 2020-06-?? 0.5.1
+    - connection robustness, widget accessibility
+    - messaging cleanup
 - 2020-06-20 0.5.0
     - refactored BluetoothView.xaml.cs into BluetoothViewModel.cs where it belonged
     - doc updates

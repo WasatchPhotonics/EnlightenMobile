@@ -1,21 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading;
 using System.Threading.Tasks;
 using Plugin.BLE.Abstractions.Contracts;
 using EnlightenMobile.Common;
 
 namespace EnlightenMobile.Models
 {
-    // Allows the Spectrometer "model" to flow-up progress updates to the 
-    // ScopeViewModel's acquireProgressBar.  Feels like cheating, but I didn't
-    // know how else to do it.  Would probably be more elegant to give
-    // Spectrometer an acquisitionProgress property and raise PropertyChanged 
-    // events from it, to which the ScopeViewModel would be subscribed.  This
-    // would probably be done by having Spectrometer implement INotifyPropertyChanged,
-    // then it could notify observers of its acquisitionProgress value.
-    public delegate void ProgressBarDelegate(double progress);
-
     // This more-or-less corresponds to WasatchNET.Spectrometer, or 
     // SiGDemo.Spectrometer.  Spectrometer state and logic should be 
     // encapsulated here.
@@ -26,6 +18,7 @@ namespace EnlightenMobile.Models
 
         // BLE comms
         Dictionary<string, ICharacteristic> characteristicsByName;
+        WhereAmI whereAmI;
 
         // hardware model
         public uint pixels;
@@ -46,21 +39,23 @@ namespace EnlightenMobile.Models
         public Measurement measurement;
         public string note { get; set; }
 
-        public bool acquiring;
         ushort lastCRC;
+
+        // @see https://forums.xamarin.com/discussion/93330/mutex-is-bugged-in-xamarin
+        static readonly SemaphoreSlim sem = new SemaphoreSlim(1, 1);
+
         const int MAX_RETRIES = 4;
         const int THROWAWAY_SPECTRA = 6;
 
-        public uint scansToAverage { get; set; } = 1;
         uint totalPixelsToRead;
         uint totalPixelsRead;
 
-        // so the Model can float-up progress updates to the View for display
         public delegate void ConnectionProgressNotification(double perc);
         public event ConnectionProgressNotification showConnectionProgress;
 
-        // util
-        WhereAmI whereAmI;
+        public delegate void AcquisitionProgressNotification(double perc);
+        public event AcquisitionProgressNotification showAcquisitionProgress;
+
         Logger logger = Logger.getInstance();
 
         ////////////////////////////////////////////////////////////////////////
@@ -77,11 +72,12 @@ namespace EnlightenMobile.Models
         Spectrometer()
         {
             reset();
-            battery = new Battery();
         }
 
         public void reset()
         { 
+            paired = false;
+
             // Provide some test defaults so we can play with the chart etc while
             // disconnected.  These will all be overwritten when we read an EEPROM.
             pixels = 1952;
@@ -102,6 +98,8 @@ namespace EnlightenMobile.Models
             acquiring = false;
             lastCRC = 0;
             scansToAverage = 1;
+
+            battery = new Battery();
         }
 
         void generatePixelAxis()
@@ -111,67 +109,36 @@ namespace EnlightenMobile.Models
                 xAxisPixels[i] = i;
         }
 
+        public bool paired
+        {
+            get => _paired;
+            set
+            {
+                _paired = value;
+                logger.debug($"Spectrometer.paired -> {value}");
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(paired)));
+            }
+        }
+        bool _paired;
+
         public async Task<bool> initAsync(Dictionary<string, ICharacteristic> characteristicsByName)
         {
             logger.debug("Initializing Spectrometer");
+            paired = false;
 
             this.characteristicsByName = characteristicsByName;
-
-            ////////////////////////////////////////////////////////////////////
-            // read the raw EEPROM pages
-            ////////////////////////////////////////////////////////////////////
-
-            var eepromCmd = characteristicsByName["eepromCmd"];
-            var eepromData = characteristicsByName["eepromData"];
-
-            if (eepromCmd is null || eepromData is null)
-            {
-                logger.error("Can't read EEPROM w/o characteristics");                
-                return false;
-            }
-
-            logger.debug("reading EEPROM");
-            List<byte[]> pages = new List<byte[]>();
-            for (int page = 0; page < EEPROM.MAX_PAGES; page++)
-            {
-                byte[] buf = new byte[EEPROM.PAGE_LENGTH];
-                int pos = 0;
-                for (int subpage = 0; subpage < EEPROM.SUBPAGE_COUNT; subpage++)
-                {
-                    byte[] request = ToBLEData.convert((byte)page, (byte)subpage);
-                    logger.debug($"requestEEPROMSubpage: page {page}, subpage {subpage}");
-                    bool ok = await eepromCmd.WriteAsync(request);
-                    if (!ok)
-                    {
-                        logger.error($"Failed to write eepromCmd({page}, {subpage})");
-                        return false;
-                    } 
-
-                    try
-                    {
-                        logger.debug("reading eepromData");
-                        var response = await eepromData.ReadAsync();
-                        // logger.hexdump(response, "response");
-
-                        for (int i = 0; i < response.Length; i++)
-                            buf[pos++] = response[i];
-                    }
-                    catch(Exception ex)
-                    {
-                        logger.error($"Caught exception when trying to read EEPROM characteristic: {ex}");
-                        return false;
-                    }
-                }
-                logger.hexdump(buf, "adding page: ");
-                pages.Add(buf);
-                showConnectionProgress(.15 + .85 * page / EEPROM.MAX_PAGES);
-            }
 
             ////////////////////////////////////////////////////////////////////
             // parse the EEPROM
             ////////////////////////////////////////////////////////////////////
 
-            logger.debug("parsing EEPROM");
+            var pages = await readEEPROMAsync();
+            if (pages is null)
+            {
+                logger.error("Spectrometer.initAsync: failed to read EEPROM");
+                return false;
+            }
+
             if (!eeprom.parse(pages))
             {
                 logger.error("Spectrometer.initAsync: failed to parse EEPROM");
@@ -195,6 +162,9 @@ namespace EnlightenMobile.Models
 
             generatePixelAxis();
 
+            // set this early so battery and other BLE calls can progress
+            paired = true;
+
             ////////////////////////////////////////////////////////////////////
             // finish initializing Spectrometer 
             ////////////////////////////////////////////////////////////////////
@@ -204,7 +174,7 @@ namespace EnlightenMobile.Models
             logger.debug("finishing spectrometer initialization");
             pixels = eeprom.activePixelsHoriz;
 
-            _ = await updateBatteryAsync();
+            await updateBatteryAsync(); 
             integrationTimeMS = (ushort)(eeprom.startupIntegrationTimeMS > 0 && eeprom.startupIntegrationTimeMS < 5000 ? eeprom.startupIntegrationTimeMS : 3);
             gainDb = eeprom.detectorGain;
 
@@ -229,6 +199,88 @@ namespace EnlightenMobile.Models
             return true;
         }
 
+        async Task<List<byte[]>> readEEPROMAsync()
+        {
+            var eepromCmd = characteristicsByName["eepromCmd"];
+            var eepromData = characteristicsByName["eepromData"];
+
+            if (eepromCmd is null || eepromData is null)
+            {
+                logger.error("Can't read EEPROM w/o characteristics");                
+                return null;
+            }
+            logger.debug("reading EEPROM");
+            List<byte[]> pages = new List<byte[]>();
+            for (int page = 0; page < EEPROM.MAX_PAGES; page++)
+            {
+                byte[] buf = new byte[EEPROM.PAGE_LENGTH];
+                int pos = 0;
+                for (int subpage = 0; subpage < EEPROM.SUBPAGE_COUNT; subpage++)
+                {
+                    byte[] request = ToBLEData.convert((byte)page, (byte)subpage);
+                    logger.debug($"requestEEPROMSubpage: page {page}, subpage {subpage}");
+                    bool ok = await eepromCmd.WriteAsync(request);
+                    if (!ok)
+                    {
+                        logger.error($"Failed to write eepromCmd({page}, {subpage})");
+                        return null;
+                    } 
+
+                    try
+                    {
+                        logger.debug("reading eepromData");
+                        var response = await eepromData.ReadAsync();
+                        logger.hexdump(response, "response");
+
+                        for (int i = 0; i < response.Length; i++)
+                            buf[pos++] = response[i];
+                    }
+                    catch(Exception ex)
+                    {
+                        logger.error($"Caught exception when trying to read EEPROM characteristic: {ex}");
+                        return null;
+                    }
+                }
+                logger.hexdump(buf, "adding page: ");
+                pages.Add(buf);
+                showConnectionProgress(.15 + .85 * page / EEPROM.MAX_PAGES);
+            }
+            return pages;
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        // acquiring
+        ////////////////////////////////////////////////////////////////////////
+
+        public bool acquiring
+        {
+            get => _acquiring;
+            set
+            {
+                acquiring = value;
+                PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(acquiring)));
+            }
+        }
+        bool _acquiring;
+
+        ////////////////////////////////////////////////////////////////////////
+        // scansToAverage
+        ////////////////////////////////////////////////////////////////////////
+
+        public uint scansToAverage 
+        { 
+            get => _scansToAverage;
+            set
+            {
+                if (value > 0)
+                {
+                    logger.debug($"Spectrometer.scansToAverage -> {value}");
+                    _scansToAverage = value;
+                }
+            }
+        }
+        uint _scansToAverage = 1;
+
         ////////////////////////////////////////////////////////////////////////
         // integrationTimeMS
         ////////////////////////////////////////////////////////////////////////
@@ -248,7 +300,7 @@ namespace EnlightenMobile.Models
 
         async Task<bool> syncIntegrationTimeMSAsync()
         {
-            if (characteristicsByName is null)
+            if (!paired || characteristicsByName is null)
                 return false;
 
             if (_nextIntegrationTimeMS == _lastIntegrationTimeMS)
@@ -271,7 +323,7 @@ namespace EnlightenMobile.Models
             if (ok)
             { 
                 _lastIntegrationTimeMS = _nextIntegrationTimeMS;
-                await pauseAsync();
+                await pauseAsync("syncIntegrationTimeMSAsync");
             }
             else
                 logger.error($"Failed to set integrationTimeMS {value}");
@@ -280,13 +332,16 @@ namespace EnlightenMobile.Models
         }
 
         // I no longer remember exactly why this method is here
-        async Task<bool> pauseAsync()
+        async Task<bool> pauseAsync(string caller)
         {
-            await Task.Delay(10);
+            const int DELAY_MS = 10;
 
-            // logger.debug("pauseAsync: running GC");
-            // GC.Collect();
-            // logger.debug("pauseAsync: back from GC");
+            logger.debug($"pauseAsync({caller}: waiting {DELAY_MS} ms");
+            await Task.Delay(DELAY_MS);
+
+            logger.debug($"pauseAsync({caller}): running GC");
+            GC.Collect();
+            logger.debug($"pauseAsync({caller}): back from GC");
 
             return true;
         }
@@ -320,7 +375,7 @@ namespace EnlightenMobile.Models
 
         async Task<bool> syncGainDbAsync()
         {
-            if (characteristicsByName is null)
+            if (!paired || characteristicsByName is null)
                 return false;
 
             if (_nextGainDb == _lastGainDb)
@@ -350,7 +405,7 @@ namespace EnlightenMobile.Models
             if (ok)
             {
                 _lastGainDb = _nextGainDb;
-                await pauseAsync();
+                await pauseAsync("syncGainDbAsync");
             }
             else
                 logger.error($"Failed to set gainDb {value:x4}");
@@ -379,7 +434,7 @@ namespace EnlightenMobile.Models
                 {
                     _nextVerticalROIStartLine = value;
                     logger.debug($"Spectrometer.verticalROIStartLine -> {value}");
-                    _ = syncROI();
+                    _ = syncROIAsync();
                 }
                 else
                 {
@@ -399,7 +454,7 @@ namespace EnlightenMobile.Models
                 {
                     _nextVerticalROIStopLine = value;
                     logger.debug($"Spectrometer.verticalROIStopLine -> {value}");
-                    _ = syncROI();
+                    _ = syncROIAsync();
                 }
                 else
                 {
@@ -410,9 +465,9 @@ namespace EnlightenMobile.Models
         ushort _nextVerticalROIStopLine = 800;
         ushort _lastVerticalROIStopLine = 0;
 
-        async Task<bool> syncROI()
+        async Task<bool> syncROIAsync()
         {
-            if (characteristicsByName is null)
+            if (!paired || characteristicsByName is null)
                 return false;
 
             var characteristic = characteristicsByName["roi"];
@@ -439,7 +494,7 @@ namespace EnlightenMobile.Models
             Array.Copy(startData, request, 2);
             Array.Copy(stopData, 0, request, 2, 2);
 
-            logger.info($"Spectrometer.syncROI({verticalROIStartLine}, {verticalROIStopLine})"); 
+            logger.info($"Spectrometer.syncROIAsync({verticalROIStartLine}, {verticalROIStopLine})"); 
             logger.hexdump(request, "data: ");
 
             var ok = await characteristic.WriteAsync(request);
@@ -447,7 +502,7 @@ namespace EnlightenMobile.Models
             {
                 _lastVerticalROIStartLine = _nextVerticalROIStartLine;
                 _lastVerticalROIStopLine = _nextVerticalROIStopLine;
-                await pauseAsync();
+                await pauseAsync("syncROIAsync");
             }
             else
                 logger.error($"Failed to set ROI ({verticalROIStartLine}, {verticalROIStopLine})");
@@ -466,10 +521,15 @@ namespace EnlightenMobile.Models
             get => laserState.mode == LaserMode.RAMAN;
             set
             {
-                laserState.mode = value ? LaserMode.RAMAN : LaserMode.MANUAL;
-                logger.debug($"Spectrometer.ramanModeEnabled: laserState.mode = {laserState.mode}");
-
-                _ = syncLaserStateAsync();
+                var mode = value ? LaserMode.RAMAN : LaserMode.MANUAL;
+                if (laserState.mode != mode)
+                { 
+                    logger.debug($"Spectrometer.ramanModeEnabled: laserState.mode -> {mode}");
+                    laserState.mode = mode;
+                    _ = syncLaserStateAsync();
+                }
+                else
+                    logger.debug($"Spectrometer.ramanModeEnabled: mode already {mode}");
             }
         }
 
@@ -478,8 +538,13 @@ namespace EnlightenMobile.Models
             get => laserState.watchdogSec;
             set
             {
-                laserState.watchdogSec = value;
-                _ = syncLaserStateAsync();
+                if (laserState.watchdogSec != value)
+                {
+                    laserState.watchdogSec = value;
+                    _ = syncLaserStateAsync();
+                }
+                else
+                    logger.debug($"Spectrometer.laserWatchdogSec: already {value}");
             }
         }
 
@@ -488,8 +553,13 @@ namespace EnlightenMobile.Models
             get => laserState.enabled;
             set
             {
-                laserState.enabled = value;
-                _ = syncLaserStateAsync();
+                if (laserState.enabled != value)
+                {
+                    laserState.enabled = value;
+                    _ = syncLaserStateAsync();
+                }
+                else
+                    logger.debug($"Spectrometer.laserEnabled: already {value}");
             }
         }
 
@@ -498,8 +568,13 @@ namespace EnlightenMobile.Models
             get => laserState.laserDelayMS;
             set
             {
-                laserState.laserDelayMS = value;
-                _ = syncLaserStateAsync();
+                if (laserState.laserDelayMS != value)
+                {
+                    laserState.laserDelayMS = value;
+                    _ = syncLaserStateAsync();
+                }
+                else
+                    logger.debug($"Spectrometer.laserDelayMS: already {value}");
             }
         }
 
@@ -516,7 +591,7 @@ namespace EnlightenMobile.Models
 
             laserState.dump();
 
-            if (characteristicsByName is null)
+            if (!paired || characteristicsByName is null)
                 return false;
 
             var characteristic = characteristicsByName["laserState"];
@@ -531,7 +606,7 @@ namespace EnlightenMobile.Models
 
             var ok = await characteristic.WriteAsync(request);
             if (ok)
-                await pauseAsync();
+                await pauseAsync("syncLaserStateAsync");
             else
                 logger.error($"Failed to set laserState");
 
@@ -542,13 +617,16 @@ namespace EnlightenMobile.Models
         // battery
         ////////////////////////////////////////////////////////////////////////
 
-        async public Task<bool> updateBatteryAsync()
+        // since this is private, and currently ONLY called from initAsync, it
+        // is only ever called once per application session; notifications
+        // are used otherwise, and apparently don't call it?
+        async Task<bool> updateBatteryAsync()
         {
-            if (battery.level > 0)
-            {
-                logger.debug("updateBatteryAsync: skipping after first read (waiting for notifications)");
-                return false;
-            }
+            // if (battery.initialized)
+            // {
+            //     logger.debug("updateBatteryAsync: skipping after first read (waiting for notifications)");
+            //     return false;
+            // }
 
             logger.debug("updateBatteryAsync: starting");
 
@@ -558,30 +636,43 @@ namespace EnlightenMobile.Models
                 return false;
             }
 
-            if (characteristicsByName is null)
+            if (!paired || characteristicsByName is null)
+            {
+                logger.debug($"updateBatteryAsync: skipping because paired = {paired} or characteristicsByName null");
                 return false;
+            }
 
             var characteristic = characteristicsByName["batteryStatus"];
             if (characteristic is null)
             {
-                logger.error("can't find characteristic batteryStatus");
+                logger.error("batteryUpdateAsync: can't find characteristic batteryStatus");
                 return false;
             }
 
-            logger.info("reading battery status");
+            logger.debug("updateBatteryAsync: waiting on semaphore");
+            if (!await sem.WaitAsync(50))
+            {
+                logger.error("updateBatteryAsync: couldn't get semaphore");
+                return false;
+            }
+
+            logger.info("batteryUpdateAsync: reading battery status");
             var response = await characteristic.ReadAsync();
             if (response is null)
             {
-                logger.error("failed reading battery");
+                logger.error("batteryUpdateAsync: failed reading battery");
+                sem.Release();
                 return false;
             }
             logger.hexdump(response, "batteryStatus: ");
             battery.parse(response);
-            await pauseAsync();
+            await pauseAsync("updateBatteryAsync");
 
+            logger.debug("updateBatteryAsync: sending batteryStatus notification");
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("batteryStatus"));
 
             logger.debug("updateBatteryAsync: done");
+            sem.Release();
             return true;
         }
 
@@ -603,12 +694,9 @@ namespace EnlightenMobile.Models
         ////////////////////////////////////////////////////////////////////////
 
         // responsible for taking one fully-averaged measurement
-        public async Task<bool> takeOneAveragedAsync(ProgressBarDelegate showProgress)
+        public async Task<bool> takeOneAveragedAsync()
         {
-            // keep this positive for loop sanity
-            scansToAverage = Math.Min(1, scansToAverage);
-
-            if (characteristicsByName is null)
+            if (!paired || characteristicsByName is null)
                 return false;
 
             // push-down any changed acquisition parameters
@@ -617,6 +705,9 @@ namespace EnlightenMobile.Models
 
             if (! await syncGainDbAsync())
                 return false;
+
+            // update battery FIRST
+            await updateBatteryAsync();
 
             // for progress bar
             totalPixelsToRead = pixels * scansToAverage;
@@ -627,13 +718,15 @@ namespace EnlightenMobile.Models
             var swRamanMode = laserState.mode == LaserMode.RAMAN && LaserState.SW_RAMAN_MODE;
             if (swRamanMode)
             {
-                var sec = (byte)Math.Max(5, (uint)((integrationTimeMS * scansToAverage / 1000.0) + 3));
-                logger.debug($"takeOneAveragedAsync: setting laserWatchdogSec -> {sec}");
+                const int MAX_SPECTRUM_READOUT_TIME_MS = 6000;
+                var watchdogMS = (scansToAverage + 1) * (integrationTimeMS + MAX_SPECTRUM_READOUT_TIME_MS);
+                var watchdogSec = (byte)(Math.Max(MAX_SPECTRUM_READOUT_TIME_MS, watchdogMS) / 1000.0);
+                logger.debug($"takeOneAveragedAsync: setting laserWatchdogSec -> {watchdogSec}");
 
                 // since we're going to sync the laser state immediately after to turn on the laser,
                 // skip this sync
                 laserSyncEnabled = false;
-                laserWatchdogSec = (byte)Math.Min(5, (uint)((integrationTimeMS * scansToAverage / 1000.0) + 3));
+                laserWatchdogSec = watchdogSec;
                 laserSyncEnabled = true;
 
                 logger.debug("takeOneAveragedAsync: setting laserEnabled = true");
@@ -643,13 +736,23 @@ namespace EnlightenMobile.Models
                 await Task.Delay(laserState.laserDelayMS);
             }
 
+            logger.debug($"takeOneAveragedAsync: integrationTimeMS {integrationTimeMS}, gainDb {gainDb}, scansToAverage {scansToAverage}, laserWatchdogSec {laserWatchdogSec}");
+
             double[] spectrum = null;
             for (int spectrumCount = 0; spectrumCount < scansToAverage; spectrumCount++)
             { 
                 bool disableLaserAfterFirstPacket = swRamanMode && spectrumCount + 1 == scansToAverage;
 
-                double[] tmp = await takeOneAsync(showProgress, disableLaserAfterFirstPacket);
+                if (!await sem.WaitAsync(100))
+                {
+                    logger.error("takeOneAveragedAsync: couldn't get semaphore");
+                    return false;                        
+                }
+
+                double[] tmp = await takeOneAsync(disableLaserAfterFirstPacket);
                 logger.debug("takeOneAveragedAsync: back from takeOneAsync");
+
+                sem.Release();
 
                 if (tmp is null || (spectrum != null && tmp.Length != spectrum.Length))
                 {
@@ -676,17 +779,10 @@ namespace EnlightenMobile.Models
                 for (int i = 0; i < spectrum.Length; i++)
                     spectrum[i] /= scansToAverage;
 
-            // MZ: memory leak? [update: no]
             lastSpectrum = spectrum;
             measurement.reset();
             measurement.reload(this);
             logger.info($"acquired Measurement {measurement.measurementID}");
-
-            // update battery if needed
-            _ = await updateBatteryAsync();
-
-            // logger.debug($"calling GC.Collect({GC.MaxGeneration})");
-            // GC.Collect(GC.MaxGeneration);
 
             logger.debug("takeOneAveragedAsync: done");
             acquiring = false;
@@ -698,11 +794,9 @@ namespace EnlightenMobile.Models
         // 
         // There is no need to disable the laser if returning NULL, as the caller
         // will do so anyway.
-        private async Task<double[]> takeOneAsync(
-            ProgressBarDelegate showProgress,
-            bool disableLaserAfterFirstPacket)
+        async Task<double[]> takeOneAsync(bool disableLaserAfterFirstPacket)
         {
-            if (characteristicsByName is null)
+            if (!paired || characteristicsByName is null)
                 return null;
 
             const int headerLen = 2;
@@ -736,7 +830,6 @@ namespace EnlightenMobile.Models
                 logger.error("failed to send acquire");
                 return null;
             }
-            request = null;
 
             // YOU ARE HERE -- when laserState.laserEnable is true, the app
             // just hangs here.  We don't get the above "failed to send acquire",
@@ -790,7 +883,7 @@ namespace EnlightenMobile.Models
                     return null;
                 }
 
-                logger.debug("reading spectrumChar");
+                logger.debug($"reading spectrumChar (pixelsRead {pixelsRead})");
                 var response = await spectrumChar.ReadAsync();
 
                 // make sure response length is even, and has both header and at least one pixel of data
@@ -826,16 +919,15 @@ namespace EnlightenMobile.Models
 
                 lastCRC = crc;
 
-                // YOU ARE HERE:
                 // This was the original SW Raman Mode design, seems to freeze
                 // the acquisition -- maybe BLE doesn't like being interrupted 
                 // in the middle of a spectrum readout?
-                if (false && disableLaserAfterFirstPacket && !haveDisabledLaser && pixelsInPacket > 0)
-                {
-                    logger.debug("disabling laser after first valid spectrum packet received");
-                    haveDisabledLaser = true;
-                    laserEnabled = false;
-                }
+                // if (false && disableLaserAfterFirstPacket && !haveDisabledLaser && pixelsInPacket > 0)
+                // {
+                //     logger.debug("disabling laser after first valid spectrum packet received");
+                //     haveDisabledLaser = true;
+                //     laserEnabled = false;
+                // }
 
                 for (int i = 0; i < pixelsInPacket; i++)
                 {
@@ -857,7 +949,7 @@ namespace EnlightenMobile.Models
                 }
                 response = null;
 
-                showProgress(((double)totalPixelsRead) / totalPixelsToRead);
+                showAcquisitionProgress(((double)totalPixelsRead) / totalPixelsToRead);
             }
 
             // YOU ARE HERE: kludge at end
@@ -883,31 +975,52 @@ namespace EnlightenMobile.Models
         }
 
         ////////////////////////////////////////////////////////////////////////
-        // Notifications
+        // BLE Characteristic Notifications (routed via BluetoothViewModel)
         ////////////////////////////////////////////////////////////////////////
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public void processBatteryNotification(byte[] data)
         {
+            // note we don't have to call updateBatteryAsync, because we get the
+            // value right along with the notification
             if (data is null)
                 return;
 
-            logger.hexdump(data, "batteryStatus: ");
+            // if (!await sem.WaitAsync(100))
+            // {
+            //     logger.error("Spectrometer.processBatteryNotification: timed-out");
+            //     return;
+            // }
+
+            logger.hexdump(data, "Spectrometer.processBatteryNotification: ");
             battery.parse(data);
 
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("batteryStatus"));
+
+            // sem.Release();
         }
 
-        public void processLaserStateNotification(byte[] data)
+        async public void processLaserStateNotificationAsync(byte[] data)
         {
             if (data is null)
                 return;
 
-            logger.hexdump(data, "laserState: ");
+            // this time-out may well not be nearly enough, given the potential 
+            // need to wait 6 x integration time for sensor to wake up, plus 4sec
+            // for read-out
+            if (!await sem.WaitAsync(100))
+            {
+                logger.error("Spectrometer.processLaserStateNotification: timed-out");
+                return;
+            }
+
+            logger.hexdump(data, "Spectrometer.processLaserStateNotification: ");
             laserState.parse(data);
 
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("laserState"));
+
+            sem.Release();
         }
     }
 }

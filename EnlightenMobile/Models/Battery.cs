@@ -8,6 +8,7 @@ namespace EnlightenMobile.Models
         ushort raw;
         byte rawLevel;
         byte rawState;
+        public bool initialized = false;
 
         // valid range should be (0, 100)
         public double level {get; private set; }
@@ -21,7 +22,7 @@ namespace EnlightenMobile.Models
         {
             get
             {
-                if (lastChecked is null)
+                if (!initialized)
                     return true;
                 return (DateTime.Now - lastChecked.Value).TotalSeconds >= 60;
             }
@@ -53,13 +54,14 @@ namespace EnlightenMobile.Models
             charging = (rawState & 1) == 1;
 
             lastChecked = DateTime.Now;
+            initialized = true;
 
             logger.debug($"Battery.parse: {this}");
         }
 
         override public string ToString()
         {
-            if (lastChecked is null)
+            if (!initialized)
                 return "???";
 
             logger.debug("Battery: raw 0x{0:x4} (lvl {1}, st 0x{2:x2}) = {3:f2}", raw, rawLevel, rawState, level);

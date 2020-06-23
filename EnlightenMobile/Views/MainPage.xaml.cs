@@ -26,18 +26,12 @@ namespace EnlightenMobile.Views
             // finger interaction with the chart  
             On<Android>().SetIsSwipePagingEnabled(false);
 
-            // conditional execution simplifies testing live-updated XAML
-            if (pageNav.tabbedPage is null)
-            {
-                logger.debug("MainPage: populating pages");
-                pageNav.tabbedPage = this;
-                foreach (var child in Children)
-                    pageNav.add(child.Title, child);
-            }
+            logger.debug("MainPage: registering tabs with PageNav");
+            pageNav.tabbedPage = this;
+            foreach (var child in Children)
+                pageNav.add(child.Title, child);
 
             CurrentPageChanged += MainPage_CurrentPageChanged;
-
-            logger.debug("MainPage: finished ctor");
         }
 
         // a callback for whenever the tab is changed; handy to notify the Logger

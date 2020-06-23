@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Xamarin.Forms;
 using EnlightenMobile.Models;
@@ -41,6 +40,7 @@ namespace EnlightenMobile.ViewModels
 
             appSettings.PropertyChanged += handleAppSettingsChange;
             spec.PropertyChanged += handleSpectrometerChange;
+            spec.showAcquisitionProgress += showAcquisitionProgress; // closure?
 
             // bind closures (method calls) to each Command
             acquireCmd = new Command(() => { _ = doAcquireAsync(); });
@@ -71,6 +71,11 @@ namespace EnlightenMobile.ViewModels
         public string title
         {
             get => "Scope Mode";
+        }
+
+        public bool paired
+        {
+            get => spec.paired;
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -171,8 +176,10 @@ namespace EnlightenMobile.ViewModels
         public void setScansToAverage(string s)
         {
             if (ushort.TryParse(s, out ushort value))
+            {
                 spec.scansToAverage = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(scansToAverage)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(scansToAverage)));
+            }
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -215,7 +222,8 @@ namespace EnlightenMobile.ViewModels
         }
 
         // Provided so the "Laser Enable" Switch is disabled if we're in Raman
-        // Mode (or battery is low).
+        // Mode (or battery is low).  Note that unless authenticated, you can't
+        // even see this switch.
         public bool laserIsAvailable
         {
             get
@@ -300,14 +308,14 @@ namespace EnlightenMobile.ViewModels
         // Acquire Command
         ////////////////////////////////////////////////////////////////////////
 
-        public string acquireButtonColor
+        public string acquireButtonBackgroundColor
         {
-            get
-            {
-                // should somehow get this into the XAML itself, or perhaps the
-                // code-behind (which could also set .IsEnabled)
-                return spec.acquiring ? "#ba0a0a" : "#ccc";
-            }
+            get => spec.acquiring ? "#ba0a0a" : "#ccc";
+        }
+
+        public string acquireButtonTextColor
+        {
+            get => spec.acquiring ? "#fff" : "#333";
         }
 
         // invoked by ScopeView when the user clicks "Acquire" 
@@ -319,11 +327,9 @@ namespace EnlightenMobile.ViewModels
             if (spec.acquiring)
                 return false;
 
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(acquireButtonColor)));
-
             // take a fresh Measurement
             var startTime = DateTime.Now;
-            var ok = await spec.takeOneAveragedAsync(showProgress);
+            var ok = await spec.takeOneAveragedAsync();
             if (ok)
             {
                 // info-level logging so we can QC timing w/o verbose logging
@@ -341,9 +347,8 @@ namespace EnlightenMobile.ViewModels
                 notifyToast?.Invoke("Error reading spectrum");
             }
 
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(acquireButtonColor)));
             updateBatteryProperties();
-            showProgress(0);
+            acquisitionProgress = 0;
             isRefreshing = false;
 
             updateLaserAvailable();
@@ -351,9 +356,7 @@ namespace EnlightenMobile.ViewModels
             return ok;
         }
 
-        // This is a callback (delegate) passed down into Spectrometer so it can
-        // update our acquisitionProgress property while reading BLE packets.
-        void showProgress(double progress) => acquisitionProgress = progress; 
+        void showAcquisitionProgress(double progress) => acquisitionProgress = progress; 
 
         // this is a floating-point "percentage completion" backing the 
         // ProgressBar on the ScopeView
@@ -558,7 +561,7 @@ namespace EnlightenMobile.ViewModels
         void handleSpectrometerChange(object sender, PropertyChangedEventArgs e)
         {
             var name = e.PropertyName;
-            logger.debug($"SVM.handleSpectrometerChange: received notification from {sender} that {name} changed");
+            logger.debug($"SVM.handleSpectrometerChange: received notification from {sender} that property '{name}' changed");
 
             if (name == "batteryStatus")
             {
@@ -566,12 +569,73 @@ namespace EnlightenMobile.ViewModels
             }
             else if (name == "laserState")
             {
-                // Is there anything useful to do with this information?
+                // If the laser timed-out (in manual mode "Advanced"), this 
+                // should flip the switch back to the proper "off" position.
                 //
-                // Basically, if the laser timed-out (in manual mode "Advanced"), 
-                // this should flip the switch back to the proper "off" position.
+                // YOU ARE HERE -- we are receiving the LaserState Notification
+                // that the laser has been de-activated in the spectrometer, which
+                // we are using to decide to flip the laserEnabled Switch on the
+                // ScopeView to "off," which is then triggering a new LaserState
+                // update to the spectrometer while we're still reading out the 
+                // spectrum.  
+                //
+                // Solution is to...hmm.  Queue processing of this Notification,
+                // until after the spectrum read-out is done?  How about use a
+                // SEMAPHORE within Spectrometer to prevent overlapping BLE commands,
+                // such that individual Tasks or Threads (such as presumably
+                // kicked-off by this Notification) can't interrupt one another
+                // and block until they each get their exclusive slot?
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(laserEnabled)));
             }
+            else if (name == "paired")
+            {
+                // notify our View that controls should be in/activated accordingly
+                logger.debug($"SVM: Spectrometer.paired = {spec.paired}");
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(paired)));
+            }
+            else if (name == "acquiring")
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(acquireButtonBackgroundColor)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(acquireButtonTextColor)));
+            }
+        }
+
+        // testing kludge
+        public void refreshAll()
+        {
+            return;
+
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(title)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(paired)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(xAxisOptions)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(xAxisOption)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(xAxisMinimum)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(xAxisMaximum)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(xAxisLabelFormat)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(integrationTimeMS)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(gainDb)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(scansToAverage)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(darkEnabled)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(note)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(laserEnabled)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(ramanModeEnabled)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(laserIsAvailable)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(isAuthenticated)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(isRefreshing)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(spectrumMax)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(batteryState)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(batteryColor)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(acquireButtonBackgroundColor)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(acquireButtonTextColor)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(chartData)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(trace0)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(trace1)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(trace2)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(trace3)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(trace4)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(trace5)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(trace6)));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(trace7)));
         }
     }
 }

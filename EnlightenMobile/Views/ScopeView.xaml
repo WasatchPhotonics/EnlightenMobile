@@ -100,6 +100,7 @@
                         <telerikChart:ChartPanAndZoomBehavior ZoomMode="Both"
                                                               PanMode="Both" 
                                                               HandleDoubleTap="True"/>
+                        <telerikChart:ChartTooltipBehavior TriggerMode="Tap" />
                     </telerikChart:RadCartesianChart.ChartBehaviors>
                 </telerikChart:RadCartesianChart>
             </StackLayout>
@@ -127,10 +128,11 @@
                          Grid.Column="0" 
                          x:Name="scrollOptions"
                          IsRefreshing="{Binding isRefreshing}"
+                         IsEnabled="{Binding paired}"
                          Command="{Binding refreshCmd}">
 
-                <ScrollView>
-		            <Grid x:Name="innerGrid" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+                <ScrollView IsEnabled="{Binding paired}">
+		            <Grid x:Name="innerGrid" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsEnabled="{Binding paired}">
 
                         <!-- initialize to Portrait mode (1 col, 2 rows) -->
 			            <Grid.RowDefinitions>
@@ -153,8 +155,12 @@
                                      ProgressColor="#2994d3"/>
 
                         <!-- Command buttons -->
-                        <StackLayout Grid.Row="2" Grid.Column="0" Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
-                            <Button Text="Acquire" Command="{Binding acquireCmd}" BackgroundColor="{Binding acquireButtonColor}" />
+                        <StackLayout Grid.Row="2" Grid.Column="0" 
+                                     Orientation="Horizontal" 
+                                     HorizontalOptions="CenterAndExpand">
+                            <Button Text="Acquire" Command="{Binding acquireCmd}" 
+                                                   TextColor="{Binding acquireButtonTextColor}" 
+                                                   BackgroundColor="{Binding acquireButtonBackgroundColor}" />
                             <Button Text="Save" Command="{Binding saveCmd}" />
                             <Button Text="Add" Command="{Binding addCmd}" />
                             <Button Text="Clear" Command="{Binding clearCmd}" />
@@ -208,7 +214,7 @@
                                 <Switch IsToggled="{Binding darkEnabled}" Scale="1.5"/>
                             </FlexLayout>
 
-                            <!-- Raman mode -->
+                            <!-- Raman mode (no binding because code-behind pops-up confirmation dialog) -->
                             <Label MinimumHeightRequest="12" /> 
                             <FlexLayout JustifyContent="SpaceBetween">
                                 <Label  Text="Raman Mode" />

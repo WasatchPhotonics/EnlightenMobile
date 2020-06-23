@@ -5,6 +5,11 @@ using EnlightenMobile.Services;
 
 namespace EnlightenMobile
 {
+    /// <summary>
+    /// This class provides some generic utility methods to the whole
+    /// application, including some which are platform-specific (and thus
+    /// provides a lightweight wrapper over the IPlatformUtil service).
+    /// </summary>
     public class Util
     {
         public static void swap(ref ushort a, ref ushort b)
@@ -12,13 +17,6 @@ namespace EnlightenMobile
             var tmp = a;
             a = b;
             b = tmp;
-        }
-
-        // only really used by BluetoothView
-        public static void updateProgressBar(Xamarin.Forms.ProgressBar pb, double progress)
-        {
-            progress = Math.Min(1.0, Math.Max(0.0, progress));
-            pb.ProgressTo(progress, 500, Easing.Linear);
         }
 
         public static double[] generateWavelengths(uint pixels, float[] coeffs)
@@ -53,7 +51,7 @@ namespace EnlightenMobile
             return wavenumbers;
         }
 
-        // Format a 16-byte array like a standard UUID
+        // Format a 16-byte array into a standard UUID string
         //
         // 00000000-0000-1000-8000-00805F9B34FB
         //  0 1 2 3  4 5  6 7  8 9  a b c d e f
@@ -88,22 +86,21 @@ namespace EnlightenMobile
 
         public static bool bluetoothEnabled()
         {
-            IPlatformUtil platformUtil = DependencyService.Get<IPlatformUtil>();
+            var platformUtil = DependencyService.Get<IPlatformUtil>();
             return platformUtil.bluetoothEnabled();
         }
 
         public static bool enableBluetooth(bool flag)
         {
-            IPlatformUtil platformUtil = DependencyService.Get<IPlatformUtil>();
+            var platformUtil = DependencyService.Get<IPlatformUtil>();
             return platformUtil.enableBluetooth(flag);
         }
 
         // View is there for iOS (Android doesn't need it)
         public static void toast(string msg, View view = null)
         {
-            IPlatformUtil platformUtil = DependencyService.Get<IPlatformUtil>();
+            var platformUtil = DependencyService.Get<IPlatformUtil>();
             platformUtil.toast(msg, view);
         }
-
     }
 }

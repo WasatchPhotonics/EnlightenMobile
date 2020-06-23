@@ -1,15 +1,15 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Collections.ObjectModel;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Threading.Tasks;
-using Xamarin.Forms;
 using Plugin.BLE.Abstractions.Contracts;
 using Plugin.BLE.Abstractions.EventArgs;
 using Plugin.BLE.Abstractions.Exceptions;
 using Plugin.BLE;
 using Plugin.Permissions;
 using Plugin.Permissions.Abstractions;
+using Xamarin.Forms;
 using EnlightenMobile.Models;
 
 namespace EnlightenMobile.ViewModels
@@ -21,7 +21,6 @@ namespace EnlightenMobile.ViewModels
         public ObservableCollection<BLEDevice> bleDeviceList = new ObservableCollection<BLEDevice>();
 
         public Command scanCmd { get; }
-        public Command resetCmd { get; }
         public Command connectCmd { get; }
 
         IBluetoothLE ble;
@@ -37,19 +36,12 @@ namespace EnlightenMobile.ViewModels
 
         Guid primaryServiceId;
 
-        // could float notifications back to View code-behind, but...meh
-        public ProgressBar progressBarConnect { set; private get; }
-
         Spectrometer spec = Spectrometer.getInstance();
         Logger logger = Logger.getInstance();
 
         // so the ViewModel can float-up messages to the View for display
         public delegate void UserNotification(string title, string message, string button);
         public event UserNotification notifyUser;
-
-        // so the ViewModel can float-up progress updates to the View for display
-        public delegate void ProgressNotification(double perc);
-        public event ProgressNotification showProgress;
 
         public BluetoothViewModel()
         {
@@ -81,7 +73,6 @@ namespace EnlightenMobile.ViewModels
                 nameByGuid[pair.Value] = pair.Key;
 
             scanCmd = new Command(() => { _ = doScanAsync(); });
-            resetCmd = new Command(() => { _ = doResetAsync(); });
             connectCmd = new Command(() => { _ = doConnectOrDisconnectAsync(); });
 
             spec.showConnectionProgress += showSpectrometerConnectionProgress;
@@ -95,6 +86,21 @@ namespace EnlightenMobile.ViewModels
         {
             get => "Bluetooth Pairing";
         }
+
+        ////////////////////////////////////////////////////////////////////////
+        // connectionProgress
+        ////////////////////////////////////////////////////////////////////////
+
+        public double connectionProgress
+        {
+            get => _connectionProgress;
+            set 
+            {
+                _connectionProgress = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(connectionProgress)));
+            }
+        }
+        double _connectionProgress;
 
         ////////////////////////////////////////////////////////////////////////
         // paired
@@ -111,10 +117,20 @@ namespace EnlightenMobile.ViewModels
         }
         bool _paired;
 
-        public bool bluetoothEnabled { get; private set; } = Util.bluetoothEnabled();
+        public bool bluetoothEnabled 
+        { 
+            get => _bluetoothEnabled;
+            private set 
+            {
+                _bluetoothEnabled = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(bluetoothEnabled)));
+            }
+        }
+        bool _bluetoothEnabled = Util.bluetoothEnabled();
+
 
         ////////////////////////////////////////////////////////////////////////
-        // Reset Command
+        // Reset (no longer a Command)
         ////////////////////////////////////////////////////////////////////////
 
         // ideally, we should probably add some kind of callback hook to an
@@ -125,12 +141,13 @@ namespace EnlightenMobile.ViewModels
             logger.debug("attempting to disable Bluetooth");
 
             bleDeviceList.Clear();
+            paired = false;
+            buttonConnectEnabled = false;
             
             if (!Util.enableBluetooth(false))
                 logger.error("Unable to disable Bluetooth");
 
             bluetoothEnabled = false;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(bluetoothEnabled)));
 
             logger.debug("sleeping during Bluetooth restart");
             await Task.Delay(1000);
@@ -142,7 +159,6 @@ namespace EnlightenMobile.ViewModels
             await Task.Delay(2000);
 
             bluetoothEnabled = true;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(bluetoothEnabled)));
 
             if (!ok)
             {
@@ -163,6 +179,12 @@ namespace EnlightenMobile.ViewModels
         /// </summary> 
         private async Task<bool> doScanAsync()
         {
+            if (paired)
+                await doDisconnectAsync();
+
+            bleDeviceList.Clear();
+            buttonConnectEnabled = false;
+
             try
             {
                 // resolve Location permission
@@ -174,15 +196,14 @@ namespace EnlightenMobile.ViewModels
                     return false;
                 }
 
-                bleDeviceList.Clear();
                 if (!ble.Adapter.IsScanning)
                 {
                     logger.debug("starting scan");
                     await adapter.StartScanningForDevicesAsync();
 
                     // Step 2: As each device is added to the list, the 
-                    // adapter.DeviceDiscovered event will call 
-                    // _bleAdapterDeviceDiscovered and add it to the listView.
+                    //         adapter.DeviceDiscovered event will call 
+                    //         _bleAdapterDeviceDiscovered and add to listView.
                 }
             }
             catch (Exception ex)
@@ -284,16 +305,15 @@ namespace EnlightenMobile.ViewModels
         {
             if (paired)
             {
-                _ = await doDisconnectAsync();
+                await doDisconnectAsync();
             }
             else
             {
                 paired = await doConnectAsync();
-                buttonConnectEnabled = true;
                 if (paired)
                     PageNav.getInstance().select("Scope");
             }
-            showProgress(0);
+            connectionProgress = 0;
             return true;
         }
 
@@ -317,8 +337,9 @@ namespace EnlightenMobile.ViewModels
         async Task<bool> doConnectAsync()
         {
             logger.debug("attempting to connect");
+            buttonConnectEnabled = false;
 
-            showProgress(0);
+            connectionProgress = 0;
             if (bleDevice is null)
             {
                 logger.error("must select a device before connecting");
@@ -333,7 +354,6 @@ namespace EnlightenMobile.ViewModels
             }
 
             logger.debug($"attempting connection to {bleDevice.name}");
-            buttonConnectEnabled = false;
             var success = false;
             try
             {
@@ -369,7 +389,7 @@ namespace EnlightenMobile.ViewModels
                 return logger.error($"failed connection to {bleDevice.name}");
 
             logger.info($"successfully connected to {bleDevice.name}");
-            showProgress(.05);
+            connectionProgress = 0.05;
 
             // Step 6: connect to primary service
             logger.debug($"connecting to primary service {primaryServiceId}");
@@ -423,7 +443,7 @@ namespace EnlightenMobile.ViewModels
                 // foreach (var d in descriptors)
                 //     logger.debug($"    descriptor {d.Name} = {d.Value}");
             }
-            showProgress(.15);
+            connectionProgress = 0.15;
 
             logger.debug("polling device for other services");
             var allServices = await bleDevice.device.GetServicesAsync();
@@ -455,7 +475,7 @@ namespace EnlightenMobile.ViewModels
 
             // populate Spectrometer
             logger.debug("initializing spectrometer");
-            _ = await spec.initAsync(characteristicsByName);
+            await spec.initAsync(characteristicsByName);
 
             // start notifications
             foreach (var pair in characteristicsByName)
@@ -465,8 +485,15 @@ namespace EnlightenMobile.ViewModels
 
                 if (c.CanUpdate && (name == "batteryStatus" || name == "laserState"))
                 {
+                    // temporarily disable notifications
+                    logger.debug($"NOT starting notification updates on {name}");
+                    continue;
+
+                    logger.debug($"starting notification updates on {name}");
                     c.ValueUpdated -= _characteristicUpdated;
                     c.ValueUpdated += _characteristicUpdated;
+
+                    // don't see a need to await this?
                     _ = c.StartUpdatesAsync();
                 }
             }
@@ -476,6 +503,10 @@ namespace EnlightenMobile.ViewModels
             ////////////////////////////////////////////////////////////////////
 
             logger.debug("btnConnect_clicked done");
+
+            // allow disconnect
+            buttonConnectEnabled = true;
+
             return true;
         }
 
@@ -484,15 +515,22 @@ namespace EnlightenMobile.ViewModels
         ////////////////////////////////////////////////////////////////////////
 
         // @todo test
-        private void _characteristicUpdated(object sender, CharacteristicUpdatedEventArgs characteristicUpdatedEventArgs)
+        private void _characteristicUpdated(
+                object sender, 
+                CharacteristicUpdatedEventArgs characteristicUpdatedEventArgs)
         {
             var c = characteristicUpdatedEventArgs.Characteristic;
 
             // faster way to do this using nameByGuid?
             string name = null;
             foreach (var pair in characteristicsByName)
+            {
                 if (pair.Value.Uuid == c.Uuid)
+                {
                     name = pair.Key;
+                    break;
+                }
+            }
 
             if (name is null)
             {
@@ -500,12 +538,12 @@ namespace EnlightenMobile.ViewModels
                 return;
             }
 
-            logger.info($"Received notification from {name}");
+            logger.info($"BVM: received BLE notification from characteristic {name}");
 
             if (name == "batteryStatus")
                 spec.processBatteryNotification(c.Value);
             else if (name == "laserState")
-                spec.processLaserStateNotification(c.Value);
+                spec.processLaserStateNotificationAsync(c.Value);
             else
                 logger.error($"no registered processor for {name} notifications");
         }
@@ -550,24 +588,22 @@ namespace EnlightenMobile.ViewModels
         /// Relay connection progress from the Spectrometer Model back to the 
         /// Bluetooth View.
         /// </summary>
-        ///
-        /// <remarks>
-        /// We could have had the BluetoothView code-behind register with the
-        /// Spectrometer to receive connection updates, but that would be missing
-        /// the point of the ViewModel, which is to talk to the Models ON BEHALF
-        /// OF the View, so the View has as little code and work as possible.
-        /// Therefore, register our own hook down into the Spectrometer, and
-        /// relay its progress updates back to the View. MVVMFTW!
-        /// </remarks>
         private void showSpectrometerConnectionProgress(double perc) =>
-            showProgress(perc);
+            connectionProgress = perc;
 
         /// <summary>
         /// Step 3b: the user clicked a BLE device in the list, raising an event
         /// in the View code-behind (step 3a), which sent the selection here.
         /// </summary>
-        public void selectBLEDevice(BLEDevice selectedBLEDevice)
+        ///
+        /// <remarks>
+        /// The selection is passed as an uncast object because Views ideally
+        /// shouldn't have contact or knowledge of Models, so we do the casting
+        /// here.
+        /// </remarks>
+        public void selectBLEDevice(object obj)
         {
+            var selectedBLEDevice = obj as BLEDevice;
             if (selectedBLEDevice is null)
             {
                 bleDevice = null;

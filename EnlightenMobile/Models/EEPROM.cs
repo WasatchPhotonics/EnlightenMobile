@@ -761,6 +761,9 @@ namespace EnlightenMobile.Models
 
         public bool parse(List<byte[]> pages_in)
         {
+            if (pages_in is null)
+                return false;
+
             pages = pages_in;
             if (pages.Count < MAX_PAGES)
             {

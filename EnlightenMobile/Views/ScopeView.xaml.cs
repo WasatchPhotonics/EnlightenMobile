@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using EnlightenMobile.ViewModels;
@@ -10,12 +11,14 @@ namespace EnlightenMobile.Views
     {
         bool lastLandscape;
         bool showingControls = true;
+        static readonly SemaphoreSlim semRotate = new SemaphoreSlim(1, 1);
 
         const string rightArrow = ">>";
         const string leftArrow = "<<";
 
-        Logger logger = Logger.getInstance();
         ScopeViewModel svm;
+
+        Logger logger = Logger.getInstance();
 
         public ScopeView()
         {
@@ -114,20 +117,37 @@ namespace EnlightenMobile.Views
         {
             base.OnSizeAllocated(width, height);
 
+            bool doRotate = false;
             var landscape = width > height;
+
+            logger.debug($"OnSizeAllocated: Width {width}, Height {height}");
+            return;
+            // if (!semRotate.Wait(5))
+            // {
+            //     logger.debug($"OnSizeAllocated: timeout");
+            //     return;
+            // }
+
             if (landscape != lastLandscape)
             {
+                logger.debug($"OnSizeAllocated: rotating from lastLandscape {lastLandscape} to landscape {landscape}");
                 lastLandscape = landscape;
-                logger.debug($"OnSizeAllocated: Width {width}, Height {height}");
+                doRotate = true;
+            }
+            // semRotate.Release();
 
+            if (doRotate)
+            {
                 if (landscape)
                 {
                     // transition to Landscape
+                    logger.debug("OnSizeAllocated: transitioning to Landscape");
                     updateLandscapeGridColumns();
                 }
                 else
                 {
                     // transition to Portrait
+                    logger.debug("OnSizeAllocated: transitioning to Portrait");
 
                     // change Grid to [ chart    ]
                     //                [ hide     ]
@@ -155,7 +175,11 @@ namespace EnlightenMobile.Views
                 logoVertical.IsVisible = !landscape;
                 logoHorizontal.IsVisible = landscape;
 
-                logger.debug($"OnSizeAllocated: stackExpander.IsVisible = {stackExpander.IsVisible}");
+                logger.debug("OnSizeAllocated: rotation complete");
+
+                logger.debug("OnSizeAllocated: refreshing all");
+                svm.refreshAll();
+                logger.debug("OnSizeAllocated: done refreshing all");
             }
         }
 
@@ -166,6 +190,8 @@ namespace EnlightenMobile.Views
             outerGrid.ColumnDefinitions.Clear();
 
             stackExpander.IsVisible = true;
+
+            logger.debug($"updateLandscapeGridColumns: showingControls {showingControls}");
 
             // change Grid to [ chart | expander | controls ]
             if (showingControls)
@@ -190,6 +216,8 @@ namespace EnlightenMobile.Views
             stackExpander.SetValue(Grid.ColumnProperty, 1);
             scrollOptions.SetValue(Grid.RowProperty, 0);
             scrollOptions.SetValue(Grid.ColumnProperty, 2);
+
+            logger.debug($"updateLandscapeGridColumns: done");
         }
     }
 }
