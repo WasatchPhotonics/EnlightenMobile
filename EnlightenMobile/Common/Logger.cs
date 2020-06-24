@@ -175,11 +175,11 @@ namespace EnlightenMobile
 
             string msg = getTimestamp() + lvl + ": " + String.Format(fmt, obj);
 
+            // Console gets littered with a lot of Xamarin messages, so flag ours
+            Console.WriteLine("[Wasatch] " + msg);
+
             lock (instance)
             {
-                // Console gets littered with a lot of Xamarin messages, so flag ours
-                Console.WriteLine("[Wasatch] " + msg);
-
                 if (outfile != null)
                 {
                     outfile.WriteLine(msg);

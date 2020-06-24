@@ -204,7 +204,12 @@ namespace EnlightenMobile.ViewModels
         public bool laserEnabled
         {
             get => spec.laserEnabled;
-            set => spec.laserEnabled = value;
+            set 
+            { 
+                if (spec.laserEnabled != value)
+                    spec.laserEnabled = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(laserEnabled)));
+            }
         }
 
         public bool ramanModeEnabled
@@ -212,11 +217,9 @@ namespace EnlightenMobile.ViewModels
             get => spec.ramanModeEnabled;
             set
             {
-                logger.debug($"SVM.ramanModeEnabled: setting Spectrometer.ramanModeEnabled = {value}");
-                spec.ramanModeEnabled = value;
-
-                // as this is based partly on Raman Mode...
-                updateLaserAvailable();
+                if (spec.ramanModeEnabled != value)
+                    spec.ramanModeEnabled = value;
+                updateLaserProperties();
             }
         }
 
@@ -248,12 +251,16 @@ namespace EnlightenMobile.ViewModels
             logger.debug($"SVM.handleAppSettingsChange: received notification from {sender}, so refreshing isAuthenticated");
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(isAuthenticated)));
 
-            updateLaserAvailable();
+            updateLaserProperties();
         }
 
-        public void updateLaserAvailable()
+        public void updateLaserProperties()
         { 
+            logger.debug("SVM.updateLaserProperties: start");
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(laserIsAvailable)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(laserEnabled)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ramanModeEnabled)));
+            logger.debug("SVM.updateLaserProperties: done");
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -356,7 +363,7 @@ namespace EnlightenMobile.ViewModels
             acquisitionProgress = 0;
             isRefreshing = false;
 
-            updateLaserAvailable();
+            updateLaserProperties();
 
             return ok;
         }
@@ -572,14 +579,14 @@ namespace EnlightenMobile.ViewModels
                 updateAcquireButtonProperties();
             else if (name == "batteryStatus")
                 updateBatteryProperties();
-            else if (name == "laserState")
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(laserEnabled)));
             else if (name == "paired")
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(paired)));
             else if (name == "integrationTimeMS")
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(integrationTimeMS)));
             else if (name == "gainDb")
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(gainDb)));
+            else if (name == "laserState" || name == "ramanModeEnabled" || name == "laserEnabled")
+                updateLaserProperties();
         }
 
         // testing kludge

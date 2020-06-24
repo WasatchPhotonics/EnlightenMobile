@@ -74,6 +74,15 @@ namespace EnlightenMobile.Models
             reset();
         }
 
+        public void disconnect()
+        {
+            logger.debug("Spectrometer.disconnect: start");
+            laserEnabled = false;
+            ramanModeEnabled = false;
+            reset();
+            logger.debug("Spectrometer.disconnect: done");
+        }
+
         public void reset()
         { 
             logger.debug("Spectrometer.reset: start");
@@ -517,7 +526,9 @@ namespace EnlightenMobile.Models
                 { 
                     logger.debug($"Spectrometer.ramanModeEnabled: laserState.mode -> {mode}");
                     laserState.mode = mode;
+                    laserState.enabled = false;
                     _ = syncLaserStateAsync();
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ramanModeEnabled)));
                 }
                 else
                     logger.debug($"Spectrometer.ramanModeEnabled: mode already {mode}");
@@ -548,6 +559,7 @@ namespace EnlightenMobile.Models
                 {
                     laserState.enabled = value;
                     _ = syncLaserStateAsync();
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(laserEnabled)));
                 }
                 else
                     logger.debug($"Spectrometer.laserEnabled: already {value}");

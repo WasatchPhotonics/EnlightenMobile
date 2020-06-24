@@ -38,6 +38,17 @@ namespace EnlightenMobile.Views
             svm.notifyToast += (string msg) => Util.toast(msg, scrollOptions);
 
             svm.theChart = chart;
+
+            // since the ramanModeEnabled switch is not "bound" to the ViewModel,
+            // we must manually process PropertyChange notifications
+            svm.PropertyChanged += viewModelPropertyChanged;
+        }
+
+        private void viewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            var name = e.PropertyName;
+            if (name == "ramanModeEnabled" && switchRamanMode.IsToggled != svm.ramanModeEnabled)
+                switchRamanMode.IsToggled = svm.ramanModeEnabled;
         }
 
         ////////////////////////////////////////////////////////////////////////

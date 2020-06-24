@@ -4,10 +4,12 @@
     - connection robustness, widget accessibility
     - messaging cleanup
     - colorized acquire button during acquisition
+    - colorized scan button during BLE scan
     - added SemaphoreSlim around landscape rotation
     - tested under Android 10
     - added Plugin.BLE trace logging
     - fixed onscreen display of EEPROM-configured startup configuration
+    - disable laser when toggling Raman Mode or disconnect
 - 2020-06-20 0.5.0
     - refactored BluetoothView.xaml.cs into BluetoothViewModel.cs where it belonged
     - doc updates

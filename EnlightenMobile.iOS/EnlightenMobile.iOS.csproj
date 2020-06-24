@@ -170,7 +170,7 @@
       <Version>6.0.1</Version>
     </PackageReference>
     <PackageReference Include="Telerik.UI.for.Xamarin.Primitives">
-      <Version>2020.2.513.1</Version>
+      <Version>2020.2.624.1</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />

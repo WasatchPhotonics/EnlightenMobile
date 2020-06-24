@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Threading.Tasks;
-using Plugin.BLE.Abstractions;
 using Plugin.BLE.Abstractions.Contracts;
 using Plugin.BLE.Abstractions.EventArgs;
 using Plugin.BLE.Abstractions.Exceptions;
@@ -54,6 +53,7 @@ namespace EnlightenMobile.ViewModels
             adapter = CrossBluetoothLE.Current.Adapter;
 
             adapter.DeviceDiscovered += _bleAdapterDeviceDiscovered;
+            adapter.ScanTimeoutElapsed += _bleAdapterStoppedScanning;
 
             primaryServiceId = _makeGuid("ff00");
 
@@ -79,6 +79,12 @@ namespace EnlightenMobile.ViewModels
             connectCmd = new Command(() => { _ = doConnectOrDisconnectAsync(); });
 
             spec.showConnectionProgress += showSpectrometerConnectionProgress;
+        }
+
+        private void _bleAdapterStoppedScanning(object sender, EventArgs e)
+        {
+            logger.debug("BLE Adapter stopped scanning");
+            updateScanButtonProperties();
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -177,6 +183,23 @@ namespace EnlightenMobile.ViewModels
         // Scan Command
         ////////////////////////////////////////////////////////////////////////
 
+        void updateScanButtonProperties()
+        {
+            logger.debug("updating scan button properties");
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(scanButtonTextColor)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(scanButtonBackgroundColor)));
+        }
+
+        public string scanButtonBackgroundColor
+        {
+            get => ble.Adapter.IsScanning ? "#ba0a0a" : "#ccc";
+        }
+
+        public string scanButtonTextColor
+        {
+            get => ble.Adapter.IsScanning ? "#fff" : "#333";
+        }
+
         /// <summary>
         /// Step 1: user clicked "Scan"
         /// </summary> 
@@ -202,7 +225,7 @@ namespace EnlightenMobile.ViewModels
                 if (!ble.Adapter.IsScanning)
                 {
                     logger.debug("starting scan");
-                    await adapter.StartScanningForDevicesAsync();
+                    _ = adapter.StartScanningForDevicesAsync();
 
                     // Step 2: As each device is added to the list, the 
                     //         adapter.DeviceDiscovered event will call 
@@ -214,7 +237,10 @@ namespace EnlightenMobile.ViewModels
                 logger.error("caught exception during scan button event: {0}", ex.Message);
                 notifyUser("EnlightenMobile", "Caught exception during BLE scan: " + ex.Message, "Ok");
             }
-            logger.debug("scan complete");
+
+            updateScanButtonProperties();
+
+            logger.debug("scan change complete");
             return true;
         }
 
@@ -323,6 +349,7 @@ namespace EnlightenMobile.ViewModels
         async Task<bool> doDisconnectAsync()
         {
             logger.debug("attempting to disconnect");
+            spec.disconnect();
 
             if (bleDevice is null)
             {
@@ -333,7 +360,6 @@ namespace EnlightenMobile.ViewModels
 
             await adapter.DisconnectDeviceAsync(bleDevice.device);
             paired = false;
-            spec.reset();
             return true;
         }
 
@@ -349,11 +375,12 @@ namespace EnlightenMobile.ViewModels
                 return false;
             }
 
-            // recommended to help avoid GattCallback error 133
+            // recommended to help reduce GattCallback error 133
             if (ble.Adapter.IsScanning)
             {
                 logger.debug("stopping scan");
                 await adapter.StopScanningForDevicesAsync();
+                updateScanButtonProperties();
             }
 
             logger.debug($"attempting connection to {bleDevice.name}");
