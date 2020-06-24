@@ -1,4 +1,4 @@
-![Portrait](https://github.com/WasatchPhotonics/EnlightenMobile/raw/master/screenshots/portrait.png)
+| ![BLE](https://github.com/WasatchPhotonics/EnlightenMobile/raw/master/screenshots/scope-top.png) | ![Scope Top](https://github.com/WasatchPhotonics/EnlightenMobile/raw/master/screenshots/scope-top.png) |
 
 # Overview
 
