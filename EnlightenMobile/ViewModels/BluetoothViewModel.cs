@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using Plugin.BLE.Abstractions;
 using Plugin.BLE.Abstractions.Contracts;
 using Plugin.BLE.Abstractions.EventArgs;
 using Plugin.BLE.Abstractions.Exceptions;
@@ -45,6 +46,8 @@ namespace EnlightenMobile.ViewModels
 
         public BluetoothViewModel()
         {
+            Plugin.BLE.Abstractions.Trace.TraceImplementation = logger.ble;
+
             // this crashes on iOS if you don't follow add plist entries per
             // https://stackoverflow.com/a/59998233/11615696
             ble = CrossBluetoothLE.Current;
@@ -483,12 +486,9 @@ namespace EnlightenMobile.ViewModels
                 var name = pair.Key;
                 var c = pair.Value;
 
-                if (c.CanUpdate && (name == "batteryStatus" || name == "laserState"))
+                // disabled until I can troubleshoot with Nic
+                if (false && c.CanUpdate && (name == "batteryStatus" || name == "laserState"))
                 {
-                    // temporarily disable notifications
-                    logger.debug($"NOT starting notification updates on {name}");
-                    continue;
-
                     logger.debug($"starting notification updates on {name}");
                     c.ValueUpdated -= _characteristicUpdated;
                     c.ValueUpdated += _characteristicUpdated;
@@ -534,11 +534,11 @@ namespace EnlightenMobile.ViewModels
 
             if (name is null)
             {
-                logger.error($"Received notification from unknown characteristic ({c.Uuid})");
+                logger.error($"BVM._characteristicUpdated: Received notification from unknown characteristic ({c.Uuid})");
                 return;
             }
 
-            logger.info($"BVM: received BLE notification from characteristic {name}");
+            logger.info($"BVM._characteristicUpdated:: received BLE notification from characteristic {name}");
 
             if (name == "batteryStatus")
                 spec.processBatteryNotification(c.Value);

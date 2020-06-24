@@ -54,6 +54,12 @@ namespace EnlightenMobile.ViewModels
             set => logger.level = value ? LogLevel.DEBUG : LogLevel.INFO;
         }
 
+        public bool debugBLE
+        { 
+            get => logger.loggingBLE;
+            set => logger.loggingBLE = value;
+        }
+
         public Command saveCmd { get; }
 
         void doSave()

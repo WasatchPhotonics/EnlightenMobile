@@ -139,7 +139,7 @@ namespace EnlightenMobile.Models
 
             sw.WriteLine("Host Description, {0}", appSettings.hostDescription);
             if (location != null)
-                sw.WriteLine("Location, \"({0} lat, {1} lon)\"", location.Latitude, location.Longitude);
+                sw.WriteLine("Location, lat {0}, lon {1}", location.Latitude, location.Longitude);
         }
 
         string render(double[] a, int index, string format="f2")

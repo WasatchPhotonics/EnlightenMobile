@@ -226,7 +226,7 @@
                                 <Label MinimumHeightRequest="12" />
                                 <FlexLayout JustifyContent="SpaceBetween" MinimumHeightRequest="80">
                                     <Label  Text="Fire Laser" />
-                                    <Switch IsToggled="{Binding laserEnabled}" IsEnabled="{Binding laserIsAvailable}" />
+                                    <Switch IsToggled="{Binding laserEnabled}" IsEnabled="{Binding laserIsAvailable}" Scale="1.5" />
                                 </FlexLayout>
                             </StackLayout>
 

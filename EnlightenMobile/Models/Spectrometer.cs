@@ -295,6 +295,7 @@ namespace EnlightenMobile.Models
                 _nextIntegrationTimeMS = value;
                 logger.debug($"Spectrometer.integrationTimeMS: next = {value}");
                 _ = syncIntegrationTimeMSAsync();
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(integrationTimeMS)));
             }
         }
         uint _nextIntegrationTimeMS = 3;
@@ -333,21 +334,6 @@ namespace EnlightenMobile.Models
             return ok;
         }
 
-        // I no longer remember exactly why this method is here
-        async Task<bool> pauseAsync(string caller)
-        {
-            const int DELAY_MS = 10;
-
-            logger.debug($"pauseAsync({caller}: waiting {DELAY_MS} ms");
-            await Task.Delay(DELAY_MS);
-
-            logger.debug($"pauseAsync({caller}): running GC");
-            GC.Collect();
-            logger.debug($"pauseAsync({caller}): back from GC");
-
-            return true;
-        }
-
         ////////////////////////////////////////////////////////////////////////
         // gainDb
         ////////////////////////////////////////////////////////////////////////
@@ -365,6 +351,7 @@ namespace EnlightenMobile.Models
                     _nextGainDb = value;
                     logger.debug($"Spectrometer.gainDb: next = {value}");
                     _ = syncGainDbAsync();
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(gainDb)));
                 }
                 else
                 {
@@ -437,6 +424,7 @@ namespace EnlightenMobile.Models
                     _nextVerticalROIStartLine = value;
                     logger.debug($"Spectrometer.verticalROIStartLine -> {value}");
                     _ = syncROIAsync();
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(verticalROIStartLine)));
                 }
                 else
                 {
@@ -457,6 +445,7 @@ namespace EnlightenMobile.Models
                     _nextVerticalROIStopLine = value;
                     logger.debug($"Spectrometer.verticalROIStopLine -> {value}");
                     _ = syncROIAsync();
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(verticalROIStopLine)));
                 }
                 else
                 {
@@ -619,17 +608,11 @@ namespace EnlightenMobile.Models
         // battery
         ////////////////////////////////////////////////////////////////////////
 
-        // since this is private, and currently ONLY called from initAsync, it
-        // is only ever called once per application session; notifications
-        // are used otherwise, and apparently don't call it?
+        // I used to call this at the END of an acquisition, and that worked; 
+        // until it didn't.  Now I call it BEFORE each acquisition, and that
+        // seems to work better?
         async Task<bool> updateBatteryAsync()
         {
-            // if (battery.initialized)
-            // {
-            //     logger.debug("updateBatteryAsync: skipping after first read (waiting for notifications)");
-            //     return false;
-            // }
-
             logger.debug("updateBatteryAsync: starting");
 
             if (!battery.isExpired)
@@ -833,15 +816,6 @@ namespace EnlightenMobile.Models
                 return null;
             }
 
-            // YOU ARE HERE -- when laserState.laserEnable is true, the app
-            // just hangs here.  We don't get the above "failed to send acquire",
-            // yet nor do we get the following "waiting" message.  
-            //
-            // This is when laserState was last sent as "00 00 01 03 00 00" 
-            // (type normal, mode manual, enabled on, watchdog 3s, delay 0ms)
-            //
-            // Apparently it DOESN'T freeze when laserDelayMS is >0 (e.g. 500ms)
-
             // wait for acquisition to complete
             logger.debug($"takeOneAsync: waiting {integrationTimeMS}ms");
             await Task.Delay((int)integrationTimeMS);
@@ -921,16 +895,6 @@ namespace EnlightenMobile.Models
 
                 lastCRC = crc;
 
-                // This was the original SW Raman Mode design, seems to freeze
-                // the acquisition -- maybe BLE doesn't like being interrupted 
-                // in the middle of a spectrum readout?
-                // if (false && disableLaserAfterFirstPacket && !haveDisabledLaser && pixelsInPacket > 0)
-                // {
-                //     logger.debug("disabling laser after first valid spectrum packet received");
-                //     haveDisabledLaser = true;
-                //     laserEnabled = false;
-                // }
-
                 for (int i = 0; i < pixelsInPacket; i++)
                 {
                     // pixel intensities are little-endian UInt16
@@ -984,23 +948,15 @@ namespace EnlightenMobile.Models
 
         public void processBatteryNotification(byte[] data)
         {
-            // note we don't have to call updateBatteryAsync, because we get the
+            // we don't have to call updateBatteryAsync, because we get the
             // value right along with the notification
             if (data is null)
                 return;
-
-            // if (!await sem.WaitAsync(100))
-            // {
-            //     logger.error("Spectrometer.processBatteryNotification: timed-out");
-            //     return;
-            // }
 
             logger.hexdump(data, "Spectrometer.processBatteryNotification: ");
             battery.parse(data);
 
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("batteryStatus"));
-
-            // sem.Release();
         }
 
         async public void processLaserStateNotificationAsync(byte[] data)
@@ -1023,6 +979,16 @@ namespace EnlightenMobile.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("laserState"));
 
             sem.Release();
+        }
+
+        // I'm never sure if this is needed or not
+        async Task<bool> pauseAsync(string caller)
+        {
+            const int DELAY_MS = 10;
+            logger.debug($"pauseAsync({caller}): waiting {DELAY_MS} ms");
+            await Task.Delay(DELAY_MS);
+            GC.Collect();
+            return true;
         }
     }
 }

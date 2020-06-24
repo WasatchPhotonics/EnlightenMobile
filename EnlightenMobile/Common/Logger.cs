@@ -30,6 +30,7 @@ namespace EnlightenMobile
         ////////////////////////////////////////////////////////////////////////
 
         public LogLevel level { get; set; } = LogLevel.DEBUG;
+        public bool loggingBLE;
 
         public bool liveUpdates;
         public LogChangedDelegate logChangedDelegate;
@@ -63,6 +64,16 @@ namespace EnlightenMobile
         public void info(string fmt, params Object[] obj) => log(LogLevel.INFO, fmt, obj);
 
         public void debug(string fmt, params Object[] obj) => log(LogLevel.DEBUG, fmt, obj);
+
+        // BluetoothViewModel uses this to hook into Plugin.BLE.Abstractions.Trace
+        public void ble(string fmt, params Object[] obj) 
+        {
+            if (!loggingBLE)
+                return;
+
+            fmt = "[Plug.BLE] " + fmt;
+            log(LogLevel.DEBUG, fmt, obj);
+        }
 
         public void logString(LogLevel lvl, string msg) => log(lvl, msg);
 

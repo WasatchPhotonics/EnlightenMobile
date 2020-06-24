@@ -6,6 +6,8 @@
     - colorized acquire button during acquisition
     - added SemaphoreSlim around landscape rotation
     - tested under Android 10
+    - added Plugin.BLE trace logging
+    - fixed onscreen display of EEPROM-configured startup configuration
 - 2020-06-20 0.5.0
     - refactored BluetoothView.xaml.cs into BluetoothViewModel.cs where it belonged
     - doc updates

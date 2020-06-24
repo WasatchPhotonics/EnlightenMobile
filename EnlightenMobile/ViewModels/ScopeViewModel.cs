@@ -307,6 +307,12 @@ namespace EnlightenMobile.ViewModels
         // Acquire Command
         ////////////////////////////////////////////////////////////////////////
 
+        void updateAcquireButtonProperties()
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(acquireButtonTextColor)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(acquireButtonBackgroundColor)));
+        }
+
         public string acquireButtonBackgroundColor
         {
             get => spec.acquiring ? "#ba0a0a" : "#ccc";
@@ -556,62 +562,39 @@ namespace EnlightenMobile.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(caller));
         }
 
-        // Provided so Spectrometer notifications will immediately take effect on our View.
+        // Provided so Spectrometer notifications can be displayed to our View
         void handleSpectrometerChange(object sender, PropertyChangedEventArgs e)
         {
             var name = e.PropertyName;
             logger.debug($"SVM.handleSpectrometerChange: received notification from {sender} that property '{name}' changed");
 
-            if (name == "batteryStatus")
-            {
+            if (name == "acquiring")
+                updateAcquireButtonProperties();
+            else if (name == "batteryStatus")
                 updateBatteryProperties();
-            }
             else if (name == "laserState")
-            {
-                // If the laser timed-out (in manual mode "Advanced"), this 
-                // should flip the switch back to the proper "off" position.
-                //
-                // YOU ARE HERE -- we are receiving the LaserState Notification
-                // that the laser has been de-activated in the spectrometer, which
-                // we are using to decide to flip the laserEnabled Switch on the
-                // ScopeView to "off," which is then triggering a new LaserState
-                // update to the spectrometer while we're still reading out the 
-                // spectrum.  
-                //
-                // Solution is to...hmm.  Queue processing of this Notification,
-                // until after the spectrum read-out is done?  How about use a
-                // SEMAPHORE within Spectrometer to prevent overlapping BLE commands,
-                // such that individual Tasks or Threads (such as presumably
-                // kicked-off by this Notification) can't interrupt one another
-                // and block until they each get their exclusive slot?
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(laserEnabled)));
-            }
             else if (name == "paired")
-            {
-                // notify our View that controls should be in/activated accordingly
-                logger.debug($"SVM: Spectrometer.paired = {spec.paired}");
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(paired)));
-            }
-            else if (name == "acquiring")
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(acquireButtonBackgroundColor)));
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(acquireButtonTextColor)));
-            }
+            else if (name == "integrationTimeMS")
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(integrationTimeMS)));
+            else if (name == "gainDb")
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(gainDb)));
         }
 
         // testing kludge
-        void refreshAll_NOT_USED()
-        {
-            // there's probably a way to iterate over Properties via Reflection
-            string[] names = {
-                "title", "paired", "xAxisOptions", "xAxisOption", "xAxisMinimum", "xAxisMaximum",
-                "xAxisLabelFormat", "integrationTimeMS", "gainDb", "scansToAverage", "darkEnabled",
-                "note", "laserEnabled", "ramanModeEnabled", "laserIsAvailable", "isAuthenticated",
-                "isRefreshing", "spectrumMax", "batteryState", "batteryColor", "acquireButtonBackgroundColor",
-                "acquireButtonTextColor", "chartData", "trace0", "trace1", "trace2", "trace3", "trace4",
-                "trace5", "trace6", "trace7" };
-            foreach (var name in names)
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
+        // void refreshAll_NOT_USED()
+        // {
+        //     // there's probably a way to iterate over Properties via Reflection
+        //     string[] names = {
+        //         "title", "paired", "xAxisOptions", "xAxisOption", "xAxisMinimum", "xAxisMaximum",
+        //         "xAxisLabelFormat", "integrationTimeMS", "gainDb", "scansToAverage", "darkEnabled",
+        //         "note", "laserEnabled", "ramanModeEnabled", "laserIsAvailable", "isAuthenticated",
+        //         "isRefreshing", "spectrumMax", "batteryState", "batteryColor", "acquireButtonBackgroundColor",
+        //         "acquireButtonTextColor", "chartData", "trace0", "trace1", "trace2", "trace3", "trace4",
+        //         "trace5", "trace6", "trace7" };
+        //     foreach (var name in names)
+        //         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        // }
     }
 }
