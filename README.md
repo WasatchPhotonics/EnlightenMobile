@@ -1,3 +1,5 @@
+![Portrait](https://github.com/WasatchPhotonics/EnlightenMobile/raw/master/screenshots/portrait.png)
+
 # Overview
 
 A lightweight ENLIGHTEN-like (-lite?) GUI for Android and iOS, designed for 
@@ -69,3 +71,5 @@ Xamarin 101
 Xamarin BLE
 - https://github.com/didourebai/BLEPluginDemo
 - (itself based on) https://github.com/xabre/xamarin-bluetooth-le
+
+![Landscape](https://github.com/WasatchPhotonics/EnlightenMobile/raw/master/screenshots/landscape.png)
