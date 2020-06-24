@@ -1,4 +1,4 @@
-| ![BLE](https://github.com/WasatchPhotonics/EnlightenMobile/raw/master/screenshots/scope-top.png) | ![Scope Top](https://github.com/WasatchPhotonics/EnlightenMobile/raw/master/screenshots/scope-top.png) |
+| ![BLE](https://github.com/WasatchPhotonics/EnlightenMobile/raw/master/screenshots/ble.png) | ![Scope Top](https://github.com/WasatchPhotonics/EnlightenMobile/raw/master/screenshots/scope-top.png) | ![Spec Settings](https://github.com/WasatchPhotonics/EnlightenMobile/raw/master/screenshots/spec-settings.png) | ![App Settings](https://github.com/WasatchPhotonics/EnlightenMobile/raw/master/screenshots/app-settings.png) |
 
 # Overview
 
@@ -72,4 +72,4 @@ Xamarin BLE
 - https://github.com/didourebai/BLEPluginDemo
 - (itself based on) https://github.com/xabre/xamarin-bluetooth-le
 
-![Landscape](https://github.com/WasatchPhotonics/EnlightenMobile/raw/master/screenshots/landscape.png)
+![Landscape-zoom](https://github.com/WasatchPhotonics/EnlightenMobile/raw/master/screenshots/landscape-zoom.png)
