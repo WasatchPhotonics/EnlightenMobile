@@ -100,6 +100,13 @@ namespace EnlightenMobile.ViewModels
         // connectionProgress
         ////////////////////////////////////////////////////////////////////////
 
+        /// <summary>
+        /// Relay connection progress from the Spectrometer Model back to the 
+        /// Bluetooth View.
+        /// </summary>
+        private void showSpectrometerConnectionProgress(double perc) =>
+            connectionProgress = perc;
+
         public double connectionProgress
         {
             get => _connectionProgress;
@@ -610,13 +617,6 @@ namespace EnlightenMobile.ViewModels
         ////////////////////////////////////////////////////////////////////////
         // View code-behind callbacks
         ////////////////////////////////////////////////////////////////////////
-
-        /// <summary>
-        /// Relay connection progress from the Spectrometer Model back to the 
-        /// Bluetooth View.
-        /// </summary>
-        private void showSpectrometerConnectionProgress(double perc) =>
-            connectionProgress = perc;
 
         /// <summary>
         /// Step 3b: the user clicked a BLE device in the list, raising an event

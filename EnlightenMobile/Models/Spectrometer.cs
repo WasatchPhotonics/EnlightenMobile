@@ -717,7 +717,7 @@ namespace EnlightenMobile.Models
             {
                 const int MAX_SPECTRUM_READOUT_TIME_MS = 6000;
                 var watchdogMS = (scansToAverage + 1) * (integrationTimeMS + MAX_SPECTRUM_READOUT_TIME_MS);
-                var watchdogSec = (byte)(Math.Max(MAX_SPECTRUM_READOUT_TIME_MS, watchdogMS) / 1000.0);
+                var watchdogSec = (byte)((Math.Max(MAX_SPECTRUM_READOUT_TIME_MS, watchdogMS) / 1000.0) * 2);
                 logger.debug($"takeOneAveragedAsync: setting laserWatchdogSec -> {watchdogSec}");
 
                 // since we're going to sync the laser state immediately after to turn on the laser,
