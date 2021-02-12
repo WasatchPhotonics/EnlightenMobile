@@ -1,55 +1,32 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TabbedPage xmlns="http://xamarin.com/schemas/2014/forms"
-            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-            xmlns:d="http://xamarin.com/schemas/2014/forms/design"
-            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-            mc:Ignorable="d"
-            xmlns:views="clr-namespace:EnlightenMobile.Views"
-            BackgroundColor="#333"
-            x:Class="EnlightenMobile.Views.MainPage">
-    <TabbedPage.Children>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+             xmlns:vm="clr-namespace:EnlightenMobile.ViewModels"
+             x:Class="EnlightenMobile.Views.MainPage"
+             BackgroundColor="#333"
+             Title="{Binding title}">
 
-        <!--
-            Note that a NavigationPage.Title is not the same as the corresponding 
-            View (or ContentPage) Title.  On Android, the NavigationPage.Title
-            goes in the "tab" (so should be short), and the ContentPage.Title 
-            goes above it in the TabBar (so can be long).
-        -->
-        <NavigationPage Title="About" IconImageSource="tab_about.png">
-             <x:Arguments>
-                <views:AboutView />
-            </x:Arguments>
-        </NavigationPage>
+    <ContentPage.BindingContext>
+        <vm:MainViewModel />
+    </ContentPage.BindingContext>
 
-        <NavigationPage Title="BLE" IconImageSource="tab_ble.png">
-            <x:Arguments>
-                <views:BluetoothView />
-            </x:Arguments>
-        </NavigationPage>
+    <ContentPage.Resources>
+       <ResourceDictionary>
+           <Color x:Key="DarkGray">#333</Color>
+           <Color x:Key="Teal">#27c0a1</Color>
+       </ResourceDictionary>
+    </ContentPage.Resources>
 
-        <NavigationPage Title="Scope" IconImageSource="tab_scope.png">
-            <x:Arguments>
-                <views:ScopeView />
-            </x:Arguments>
-        </NavigationPage>
-
-        <NavigationPage Title="Spec" IconImageSource="tab_spec_settings.png">
-            <x:Arguments>
-                <views:SpectrometerSettingsView />
-            </x:Arguments>
-        </NavigationPage>
-
-        <NavigationPage Title="Settings" IconImageSource="tab_app_settings.png">
-            <x:Arguments>
-                <views:AppSettingsView />
-            </x:Arguments>
-        </NavigationPage>
-
-        <NavigationPage Title="Log" IconImageSource="tab_log.png">
-            <x:Arguments>
-                <views:LogView />
-            </x:Arguments>
-        </NavigationPage>
-
-    </TabbedPage.Children>
-</TabbedPage>
+    <FlexLayout BackgroundColor="{StaticResource DarkGray}" 
+                Direction="Column"
+                AlignItems="Center"
+                JustifyContent="SpaceEvenly">
+        <Image Source="enlightenLOGO.png" HeightRequest="100" />
+        <Label FontSize="22" TextColor="#eee" Text="{Binding version, StringFormat='ENLIGHTEN™ Mobile {0}'}" />
+        <Button Padding="40,10,40,10" 
+                Text="Learn more" 
+                Command="{Binding OpenWebCommand}" 
+                BackgroundColor="{StaticResource Teal}" 
+                TextColor="White" />
+    </FlexLayout>
+</ContentPage>

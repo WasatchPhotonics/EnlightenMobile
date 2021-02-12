@@ -346,8 +346,10 @@ namespace EnlightenMobile.ViewModels
             else
             {
                 paired = await doConnectAsync();
-                if (paired)
-                    PageNav.getInstance().select("Scope");
+
+                // @todo convert to Shell
+                // if (paired)
+                //     PageNav.getInstance().select("Scope");
             }
             connectionProgress = 0;
             return true;
