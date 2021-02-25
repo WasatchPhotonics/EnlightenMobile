@@ -79,7 +79,7 @@ namespace EnlightenMobile.ViewModels
             connectCmd = new Command(() => { _ = doConnectOrDisconnectAsync(); });
 
             spec.showConnectionProgress += showSpectrometerConnectionProgress;
-        }
+    }
 
         private void _bleAdapterStoppedScanning(object sender, EventArgs e)
         {
@@ -217,7 +217,7 @@ namespace EnlightenMobile.ViewModels
 
             bleDeviceList.Clear();
             buttonConnectEnabled = false;
-
+            
             try
             {
                 // resolve Location permission
@@ -352,6 +352,7 @@ namespace EnlightenMobile.ViewModels
                 //     PageNav.getInstance().select("Scope");
             }
             connectionProgress = 0;
+            await Shell.Current.GoToAsync("//scope");
             return true;
         }
 
