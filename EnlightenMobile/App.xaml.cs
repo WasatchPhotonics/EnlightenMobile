@@ -11,8 +11,14 @@ namespace EnlightenMobile
     {
         Logger logger = Logger.getInstance();
 
-        public App()
+        public static string appProjectSetting;
+
+        public App(string appProj)
         {
+            //public string 
+            
+            appProjectSetting = appProj;
+
             InitializeComponent();
 
             // register platform-specific Services here
@@ -20,11 +26,40 @@ namespace EnlightenMobile
 
             VersionTracking.Track();
             // MainPage = new MainPage();
-            MainPage = new AppShell();
+            if (appProj == "Enlighten")
+            {
+                MainPage = new AppShell();
+            }
+            else if (appProj == "Raman")
+            {
+                MainPage = new RamanAppShell();
+            }
+            else if (appProj == "Absorbance")
+            {
+                MainPage = new AbsorbanceAppShell();
+            }
+            else if (appProj == "Fluoresence")
+            {
+                MainPage = new FluoresenceAppShell();
+            }
+            else if (appProj == "Irradiance")
+            {
+                MainPage = new IrradianceAppShell();
+            }
+            else if (appProj == "Irradiance")
+            {
+                MainPage = new IrradianceAppShell();
+            }
+            else if (appProj == "Color")
+            {
+                MainPage = new ColorAppShell();
+            }
         }
+
 
         protected override void OnStart() { }
         protected override void OnSleep() { }
         protected override void OnResume() { }
     }
+
 }

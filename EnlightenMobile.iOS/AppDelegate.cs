@@ -26,7 +26,7 @@ namespace EnlightenMobile.iOS
             // Xamarin.Calabash.Start();
 
             global::Xamarin.Forms.Forms.Init();
-            LoadApplication(new App());
+            LoadApplication(new App("enlighten"));
 
             return base.FinishedLaunching(app, options);
         }

@@ -22,4 +22,9 @@
     <PackageReference Include="Telerik.UI.for.Xamarin" Version="2020.2.624.1" />
     <PackageReference Include="Telerik.UI.for.Xamarin.Chart" Version="2020.2.624.1" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Update="AppShell - Copy.xaml.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>
