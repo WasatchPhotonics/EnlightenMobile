@@ -30,12 +30,12 @@ namespace EnlightenMobile.ViewModels
 
         public string title 
         {
-            get => String.Format("About {0}", App.appProjectSetting);
+            get => String.Format("About Enlighten");
         }
 
         public string version
         {
-            get => String.Format("{0} Mobile {1}", App.appProjectSetting, AppSettings.getInstance().version);
+            get => String.Format("Enlighten Mobile version 1.0.1");
         }
 
         public ICommand OpenWebCommand { get; }
