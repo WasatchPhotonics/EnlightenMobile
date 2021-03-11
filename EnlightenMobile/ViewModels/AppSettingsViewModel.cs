@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Xamarin.Essentials;
 using EnlightenMobile.Models;
 
 namespace EnlightenMobile.ViewModels
@@ -20,6 +21,33 @@ namespace EnlightenMobile.ViewModels
             laserDelayMS = spec.laserDelayMS;
         }
 
+        public void loadSettings()
+        {
+            bool savePixelValue = Preferences.Get("savePixel", false);
+            bool saveWavelengthValue = Preferences.Get("saveWavelength", false);
+            bool saveWavenumberValue = Preferences.Get("saveWavenumber", false);
+            bool saveRawValue = Preferences.Get("saveRaw", false);
+            bool saveDarkValue = Preferences.Get("saveDark", false);
+            bool saveReferenceValue = Preferences.Get("saveReference", false);
+            bool authValue = Preferences.Get("authenticated", false);
+
+            appSettings.savePixel = savePixelValue;
+            appSettings.saveWavelength = saveWavelengthValue;
+            appSettings.saveWavenumber = saveWavenumberValue;
+            appSettings.saveRaw = saveRawValue;
+            appSettings.saveDark = saveDarkValue;
+            appSettings.saveReference = saveReferenceValue;
+            appSettings.authenticated = authValue;
+
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(savePixel)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(saveWavelength)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(saveWavenumber)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(saveRaw)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(saveDark)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(saveReference)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(isAuthenticated)));
+        }
+
         public string title
         {
             get => "Application Settings";
@@ -28,37 +56,62 @@ namespace EnlightenMobile.ViewModels
         public bool savePixel 
         {
             get => appSettings.savePixel;
-            set => appSettings.savePixel = value;
+            set
+            {
+                appSettings.savePixel = value;
+                Preferences.Set("savePixel", value);
+                System.Console.WriteLine($"Changed save pixel to the following: {appSettings.savePixel.ToString()}");
+            }
         }
 
         public bool saveWavelength
         {
             get => appSettings.saveWavelength;
-            set => appSettings.saveWavelength = value;
+            set
+            {
+                appSettings.saveWavelength = value;
+                Preferences.Set("saveWavelength", value);
+            }
         }
 
         public bool saveWavenumber 
         {
             get => appSettings.saveWavenumber;
-            set => appSettings.saveWavenumber = value;
+            set
+            {
+                appSettings.saveWavenumber = value;
+                Preferences.Set("saveWavenumber", value);
+            }
         }
 
         public bool saveRaw 
         {
             get => appSettings.saveRaw;
-            set => appSettings.saveRaw = value;
+            set
+            {
+                appSettings.saveRaw = value;
+                Preferences.Set("saveRaw", value);
+            }
         }
 
         public bool saveDark 
         {
             get => appSettings.saveDark;
-            set => appSettings.saveDark = value;
+            set
+            {
+                appSettings.saveDark = value;
+                Preferences.Set("saveDark", value);
+            }
         }
 
         public bool saveReference 
         {
             get => appSettings.saveReference;
-            set => appSettings.saveReference = value;
+            set
+            {
+                appSettings.saveReference = value;
+                Preferences.Set("saveReference", value);
+            }
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -97,13 +150,21 @@ namespace EnlightenMobile.ViewModels
         public byte laserWatchdogTimeoutSec
         {
             get => spec.laserWatchdogSec;
-            set => spec.laserWatchdogSec = value;
+            set
+            {
+                spec.laserWatchdogSec = value;
+                Preferences.Set("laserWatchdog", value);
+            }
         }
 
         public ushort laserDelayMS
         {
             get => spec.laserDelayMS;
-            set => spec.laserDelayMS = value;
+            set
+            {
+                spec.laserDelayMS = value;
+                Preferences.Set("laserDelay", value);
+            }
         }
 
         public string verticalROIStartLine
@@ -118,6 +179,7 @@ namespace EnlightenMobile.ViewModels
         {
             if (ushort.TryParse(s, out ushort value))
                 spec.verticalROIStartLine = value;
+                Preferences.Set("ROIStart", value);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(verticalROIStartLine)));
         }
 
@@ -133,6 +195,7 @@ namespace EnlightenMobile.ViewModels
         {
             if (ushort.TryParse(s, out ushort value))
                 spec.verticalROIStopLine = value;
+                Preferences.Set("ROIStop", value);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(verticalROIStopLine)));
         }
     }

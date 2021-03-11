@@ -29,12 +29,12 @@ namespace EnlightenMobile.Models
         public string savePath;
 
         // todo: move to SaveOptions
-        public bool savePixel = true;
-        public bool saveWavelength = true;
-        public bool saveWavenumber = true;
-        public bool saveRaw = true;
-        public bool saveDark = true;
-        public bool saveReference = false;
+        public bool savePixel;
+        public bool saveWavelength;
+        public bool saveWavenumber;
+        public bool saveRaw;
+        public bool saveDark;
+        public bool saveReference;
 
         // todo: prompt to auto-connect this device if found on scan
         // public Guid lastConnectedGuid;
@@ -115,7 +115,7 @@ namespace EnlightenMobile.Models
             set
             {
                 _authenticated = value;
-
+                Preferences.Set("authenticated", value);
                 // notify anyone listening to AppSettings.authenticated, such as
                 // ScopeViewModel (which uses this to decide whether to show the
                 // laserFiring switch, etc)
@@ -137,6 +137,7 @@ namespace EnlightenMobile.Models
         {
             const string EXPECTED_PASSWORD = "DangerMan";
             authenticated = password == EXPECTED_PASSWORD;
+
 
             logger.debug($"authenticated = {authenticated}");
             return authenticated;

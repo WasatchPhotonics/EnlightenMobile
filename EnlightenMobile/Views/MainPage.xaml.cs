@@ -1,5 +1,6 @@
 ﻿using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using EnlightenMobile;
 
 namespace EnlightenMobile.Views
 {

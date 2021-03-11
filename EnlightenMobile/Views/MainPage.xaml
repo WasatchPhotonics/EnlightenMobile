@@ -11,10 +11,10 @@
     </ContentPage.BindingContext>
 
     <ContentPage.Resources>
-       <ResourceDictionary>
-           <Color x:Key="DarkGray">#333</Color>
-           <Color x:Key="Teal">#27c0a1</Color>
-       </ResourceDictionary>
+        <ResourceDictionary>
+            <Color x:Key="DarkGray">#333</Color>
+            <Color x:Key="Teal">#27c0a1</Color>
+        </ResourceDictionary>
     </ContentPage.Resources>
 
     <FlexLayout BackgroundColor="{StaticResource DarkGray}" 
@@ -22,7 +22,7 @@
                 AlignItems="Center"
                 JustifyContent="SpaceEvenly">
         <Image Source="enlightenLOGO.png" HeightRequest="100" />
-        <Label FontSize="22" TextColor="#eee" Text="{Binding version, StringFormat='ENLIGHTEN™ Mobile {0}'}" />
+        <Label FontSize="22" TextColor="#eee" Text="{Binding version}" />
         <Button Padding="40,10,40,10" 
                 Text="Learn more" 
                 Command="{Binding OpenWebCommand}" 
