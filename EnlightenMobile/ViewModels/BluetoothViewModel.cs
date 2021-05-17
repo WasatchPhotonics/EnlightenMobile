@@ -20,11 +20,15 @@ namespace EnlightenMobile.ViewModels
 
         public ObservableCollection<BLEDevice> bleDeviceList = new ObservableCollection<BLEDevice>();
 
+        
+
         public Command scanCmd { get; }
         public Command connectCmd { get; }
 
         IBluetoothLE ble;
         IAdapter adapter;
+
+         
 
         BLEDevice bleDevice;
 
@@ -39,8 +43,10 @@ namespace EnlightenMobile.ViewModels
         Spectrometer spec = Spectrometer.getInstance();
         Logger logger = Logger.getInstance();
 
-        // so the ViewModel can float-up messages to the View for display
-        public delegate void UserNotification(string title, string message, string button);
+        
+
+    // so the ViewModel can float-up messages to the View for display
+    public delegate void UserNotification(string title, string message, string button);
         public event UserNotification notifyUser;
 
         public BluetoothViewModel()
@@ -54,6 +60,7 @@ namespace EnlightenMobile.ViewModels
 
             adapter.DeviceDiscovered += _bleAdapterDeviceDiscovered;
             adapter.ScanTimeoutElapsed += _bleAdapterStoppedScanning;
+            adapter.DeviceConnectionLost += _bleAdapterDeviceConnectionLost;
 
             primaryServiceId = _makeGuid("ff00");
 
@@ -80,6 +87,29 @@ namespace EnlightenMobile.ViewModels
 
             spec.showConnectionProgress += showSpectrometerConnectionProgress;
     }
+
+        // https://github.com/xabre/xamarin-bluetooth-le/issues/99 seems promising
+        private void _bleAdapterDeviceConnectionLost(object sender, DeviceErrorEventArgs e)
+        {
+            logger.info("\n\n\nBLE connection was lost\n\n\n");
+            attemptReconnect();
+        }
+
+        async void attemptReconnect()
+        {
+            if(bleDevice != null)
+            {
+                try
+                {
+                    await adapter.ConnectToKnownDeviceAsync(bleDevice.device.Id);
+                }
+                catch (Exception e)
+                {
+                    // per ref, needed for android which throws error on timeout for reconnect
+                    attemptReconnect();
+                }
+            }
+        }
 
         private void _bleAdapterStoppedScanning(object sender, EventArgs e)
         {
@@ -346,13 +376,13 @@ namespace EnlightenMobile.ViewModels
             else
             {
                 paired = await doConnectAsync();
-
+                await Shell.Current.GoToAsync("//scope");
                 // @todo convert to Shell
                 // if (paired)
                 //     PageNav.getInstance().select("Scope");
             }
             connectionProgress = 0;
-            await Shell.Current.GoToAsync("//scope");
+            
             return true;
         }
 
