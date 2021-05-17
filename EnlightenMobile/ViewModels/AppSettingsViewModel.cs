@@ -114,6 +114,34 @@ namespace EnlightenMobile.ViewModels
             }
         }
 
+        public bool saveByRow
+        {
+            get => appSettings.saveByRow;
+            set
+            {
+                appSettings.saveByRow = value;
+                if(value == false)
+                {
+                    appendSpectra = false;
+                    Preferences.Set("appendSpectra", false);
+                }
+                Preferences.Set("saveByRow", value);
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(saveByRow)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(appendSpectra)));
+            }
+        }
+
+        public bool appendSpectra
+        {
+            get => appSettings.appendSpectra;
+            set
+            {
+                appSettings.appendSpectra = value;
+                Preferences.Set("appendSpectra", value);
+            }
+
+        }
+
         ////////////////////////////////////////////////////////////////////////
         // Authentication 
         ////////////////////////////////////////////////////////////////////////

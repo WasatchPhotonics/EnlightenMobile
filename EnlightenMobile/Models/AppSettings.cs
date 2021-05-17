@@ -35,6 +35,8 @@ namespace EnlightenMobile.Models
         public bool saveRaw;
         public bool saveDark;
         public bool saveReference;
+        public bool saveByRow;
+        public bool appendSpectra;
 
         // todo: prompt to auto-connect this device if found on scan
         // public Guid lastConnectedGuid;

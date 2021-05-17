@@ -52,6 +52,14 @@
                         <Label  Text="Save Reference" TextColor="#ccc" VerticalTextAlignment="Center"/>
                         <Switch IsToggled="{Binding saveReference}" HorizontalOptions="EndAndExpand" />
                     </StackLayout>
+                    <StackLayout Orientation="Horizontal" Margin="30, 0, 0, 0">
+                        <Label  Text="Save Row Order" TextColor="#ccc" VerticalTextAlignment="Center"/>
+                        <Switch IsToggled="{Binding saveByRow}" HorizontalOptions="EndAndExpand" />
+                    </StackLayout>
+                    <StackLayout Orientation="Horizontal" Margin="30, 0, 0, 0">
+                        <Label  Text="Append Spectra" TextColor="#ccc" VerticalTextAlignment="Center" IsVisible="{Binding saveByRow}"/>
+                        <Switch IsToggled="{Binding appendSpectra}" HorizontalOptions="EndAndExpand" IsVisible="{Binding saveByRow}"/>
+                    </StackLayout>
 
                     <Label Text="Advanced Features" FontSize="Large"/>
 

@@ -106,10 +106,19 @@ namespace EnlightenMobile.Models
             logger.debug($"Measurement.saveAsync: creating {pathname}");
 
             using (StreamWriter sw = new StreamWriter(pathname))  
-            {  
-                writeMetadata(sw);
-                sw.WriteLine();
-                writeSpectra(sw);
+            {
+                if (!appSettings.saveByRow)
+                {
+                    logger.info("saving by column");
+                    writeMetadata(sw);
+                    sw.WriteLine();
+                    writeSpectra(sw);
+                }
+                else
+                {
+                    logger.info("saving by row");
+                }
+                
             }
 
             return true;
