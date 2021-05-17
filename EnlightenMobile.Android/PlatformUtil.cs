@@ -62,9 +62,8 @@ namespace EnlightenMobile.Droid
             }
 
             // create EnlightenSpectra if necessary
-            string defaultPath = string.Format("{0}/{1}", 
-                Android.OS.Environment.ExternalStorageDirectory.AbsolutePath, 
-                "EnlightenSpectra");
+            string defaultPath = System.IO.Path.Combine((Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDocuments).AbsolutePath), "EnlightenSpectra");
+            //string defaultPath = string.Format("{0}/{1}",Android.OS.Environment.ExternalStorageDirectory.AbsolutePath,"EnlightenSpectra");
             logger.debug($"getSavePath: defaultPath = {defaultPath}");
             if (!writeable(defaultPath))
             {
