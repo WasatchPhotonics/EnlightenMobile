@@ -84,6 +84,8 @@ namespace EnlightenMobile.Models
         /// - support full ENLIGHTEN metadata
         /// - support SaveOptions (selectable output fields)
         /// </todo>
+        public string savePath;
+        private bool needWriteMetaData = true;
         public bool save()
         {
             logger.debug("Measurement.save: starting");
@@ -95,7 +97,21 @@ namespace EnlightenMobile.Models
             }
 
             AppSettings appSettings = AppSettings.getInstance();
-            string savePath = appSettings.getSavePath();
+            if (!appSettings.appendSpectra)
+            {
+                savePath = appSettings.getSavePath();
+            }
+            else
+            {
+                // the idea here is that if spectra is supposed to be appended and there is no prior save path get one
+                // otherwise continue on and use what was perviously stored in savePath so that it will be appended
+                if(savePath is null)
+                {
+                    savePath = appSettings.getSavePath();
+                    needWriteMetaData = true;
+                }
+            }
+            
             if (savePath is null)
             {
                 logger.error("saveAsync: can't get savePath");
@@ -117,11 +133,120 @@ namespace EnlightenMobile.Models
                 else
                 {
                     logger.info("saving by row");
+                    if (needWriteMetaData)
+                    {
+                        writeRowMetadata(sw); //need to change to row version
+                        needWriteMetaData = false;
+                    }
+                    writeRowData(sw);
                 }
                 
             }
 
             return true;
+        }
+
+        void writeRowMetadata(StreamWriter sw)
+        {
+            var appSettings = AppSettings.getInstance();
+            //meta data for EnlightenMobile does not match with Enlighten Desktop
+            //For consistency I kept the mobile metadata the same
+            //If in the future there is the desire to have this the same it can reasonably be changed
+            sw.Write("ENLIGHTEN Version,");
+            sw.Write("Measurement ID,");
+            sw.Write("Serial Number,");
+            sw.Write("Model");
+            sw.WriteLine();
+            sw.Write($"Mobile {appSettings.version} for {appSettings.os},");
+            sw.Write($"{measurementID},");
+            sw.Write($"{spec.eeprom.serialNumber},`");
+            sw.Write($"{spec.eeprom.model}");
+            //The above meta data shouldn't change much but the rest likely will, which is the reason for the split
+            sw.WriteLine();
+            sw.Write("Integrtion Time,");
+            sw.Write("Detector Gain,");
+            sw.Write("Scan Averaging,");
+            sw.Write("Laser Enable,");
+            sw.Write("Laser Wavelength,");
+            sw.Write("Timestamp,");
+            sw.Write("Note,");
+            sw.Write("Pixel Count");
+            for(int i = 0; i < spec.eeprom.activePixelsHoriz; i++)
+            {
+                sw.Write($"{i},");
+            }
+            sw.WriteLine();
+        }
+
+        void writeRowData(StreamWriter sw)
+        {
+            logger.debug("writeSpectra: starting (by row)");
+            AppSettings appSettings = AppSettings.getInstance();
+
+            List<string> headers = new List<string>();
+
+            double[] pix = new double[processed.Length];
+
+            for(int i = 0; i < processed.Length; i++)
+            {
+                pix[i] = i;
+            }
+
+            Dictionary<string, double[]> headerMatch = new Dictionary<string, double[]>();
+
+            if (appSettings.savePixel)
+            { 
+                headers.Add("Pixel"); 
+                headerMatch.Add("Pixel",pix);
+            }
+            if (appSettings.saveWavelength)
+            {
+                headers.Add("Wavelength");
+                headerMatch.Add("Wavelength", spec.wavelengths);
+            }
+            if (appSettings.saveWavenumber)
+            {
+                headers.Add("Wavenumber");
+                headerMatch.Add("Wavenumber", spec.wavenumbers);
+            }
+            headers.Add("Processed");
+            headerMatch.Add("Processed", processed);
+            if (appSettings.saveRaw)
+            {
+                headers.Add("Raw");
+                headerMatch.Add("Raw", raw);
+            }
+            if (appSettings.saveDark)
+            {
+                headers.Add("Dark");
+                headerMatch.Add("Dark", dark);
+            }
+            if (appSettings.saveReference)
+            {
+                headers.Add("Reference");
+                headerMatch.Add("Reference", reference);
+            }
+            foreach(string head in headers)
+            {
+                double[] headerValues = null;
+                sw.Write($"{spec.eeprom.maxIntegrationTimeMS},");
+                sw.Write($"{spec.gainDb},");
+                sw.Write($"{spec.scansToAverage},");
+                sw.Write($"{spec.laserEnabled || spec.ramanModeEnabled},");
+                sw.Write($"{spec.eeprom.laserExcitationWavelengthNMFloat},");
+                sw.Write($"{timestamp.ToString()},");
+                sw.Write($"{head},");
+                headerValues = headerMatch[head];
+                logger.info($"Trying to access header match for {head}");
+                if(!(headerValues is null))
+                {
+                    for(int i = 0; i < processed.Length; i++)
+                    {
+                        sw.Write($"{headerValues[i]},");
+                    }
+                }
+            }
+
         }
 
         void writeMetadata(StreamWriter sw)
@@ -166,14 +291,6 @@ namespace EnlightenMobile.Models
             AppSettings appSettings = AppSettings.getInstance();
 
             List<string> headers = new List<string>();
-
-            if (appSettings.savePixel     ) headers.Add("Pixel");
-            if (appSettings.saveWavelength) headers.Add("Wavelength");
-            if (appSettings.saveWavenumber) headers.Add("Wavenumber");
-                                            headers.Add("Processed");
-            if (appSettings.saveRaw       ) headers.Add("Raw");
-            if (appSettings.saveDark      ) headers.Add("Dark");
-            if (appSettings.saveReference ) headers.Add("Reference");
 
             // reference-based techniques should output higher precision
             string fmt = reference is null ? "f2" : "f5";
