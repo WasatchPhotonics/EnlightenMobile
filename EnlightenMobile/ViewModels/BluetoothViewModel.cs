@@ -477,6 +477,8 @@ namespace EnlightenMobile.ViewModels
                 if (c.CanUpdate)
                     logger.debug("    (supports notifications)");
 
+                
+
                 // Step 7a: read characteristic descriptors
                 // logger.debug($"    WriteType = {c.WriteType}");
                 // var descriptors = await c.GetDescriptorsAsync();

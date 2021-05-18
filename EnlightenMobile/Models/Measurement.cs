@@ -121,33 +121,42 @@ namespace EnlightenMobile.Models
             string pathname = string.Format($"{savePath}/{filename}");
             logger.debug($"Measurement.saveAsync: creating {pathname}");
 
-            using (StreamWriter sw = new StreamWriter(pathname))  
+            if (!appSettings.saveByRow)
             {
-                if (!appSettings.saveByRow)
+                using (StreamWriter sw = File.CreateText(pathname))
                 {
                     logger.info("saving by column");
                     writeMetadata(sw);
                     sw.WriteLine();
                     writeSpectra(sw);
                 }
-                else
+                        
+            }
+            else
+            {
+                using (StreamWriter sw = File.AppendText(pathname))
                 {
                     logger.info("saving by row");
                     if (needWriteMetaData)
                     {
                         writeRowMetadata(sw); //need to change to row version
                         needWriteMetaData = false;
+                        writeRowData(sw);
                     }
-                    writeRowData(sw);
+                    else
+                    {
+                        sw.WriteLine();
+                        writeRowData(sw);
+                    }
                 }
-                
             }
-
+                
             return true;
         }
 
         void writeRowMetadata(StreamWriter sw)
         {
+            logger.info("Writing meta data by row.");
             var appSettings = AppSettings.getInstance();
             //meta data for EnlightenMobile does not match with Enlighten Desktop
             //For consistency I kept the mobile metadata the same

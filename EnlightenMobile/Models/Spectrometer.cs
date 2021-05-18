@@ -946,7 +946,14 @@ namespace EnlightenMobile.Models
             spectrum[pixels-1] = spectrum[pixels-2];
 
             // apply 2x2 binning
-            if (eeprom.featureMask.bin2x2)            {                var smoothed = new double[spectrum.Length];                for (int i = 0; i < spectrum.Length - 1; i++)                    smoothed[i] = (spectrum[i] + spectrum[i + 1]) / 2.0;                smoothed[spectrum.Length - 1] = spectrum[spectrum.Length - 1];                spectrum = smoothed;            }
+            if (eeprom.featureMask.bin2x2)
+            {
+                var smoothed = new double[spectrum.Length];
+                for (int i = 0; i < spectrum.Length - 1; i++)
+                    smoothed[i] = (spectrum[i] + spectrum[i + 1]) / 2.0;
+                smoothed[spectrum.Length - 1] = spectrum[spectrum.Length - 1];
+                spectrum = smoothed;
+            }
 
             logger.debug("Spectrometer.takeOneAsync: returning completed spectrum");
             return spectrum;
