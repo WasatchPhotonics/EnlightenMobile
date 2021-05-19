@@ -38,6 +38,7 @@ namespace EnlightenMobile.Models
 
         public Measurement measurement;
         public string note { get; set; }
+        public string qrValue { get; set; }
 
         ushort lastCRC;
 

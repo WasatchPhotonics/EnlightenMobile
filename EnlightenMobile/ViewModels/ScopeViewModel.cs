@@ -7,6 +7,7 @@ using EnlightenMobile.Models;
 using System.Threading.Tasks;
 using Telerik.XamarinForms.Chart;
 
+
 namespace EnlightenMobile.ViewModels
 {
     // This class provides all the business logic controlling the ScopeView. 
@@ -20,6 +21,7 @@ namespace EnlightenMobile.ViewModels
         // sure what the "best practice" architecture would be.
         public delegate void ToastNotification(string msg);
         public event ToastNotification notifyToast;
+        
 
         ////////////////////////////////////////////////////////////////////////
         // Private attributes
@@ -263,6 +265,7 @@ namespace EnlightenMobile.ViewModels
             logger.debug("SVM.updateLaserProperties: done");
         }
 
+
         ////////////////////////////////////////////////////////////////////////
         // Refresh
         ////////////////////////////////////////////////////////////////////////
@@ -302,6 +305,22 @@ namespace EnlightenMobile.ViewModels
         public string batteryColor
         { 
             get => spec.battery.level > 20 ? "#eee" : "#f33";
+        }
+
+        public string qrText
+        {
+            get => spec.qrValue;
+            set
+            {
+                spec.qrValue = value;
+                logger.info($"updating qr result value to {value}");
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(qrText)));
+            }
+        }
+
+        public void setQRText(string resultText)
+        {
+            qrText = resultText;
         }
 
         void updateBatteryProperties()

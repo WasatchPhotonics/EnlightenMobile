@@ -3,6 +3,7 @@ using System.Threading;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using EnlightenMobile.ViewModels;
+using ZXing.Net.Mobile.Forms;
 
 namespace EnlightenMobile.Views
 {
@@ -13,6 +14,7 @@ namespace EnlightenMobile.Views
         bool showingControls = true;
         static readonly SemaphoreSlim semRotate = new SemaphoreSlim(1, 1);
 
+        ZXingScannerPage scanPage;
         const string rightArrow = ">>";
         const string leftArrow = "<<";
 
@@ -225,6 +227,28 @@ namespace EnlightenMobile.Views
             scrollOptions.SetValue(Grid.ColumnProperty, 2);
 
             logger.debug($"updateLandscapeGridColumns: done");
+        }
+
+        private void qrScan(object sender, EventArgs e)
+        {
+            performQRScan();
+        }
+
+        private async void performQRScan()
+        {
+            scanPage = new ZXingScannerPage();
+            scanPage.OnScanResult += (result) =>
+            {
+                scanPage.IsScanning = false;
+
+                Device.BeginInvokeOnMainThread(async () =>
+                {
+                    await Navigation.PopAsync();
+                    svm.setQRText(result.Text);
+                });
+            };
+
+            await Navigation.PushAsync(scanPage);
         }
     }
 }
