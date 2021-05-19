@@ -16,6 +16,16 @@
              xmlns:telerikInput="clr-namespace:Telerik.XamarinForms.Input;assembly=Telerik.XamarinForms.Input">
 
     <ContentPage.Resources>
+	    <ResourceDictionary>
+	       <OnPlatform x:TypeArguments="Thickness" x:Key="marginSpace">
+                <On Platform="Android" Value="0,0,0,0" />
+                <On Platform="iOS" Value="0,12,0,0" />
+            </OnPlatform>
+            <Style x:Key="spacingLabel" TargetType="Label" BaseResourceKey="spacerStyle">
+                <Setter Property="MinimumHeightRequest" Value="8"/>
+                <Setter Property="Margin" Value="{StaticResource marginSpace}"/>
+            </Style>
+	    </ResourceDictionary>
     </ContentPage.Resources>
 
     <ContentPage.BindingContext>
@@ -214,14 +224,14 @@
                             </FlexLayout>
 
                             <!-- dark -->
-                            <Label MinimumHeightRequest="12" />
+                            <Label Style="{StaticResource spacingLabel}"/>
                             <FlexLayout JustifyContent="SpaceBetween" MinimumHeightRequest="80" >
                                 <Label  Text="Dark" MinimumWidthRequest="75" />
                                 <Switch IsToggled="{Binding darkEnabled}" Scale="1.5"/>
                             </FlexLayout>
 
                             <!-- Raman mode (no binding because code-behind pops-up confirmation dialog) -->
-                            <Label MinimumHeightRequest="12" /> 
+                            <Label Style="{StaticResource spacingLabel}"/> 
                             <FlexLayout JustifyContent="SpaceBetween">
                                 <Label  Text="Raman Mode" />
                                 <Switch x:Name="switchRamanMode" Toggled="ramanMode_Toggled" Scale="1.5" />
@@ -229,7 +239,7 @@
 
                             <!-- laser (if not in Raman Mode) -->
                             <StackLayout IsVisible="{Binding isAuthenticated}" Orientation="Vertical">
-                                <Label MinimumHeightRequest="12" />
+                                <Label Style="{StaticResource spacingLabel}"/>
                                 <FlexLayout JustifyContent="SpaceBetween" MinimumHeightRequest="80">
                                     <Label  Text="Fire Laser" />
                                     <Switch IsToggled="{Binding laserEnabled}" IsEnabled="{Binding laserIsAvailable}" Scale="1.5" />
