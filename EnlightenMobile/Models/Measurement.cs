@@ -132,6 +132,7 @@ namespace EnlightenMobile.Models
             sw.WriteLine("Timestamp, {0}", timestamp.ToString());
             sw.WriteLine("Note, {0}", spec.note);
             sw.WriteLine("Pixel Count, {0}", spec.eeprom.activePixelsHoriz);
+            sw.WriteLine($"QR Scan, {spec.qrValue}");    
 
             ////////////////////////////////////////////////////////////////////
             // a few that ENLIGHTEN doesn't have...

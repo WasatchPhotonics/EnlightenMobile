@@ -50,5 +50,7 @@
 	<true/>
 	<key>UIFileSharingEnabled</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Barcode scanner requires camera.</string>
 </dict>
 </plist>

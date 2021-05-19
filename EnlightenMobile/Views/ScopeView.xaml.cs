@@ -244,7 +244,7 @@ namespace EnlightenMobile.Views
                 Device.BeginInvokeOnMainThread(async () =>
                 {
                     await Navigation.PopAsync();
-                    await DisplayAlert("Scanned Barcode", result.Text, "OK");
+                    svm.setQRText(result.Text);
                 });
             };
 

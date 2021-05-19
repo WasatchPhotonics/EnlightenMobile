@@ -307,6 +307,22 @@ namespace EnlightenMobile.ViewModels
             get => spec.battery.level > 20 ? "#eee" : "#f33";
         }
 
+        public string qrText
+        {
+            get => spec.qrValue;
+            set
+            {
+                spec.qrValue = value;
+                logger.info($"updating qr result value to {value}");
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(qrText)));
+            }
+        }
+
+        public void setQRText(string resultText)
+        {
+            qrText = resultText;
+        }
+
         void updateBatteryProperties()
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(batteryState)));

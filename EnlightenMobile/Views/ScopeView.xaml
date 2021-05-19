@@ -278,6 +278,13 @@
                                        VerticalOptions="FillAndExpand"
                                        HorizontalOptions="FillAndExpand" />
                             </StackLayout>
+                            <FlexLayout Grid.Row="0" Grid.Column="0"
+                                         HorizontalOptions="FillAndExpand"
+                                         VerticalOptions="FillAndExpand"
+                                         JustifyContent="SpaceBetween">
+                                <Label Text="QR Result" VerticalTextAlignment="Center"/>
+                                <Label Text="{Binding qrText}" VerticalTextAlignment="Center"/>
+                            </FlexLayout>
                         </StackLayout>
 
                         <!-- Status Bar -->
