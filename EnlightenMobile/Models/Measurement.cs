@@ -95,11 +95,16 @@ namespace EnlightenMobile.Models
                 logger.error("saveAsync: nothing to save");
                 return false;
             }
-
             AppSettings appSettings = AppSettings.getInstance();
+            // right now the if else statements for the save path dont do anything
+            // the platform util handles returning a repeated path, but it returns the same one
+            // every time unless the app is reopened. This adds some bloat becuase it doesnt do anything
+            // but I think it would be nice to have the option in the future as this will return
+            // the same path based on the config of the settings.
             if (!appSettings.appendSpectra)
             {
                 savePath = appSettings.getSavePath();
+                needWriteMetaData = true;
             }
             else
             {
