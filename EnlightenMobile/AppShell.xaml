@@ -43,6 +43,7 @@
                 <Image Source="{Binding FlyoutIcon}"/>
                 <Label Grid.Column="1"
         Text="{Binding Title}"
+		Margin="15"
         VerticalTextAlignment="Center" 
         TextColor="White"/>
             </Grid>
