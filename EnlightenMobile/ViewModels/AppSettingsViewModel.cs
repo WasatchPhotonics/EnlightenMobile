@@ -30,6 +30,8 @@ namespace EnlightenMobile.ViewModels
             bool saveDarkValue = Preferences.Get("saveDark", false);
             bool saveReferenceValue = Preferences.Get("saveReference", false);
             bool authValue = Preferences.Get("authenticated", false);
+            bool rowSave = Preferences.Get("saveByRow", false);
+            bool appending = Preferences.Get("appendSpectra", false);
 
             appSettings.savePixel = savePixelValue;
             appSettings.saveWavelength = saveWavelengthValue;
@@ -38,6 +40,8 @@ namespace EnlightenMobile.ViewModels
             appSettings.saveDark = saveDarkValue;
             appSettings.saveReference = saveReferenceValue;
             appSettings.authenticated = authValue;
+            appSettings.saveByRow = rowSave;
+            appSettings.appendSpectra = appending;
 
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(savePixel)));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(saveWavelength)));
@@ -46,6 +50,8 @@ namespace EnlightenMobile.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(saveDark)));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(saveReference)));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(isAuthenticated)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(saveByRow)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(appendSpectra)));
         }
 
         public string title
