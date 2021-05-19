@@ -155,15 +155,21 @@
                                      ProgressColor="#2994d3"/>
 
                         <!-- Command buttons -->
-                        <StackLayout Grid.Row="2" Grid.Column="0" 
-                                     Orientation="Horizontal" 
-                                     HorizontalOptions="CenterAndExpand">
-                            <Button Text="Acquire" Command="{Binding acquireCmd}"
-                                                   TextColor="{Binding acquireButtonTextColor}" 
-                                                   BackgroundColor="{Binding acquireButtonBackgroundColor}" />
-                            <Button Text="Save" Command="{Binding saveCmd}" />
-                            <Button Text="Add" Command="{Binding addCmd}" />
-                            <Button Text="Clear" Command="{Binding clearCmd}" />
+                        <StackLayout Grid.Row="2" Grid.Column="0" Margin="2">
+                            <FlexLayout
+                                Wrap="Wrap"
+                                AlignItems="Center"
+                                VerticalOptions="Start"
+                                JustifyContent="Center"
+                                >
+                                <Button Margin="2" Text="Acquire" Command="{Binding acquireCmd}"
+                                                       TextColor="{Binding acquireButtonTextColor}" 
+                                                       BackgroundColor="{Binding acquireButtonBackgroundColor}" />
+                                <Button Margin="2" Text="Save" Command="{Binding saveCmd}" />
+                                <Button Margin="2" Text="Add" Command="{Binding addCmd}" />
+                                <Button Margin="2" Text="Clear" Command="{Binding clearCmd}" />
+                                <Button Margin="2" Text="QR" Clicked="qrScan" />
+                            </FlexLayout>
                         </StackLayout>
 
                         <StackLayout Grid.Row="3" Grid.Column="0" HorizontalOptions="FillAndExpand" Padding="20, 10, 20, 10">

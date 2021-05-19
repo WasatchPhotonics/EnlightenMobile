@@ -7,6 +7,7 @@ using EnlightenMobile.Models;
 using System.Threading.Tasks;
 using Telerik.XamarinForms.Chart;
 
+
 namespace EnlightenMobile.ViewModels
 {
     // This class provides all the business logic controlling the ScopeView. 
@@ -20,6 +21,7 @@ namespace EnlightenMobile.ViewModels
         // sure what the "best practice" architecture would be.
         public delegate void ToastNotification(string msg);
         public event ToastNotification notifyToast;
+        
 
         ////////////////////////////////////////////////////////////////////////
         // Private attributes
@@ -262,6 +264,7 @@ namespace EnlightenMobile.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ramanModeEnabled)));
             logger.debug("SVM.updateLaserProperties: done");
         }
+
 
         ////////////////////////////////////////////////////////////////////////
         // Refresh
