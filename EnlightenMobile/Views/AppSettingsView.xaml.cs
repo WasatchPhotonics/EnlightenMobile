@@ -18,6 +18,7 @@ namespace EnlightenMobile.Views
             InitializeComponent();
 
             asvm = (AppSettingsViewModel)BindingContext;
+            asvm.loadSettings();
         }
 
         // the user clicked "return" or "done" when entering the password, so

@@ -1,5 +1,7 @@
-﻿using System.ComponentModel;
-using System.Runtime.CompilerServices;
+﻿using System;
+using System.ComponentModel;
+using System.Windows.Input;
+using Xamarin.Essentials;
 using Xamarin.Forms;
 using EnlightenMobile.Models;
 
@@ -7,20 +9,35 @@ namespace EnlightenMobile.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
     {
-        Logger logger = Logger.getInstance();
-
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public MainViewModel() 
+        AppSettings appSettings = AppSettings.getInstance();
+
+        Logger logger = Logger.getInstance();
+
+        ////////////////////////////////////////////////////////////////////////
+        // Lifecycle
+        ////////////////////////////////////////////////////////////////////////
+
+        public MainViewModel()
         {
-            logger.debug("MVM: too many MVVM");
+            OpenWebCommand = new Command(async () => await Browser.OpenAsync(appSettings.companyURL));
         }
 
-        public string appVersion => AppSettings.getInstance().version;
+        ////////////////////////////////////////////////////////////////////////
+        // Public Properties
+        ////////////////////////////////////////////////////////////////////////
 
-        protected void RaisePropertyChanged ([CallerMemberName] string caller ="")
+        public string title 
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(caller));
+            get => String.Format("About Enlighten");
         }
+
+        public string version
+        {
+            get => String.Format("Enlighten Mobile version 1.0.1");
+        }
+
+        public ICommand OpenWebCommand { get; }
     }
-}
+} 

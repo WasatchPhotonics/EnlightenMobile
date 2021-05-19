@@ -74,7 +74,7 @@ namespace EnlightenMobile.ViewModels
 
         public bool paired
         {
-            get => spec.paired;
+            get => true;//spec.paired;
         }
 
         ////////////////////////////////////////////////////////////////////////

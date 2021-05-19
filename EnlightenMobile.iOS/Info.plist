@@ -46,5 +46,9 @@
 	<string>Telerik UI for Xamarin uses this</string>
 	<key>CFBundleVersion</key>
 	<string>1.0.3</string>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+	<key>UIFileSharingEnabled</key>
+	<true/>
 </dict>
 </plist>

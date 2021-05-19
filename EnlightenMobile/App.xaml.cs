@@ -19,7 +19,8 @@ namespace EnlightenMobile
             DependencyService.Register<IPlatformUtil>();
 
             VersionTracking.Track();
-            MainPage = new MainPage();
+            // MainPage = new MainPage();
+            MainPage = new AppShell();
         }
 
         protected override void OnStart() { }
