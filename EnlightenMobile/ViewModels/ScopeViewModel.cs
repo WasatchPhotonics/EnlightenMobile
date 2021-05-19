@@ -434,7 +434,20 @@ namespace EnlightenMobile.ViewModels
         string lastAxisType;
         int nextTrace = 0;
         const int MAX_TRACES = 8;
-
+        void setTraceData(int trace, ObservableCollection<ChartDataPoint> data)
+        {
+            switch (trace)
+            {
+                case 0: trace0 = data; return;
+                case 1: trace1 = data; return;
+                case 2: trace2 = data; return;
+                case 3: trace3 = data; return;
+                case 4: trace4 = data; return;
+                case 5: trace5 = data; return;
+                case 6: trace6 = data; return;
+                case 7: trace7 = data; return;
+            }
+        }
         ObservableCollection<ChartDataPoint> getTraceData(int trace)
         {
             switch(trace)
@@ -514,22 +527,21 @@ namespace EnlightenMobile.ViewModels
         }
 
         bool doAdd()
-        { 
+        {
             logger.debug("Add button pressed");
 
             var name = getTraceName(nextTrace);
             logger.debug($"Populating trace {name}");
-
-            var data = getTraceData(nextTrace);
-            data.Clear();
+            var newData = new ObservableCollection<ChartDataPoint>();
             foreach (var orig in chartData)
-                data.Add(new ChartDataPoint() { xValue = orig.xValue, intensity = orig.intensity });
+                newData.Add(new ChartDataPoint() { xValue = orig.xValue, intensity = orig.intensity });
+            setTraceData(nextTrace, newData);
 
             updateTrace(nextTrace);
 
             nextTrace = (nextTrace + 1) % MAX_TRACES;
 
-            return true;
+            return true; 
         }
 
         bool doClear()
