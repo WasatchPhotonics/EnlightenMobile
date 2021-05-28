@@ -234,6 +234,11 @@ namespace EnlightenMobile.Views
             performQRScan();
         }
 
+        private void photoCapture(object sender, EventArgs e)
+        {
+            svm.performPhotoCapture();
+        }
+
         private async void performQRScan()
         {
             scanPage = new ZXingScannerPage();

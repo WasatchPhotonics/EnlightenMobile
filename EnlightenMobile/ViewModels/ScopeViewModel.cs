@@ -3,9 +3,11 @@ using System.ComponentModel;
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 using Xamarin.Forms;
+using Xamarin.Essentials;
 using EnlightenMobile.Models;
 using System.Threading.Tasks;
 using Telerik.XamarinForms.Chart;
+using System.IO;
 
 
 namespace EnlightenMobile.ViewModels
@@ -280,6 +282,7 @@ namespace EnlightenMobile.ViewModels
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(isRefreshing)));
             }
         }
+
         bool _isRefreshing;
 
         // invoked by ScopeView when the user pulls-down on the Scope Options grid
@@ -327,6 +330,41 @@ namespace EnlightenMobile.ViewModels
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(batteryState)));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(batteryColor)));
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        // Photo Command
+        ////////////////////////////////////////////////////////////////////////
+
+        public async void performPhotoCapture()
+        {
+            try
+            {
+                var photo = await MediaPicker.CapturePhotoAsync();
+                logger.info($"Photo taken.");
+                DateTime timestamp = DateTime.Now;
+                AppSettings appSettings = AppSettings.getInstance();
+                string savePath = appSettings.getSavePath();
+                var serialNumber = spec is null ? "sim" : spec.eeprom.serialNumber;
+                string measurementID = string.Format("enlighten-{0}-{1}",
+                    timestamp.ToString("yyyyMMdd-HHmmss-ffffff"),
+                    serialNumber);
+                string filename = measurementID + ".png";
+                string pathname = string.Format($"{savePath}/{filename}");
+                using (var stream = await photo.OpenReadAsync())
+                {
+                    using (var writeStream = File.OpenWrite(pathname))
+                    {
+                        await stream.CopyToAsync(writeStream);
+                    }
+                }
+                logger.info($"Save photo to file {pathname}");
+            }
+            catch(Exception e)
+            {
+                logger.error($"Error while taking photo of {e}");
+            }
+
         }
 
         ////////////////////////////////////////////////////////////////////////

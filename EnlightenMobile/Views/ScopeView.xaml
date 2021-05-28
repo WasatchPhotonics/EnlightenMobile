@@ -179,6 +179,7 @@
                                 <Button Margin="2" Text="Add" Command="{Binding addCmd}" />
                                 <Button Margin="2" Text="Clear" Command="{Binding clearCmd}" />
                                 <Button Margin="2" Text="QR" Clicked="qrScan" />
+                                <Button Margin="2" Text="Photo" Clicked="photoCapture" />
                             </FlexLayout>
                         </StackLayout>
 
