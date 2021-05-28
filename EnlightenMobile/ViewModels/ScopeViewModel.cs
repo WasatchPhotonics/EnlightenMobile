@@ -3,10 +3,13 @@ using System.ComponentModel;
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 using Xamarin.Forms;
+using Xamarin.Essentials;
 using EnlightenMobile.Models;
 using System.Threading.Tasks;
 using Telerik.XamarinForms.Chart;
-
+using System.IO;
+using Plugin.Permissions;
+using Plugin.Permissions.Abstractions;
 
 namespace EnlightenMobile.ViewModels
 {
@@ -30,7 +33,8 @@ namespace EnlightenMobile.ViewModels
         Spectrometer spec;
         AppSettings appSettings;
         Logger logger = Logger.getInstance();
-
+        public delegate void UserNotification(string title, string message, string button);
+        public event UserNotification notifyUser;
         ////////////////////////////////////////////////////////////////////////
         // Lifecycle
         ////////////////////////////////////////////////////////////////////////
@@ -142,6 +146,8 @@ namespace EnlightenMobile.ViewModels
                 spec.integrationTimeMS = value;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(integrationTimeMS)));
         }
+        
+
 
         ////////////////////////////////////////////////////////////////////////
         // gainDb
@@ -279,7 +285,9 @@ namespace EnlightenMobile.ViewModels
                 _isRefreshing = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(isRefreshing)));
             }
+            
         }
+
         bool _isRefreshing;
 
         // invoked by ScopeView when the user pulls-down on the Scope Options grid
@@ -327,6 +335,54 @@ namespace EnlightenMobile.ViewModels
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(batteryState)));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(batteryColor)));
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        // Photo Command
+        ////////////////////////////////////////////////////////////////////////
+
+        public async void performPhotoCapture()
+        {
+            var status = await CrossPermissions.Current.CheckPermissionStatusAsync(Permission.Location);
+
+            // if not, prompt the user to authorize it
+            if (status != Plugin.Permissions.Abstractions.PermissionStatus.Granted)
+            {
+                if (await CrossPermissions.Current.ShouldShowRequestPermissionRationaleAsync(Permission.Location))
+                    notifyUser("Permissions",
+                               "ENLIGHTEN Mobile requires Location data for saving photo location",
+                               "Ok");
+
+                var result = await CrossPermissions.Current.RequestPermissionsAsync(Permission.Location);
+                status = result[Permission.Location];
+            }
+            try
+            {
+                var photo = await MediaPicker.CapturePhotoAsync();
+                logger.info($"Photo taken.");
+                DateTime timestamp = DateTime.Now;
+                AppSettings appSettings = AppSettings.getInstance();
+                string savePath = appSettings.getSavePath();
+                var serialNumber = spec is null ? "sim" : spec.eeprom.serialNumber;
+                string measurementID = string.Format("enlighten-{0}-{1}",
+                    timestamp.ToString("yyyyMMdd-HHmmss-ffffff"),
+                    serialNumber);
+                string filename = measurementID + ".png";
+                string pathname = string.Format($"{savePath}/{filename}");
+                using (var stream = await photo.OpenReadAsync())
+                {
+                    using (var writeStream = File.OpenWrite(pathname))
+                    {
+                        await stream.CopyToAsync(writeStream);
+                    }
+                }
+                logger.info($"Save photo to file {pathname}");
+            }
+            catch(Exception e)
+            {
+                logger.error($"Error while taking photo of {e}");
+            }
+
         }
 
         ////////////////////////////////////////////////////////////////////////

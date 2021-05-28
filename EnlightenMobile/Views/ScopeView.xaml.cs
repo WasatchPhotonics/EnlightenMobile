@@ -75,7 +75,8 @@ namespace EnlightenMobile.Views
             var entry = sender as Entry;
             svm.setGainDb(entry.Text);
         }
-
+        async void notifyUserAsync(string title, string message, string button) =>
+           await DisplayAlert(title, message, button);
         void entryScansToAverage_Completed(Object sender, EventArgs e)
         {
             var entry = sender as Entry;
@@ -232,6 +233,11 @@ namespace EnlightenMobile.Views
         private void qrScan(object sender, EventArgs e)
         {
             performQRScan();
+        }
+
+        private void photoCapture(object sender, EventArgs e)
+        {
+            svm.performPhotoCapture();
         }
 
         private async void performQRScan()
