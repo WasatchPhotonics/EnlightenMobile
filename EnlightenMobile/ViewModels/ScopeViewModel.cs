@@ -8,7 +8,8 @@ using EnlightenMobile.Models;
 using System.Threading.Tasks;
 using Telerik.XamarinForms.Chart;
 using System.IO;
-
+using Plugin.Permissions;
+using Plugin.Permissions.Abstractions;
 
 namespace EnlightenMobile.ViewModels
 {
@@ -32,7 +33,8 @@ namespace EnlightenMobile.ViewModels
         Spectrometer spec;
         AppSettings appSettings;
         Logger logger = Logger.getInstance();
-
+        public delegate void UserNotification(string title, string message, string button);
+        public event UserNotification notifyUser;
         ////////////////////////////////////////////////////////////////////////
         // Lifecycle
         ////////////////////////////////////////////////////////////////////////
@@ -144,6 +146,8 @@ namespace EnlightenMobile.ViewModels
                 spec.integrationTimeMS = value;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(integrationTimeMS)));
         }
+        
+
 
         ////////////////////////////////////////////////////////////////////////
         // gainDb
@@ -281,6 +285,7 @@ namespace EnlightenMobile.ViewModels
                 _isRefreshing = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(isRefreshing)));
             }
+            
         }
 
         bool _isRefreshing;
@@ -338,6 +343,19 @@ namespace EnlightenMobile.ViewModels
 
         public async void performPhotoCapture()
         {
+            var status = await CrossPermissions.Current.CheckPermissionStatusAsync(Permission.Location);
+
+            // if not, prompt the user to authorize it
+            if (status != Plugin.Permissions.Abstractions.PermissionStatus.Granted)
+            {
+                if (await CrossPermissions.Current.ShouldShowRequestPermissionRationaleAsync(Permission.Location))
+                    notifyUser("Permissions",
+                               "ENLIGHTEN Mobile requires Location data for saving photo location",
+                               "Ok");
+
+                var result = await CrossPermissions.Current.RequestPermissionsAsync(Permission.Location);
+                status = result[Permission.Location];
+            }
             try
             {
                 var photo = await MediaPicker.CapturePhotoAsync();

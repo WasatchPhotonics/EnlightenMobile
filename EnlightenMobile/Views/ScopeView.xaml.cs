@@ -75,7 +75,8 @@ namespace EnlightenMobile.Views
             var entry = sender as Entry;
             svm.setGainDb(entry.Text);
         }
-
+        async void notifyUserAsync(string title, string message, string button) =>
+           await DisplayAlert(title, message, button);
         void entryScansToAverage_Completed(Object sender, EventArgs e)
         {
             var entry = sender as Entry;
