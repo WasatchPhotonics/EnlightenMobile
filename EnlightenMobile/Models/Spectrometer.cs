@@ -213,10 +213,14 @@ namespace EnlightenMobile.Models
 
         async Task<List<byte[]>> readEEPROMAsync()
         {
-            var eepromCmd = characteristicsByName["eepromCmd"];
-            var eepromData = characteristicsByName["eepromData"];
+            logger.info("Attempting to read EEPROM data.");
 
-            if (eepromCmd is null || eepromData is null)
+            if (characteristicsByName.ContainsKey("eepromCmd") && characteristicsByName.ContainsKey("eepromData"))
+            {
+                var eepromCmd = characteristicsByName["eepromCmd"];
+                var eepromData = characteristicsByName["eepromData"];
+            }
+            else (eepromCmd is null || eepromData is null)
             {
                 logger.error("Can't read EEPROM w/o characteristics");                
                 return null;
@@ -947,7 +951,14 @@ namespace EnlightenMobile.Models
             spectrum[pixels-1] = spectrum[pixels-2];
 
             // apply 2x2 binning
-            if (eeprom.featureMask.bin2x2)            {                var smoothed = new double[spectrum.Length];                for (int i = 0; i < spectrum.Length - 1; i++)                    smoothed[i] = (spectrum[i] + spectrum[i + 1]) / 2.0;                smoothed[spectrum.Length - 1] = spectrum[spectrum.Length - 1];                spectrum = smoothed;            }
+            if (eeprom.featureMask.bin2x2)
+            {
+                var smoothed = new double[spectrum.Length];
+                for (int i = 0; i < spectrum.Length - 1; i++)
+                    smoothed[i] = (spectrum[i] + spectrum[i + 1]) / 2.0;
+                smoothed[spectrum.Length - 1] = spectrum[spectrum.Length - 1];
+                spectrum = smoothed;
+            }
 
             logger.debug("Spectrometer.takeOneAsync: returning completed spectrum");
             return spectrum;
