@@ -432,6 +432,7 @@ namespace EnlightenMobile.ViewModels
             connectionProgress = 0.05;
 
             // Step 6: connect to primary service
+            await bleDevice.device.RequestMtuAsync(256);
             logger.debug($"connecting to primary service {primaryServiceId}");
             service = await bleDevice.device.GetServiceAsync(primaryServiceId);
             if (service is null)
