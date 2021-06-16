@@ -214,13 +214,15 @@ namespace EnlightenMobile.Models
         async Task<List<byte[]>> readEEPROMAsync()
         {
             logger.info("Attempting to read EEPROM data.");
+            Plugin.BLE.Abstractions.Contracts.ICharacteristic eepromCmd;
+            Plugin.BLE.Abstractions.Contracts.ICharacteristic eepromData;
 
             if (characteristicsByName.ContainsKey("eepromCmd") && characteristicsByName.ContainsKey("eepromData"))
             {
-                var eepromCmd = characteristicsByName["eepromCmd"];
-                var eepromData = characteristicsByName["eepromData"];
+                eepromCmd = characteristicsByName["eepromCmd"];
+                eepromData = characteristicsByName["eepromData"];
             }
-            else (eepromCmd is null || eepromData is null)
+            else
             {
                 logger.error("Can't read EEPROM w/o characteristics");                
                 return null;
@@ -247,6 +249,7 @@ namespace EnlightenMobile.Models
                         logger.debug("reading eepromData");
                         var response = await eepromData.ReadAsync();
                         logger.hexdump(response, "response");
+                        logger.info($"The length of buf is {buf.Length} and lenght of response is {response.Length}");
 
                         for (int i = 0; i < response.Length; i++)
                             buf[pos++] = response[i];
@@ -602,7 +605,8 @@ namespace EnlightenMobile.Models
             if (!paired || characteristicsByName is null)
                 return false;
 
-            var characteristic = characteristicsByName["laserState"];
+            ICharacteristic characteristic;
+            characteristicsByName.TryGetValue("laserState", out characteristic);
             if (characteristic is null)
             {
                 logger.error("laserState characteristic not found");
@@ -702,13 +706,15 @@ namespace EnlightenMobile.Models
                 return false;
 
             // push-down any changed acquisition parameters
+            logger.debug("take one average reading: syncing integration time");
             if (! await syncIntegrationTimeMSAsync())
                 return false;
-
+            logger.debug("take one averaged reading: syncing gain");
             if (! await syncGainDbAsync())
                 return false;
 
             // update battery FIRST
+            logger.debug("take one averaged reading: updating battery");
             await updateBatteryAsync();
 
             // for progress bar
