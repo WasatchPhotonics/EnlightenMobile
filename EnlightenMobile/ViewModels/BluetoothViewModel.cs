@@ -346,13 +346,12 @@ namespace EnlightenMobile.ViewModels
             else
             {
                 paired = await doConnectAsync();
-
-                // @todo convert to Shell
-                // if (paired)
-                //     PageNav.getInstance().select("Scope");
+                if (paired)
+                {
+                    await Shell.Current.GoToAsync("//scope");
+                }
             }
             connectionProgress = 0;
-            await Shell.Current.GoToAsync("//scope");
             return true;
         }
 
