@@ -1,5 +1,10 @@
 # Version History
 
+- 2022-09-19 1.1.0
+    - New UI design
+    - Merge in RPi Fix
+    - QR Scan
+    - Photo feature
 - 2020-06-23 1.0.0
     - connection robustness, widget accessibility
     - messaging cleanup

@@ -8,6 +8,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnlightenMobile.iOS", "Enli
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EnlightenMobile", "EnlightenMobile\EnlightenMobile.csproj", "{61AD8B13-2EE8-43AB-8150-F28A7CDE8305}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E3387ADB-5769-4D61-B70C-F1247824490A}"
+	ProjectSection(SolutionItems) = preProject
+		README_ARCHITECTURE.md = README_ARCHITECTURE.md
+		README_CHANGELOG.md = README_CHANGELOG.md
+		README_IOS.md = README_IOS.md
+		README_SECURITY.md = README_SECURITY.md
+		README_TARGETS.md = README_TARGETS.md
+		README_V2.md = README_V2.md
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

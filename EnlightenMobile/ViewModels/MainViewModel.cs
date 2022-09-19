@@ -35,7 +35,7 @@ namespace EnlightenMobile.ViewModels
 
         public string version
         {
-            get => String.Format("Enlighten Mobile version 1.0.1");
+            get => String.Format("Enlighten Mobile version 1.1.0");
         }
 
         public ICommand OpenWebCommand { get; }
