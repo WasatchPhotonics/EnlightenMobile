@@ -67,13 +67,6 @@
             <views:ScopeView />
         </ShellContent>
     </FlyoutItem>
-    <FlyoutItem Title="BLE"
-                Icon="tab_ble.png"
-                >
-        <ShellContent Route="ble">
-            <views:BluetoothView />
-        </ShellContent>
-    </FlyoutItem>
     <FlyoutItem Title="Advanced"
                 Icon="tab_spec_settings.png">
         <Tab Title="App" Icon="tab_app_settings.png" >

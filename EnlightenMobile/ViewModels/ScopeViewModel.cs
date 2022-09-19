@@ -595,9 +595,10 @@ namespace EnlightenMobile.ViewModels
                     return;
 
                 logger.info("populating ChartData");
-                chartData.Clear();
+                var updateChartData = new ObservableCollection<ChartDataPoint>();
                 for (int i = 0; i < pixels; i++)
-                    chartData.Add(new ChartDataPoint() { intensity = intensities[i], xValue = xAxis[i] });
+                    updateChartData.Add(new ChartDataPoint() { intensity = intensities[i], xValue = xAxis[i] });
+                chartData = updateChartData;
 
                 xAxisMinimum = xAxis[0];
                 xAxisMaximum = xAxis[pixels-1];

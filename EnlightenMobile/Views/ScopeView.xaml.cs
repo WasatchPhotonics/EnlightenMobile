@@ -235,6 +235,11 @@ namespace EnlightenMobile.Views
             performQRScan();
         }
 
+        private async void connectPage(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new BluetoothView());
+        }
+
         private void photoCapture(object sender, EventArgs e)
         {
             svm.performPhotoCapture();

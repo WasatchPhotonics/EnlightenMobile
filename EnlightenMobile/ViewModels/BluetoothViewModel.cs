@@ -348,7 +348,7 @@ namespace EnlightenMobile.ViewModels
                 paired = await doConnectAsync();
                 if (paired)
                 {
-                    await Shell.Current.GoToAsync("//scope");
+                    await Shell.Current.GoToAsync("..");
                 }
             }
             connectionProgress = 0;

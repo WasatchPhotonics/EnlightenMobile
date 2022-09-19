@@ -59,6 +59,7 @@
                 <Image x:Name="logoVertical" Source="enlightenLOGO" WidthRequest="300" BackgroundColor="#333"
                        Margin="0, 5, 0, 5" />
 
+
                 <!-- ======================================================= -->
                 <!-- The all-important spectral chart -->
                 <!-- ======================================================= -->
@@ -142,6 +143,7 @@
                          Command="{Binding refreshCmd}">
 
                 <ScrollView IsEnabled="{Binding paired}">
+                    
 		            <Grid x:Name="innerGrid" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsEnabled="{Binding paired}">
 
                         <!-- initialize to Portrait mode (1 col, 2 rows) -->
@@ -166,6 +168,7 @@
 
                         <!-- Command buttons -->
                         <StackLayout Grid.Row="2" Grid.Column="0" Margin="2">
+                            <Button Text="Connect" Margin="5" Clicked="connectPage"/>
                             <FlexLayout
                                 Wrap="Wrap"
                                 AlignItems="Center"
