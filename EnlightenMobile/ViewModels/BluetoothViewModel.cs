@@ -346,13 +346,12 @@ namespace EnlightenMobile.ViewModels
             else
             {
                 paired = await doConnectAsync();
-
-                // @todo convert to Shell
-                // if (paired)
-                //     PageNav.getInstance().select("Scope");
+                if (paired)
+                {
+                    await Shell.Current.GoToAsync("//scope");
+                }
             }
             connectionProgress = 0;
-            await Shell.Current.GoToAsync("//scope");
             return true;
         }
 
@@ -432,10 +431,13 @@ namespace EnlightenMobile.ViewModels
             connectionProgress = 0.05;
 
             // Step 6: connect to primary service
+            await bleDevice.device.RequestMtuAsync(256);
             logger.debug($"connecting to primary service {primaryServiceId}");
             service = await bleDevice.device.GetServiceAsync(primaryServiceId);
             if (service is null)
+            {
                 return logger.error($"did not find primary service {primaryServiceId}");
+            }
 
             logger.debug($"found primary service {service}");
 
@@ -500,15 +502,20 @@ namespace EnlightenMobile.ViewModels
                 foreach (var c in characteristics)
                 {
                     logger.debug($"reading {c.Name}");
-                    var data = await c.ReadAsync();
-                    if (data is null)
+                    // This line is required because for some reason attempting to read
+                    // the Service Changed service cause the program to get blocked here
+                    if(c.Name != "Service Changed")
                     {
-                        logger.error($"can't read {c.Uuid} ({c.Name})");
-                    }
-                    else
-                    {
-                        logger.hexdump(data, prefix: $"  {c.Uuid}: {c.Name} = ");
-                        spec.bleDeviceInfo.add(c.Name, Util.toASCII(data));
+                        var data = await c.ReadAsync();
+                        if (data is null)
+                        {
+                            logger.error($"can't read {c.Uuid} ({c.Name})");
+                        }
+                        else
+                        {
+                            logger.hexdump(data, prefix: $"  {c.Uuid}: {c.Name} = ");
+                            spec.bleDeviceInfo.add(c.Name, Util.toASCII(data));
+                        }
                     }
                 }
             }
