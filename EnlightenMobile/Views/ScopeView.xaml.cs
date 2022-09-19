@@ -46,6 +46,11 @@ namespace EnlightenMobile.Views
             svm.PropertyChanged += viewModelPropertyChanged;
         }
 
+        protected override void OnAppearing()
+        {
+            svm.updateBLEBtn();
+        }
+
         private void viewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             var name = e.PropertyName;

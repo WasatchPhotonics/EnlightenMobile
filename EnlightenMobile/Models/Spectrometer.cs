@@ -27,6 +27,7 @@ namespace EnlightenMobile.Models
         public Battery battery;
 
         public BLEDeviceInfo bleDeviceInfo = new BLEDeviceInfo();
+        public BLEDevice bleDevice = null;
 
         // software state
         public double[] wavelengths;

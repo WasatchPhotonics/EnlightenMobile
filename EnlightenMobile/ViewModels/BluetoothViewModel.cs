@@ -11,6 +11,7 @@ using Plugin.Permissions;
 using Plugin.Permissions.Abstractions;
 using Xamarin.Forms;
 using EnlightenMobile.Models;
+using System.Linq;
 
 namespace EnlightenMobile.ViewModels
 {
@@ -77,6 +78,8 @@ namespace EnlightenMobile.ViewModels
 
             scanCmd = new Command(() => { _ = doScanAsync(); });
             connectCmd = new Command(() => { _ = doConnectOrDisconnectAsync(); });
+            Task<bool> task = doDisconnectAsync();
+            task.Wait();
 
             spec.showConnectionProgress += showSpectrometerConnectionProgress;
     }
@@ -360,14 +363,31 @@ namespace EnlightenMobile.ViewModels
             logger.debug("attempting to disconnect");
             spec.disconnect();
 
-            if (bleDevice is null)
+            if (bleDevice is null && spec.bleDevice is null)
             {
                 logger.error("attempt to disconnect without bleDevice");
                 paired = false;
                 return false;
             }
 
-            await adapter.DisconnectDeviceAsync(bleDevice.device);
+            try { 
+                if(!(spec.bleDevice is null)) {
+                    // See https://github.com/xabre/xamarin-bluetooth-le/issues/311
+                    // I'm getting an exception but looking at the rpi it works
+                    // Using await hangs infinitely here though
+                    var device = spec.bleDevice.device;
+                    spec.bleDevice = null;
+                    adapter.DisconnectDeviceAsync(device).Start();
+                }
+                else {
+                    Console.WriteLine("Not disconnect through spec");
+                    await adapter.DisconnectDeviceAsync(bleDevice.device);
+                } 
+            }
+            catch {
+                Console.WriteLine("Issue with disconnect call");
+            }
+           
             paired = false;
             return true;
         }
@@ -547,6 +567,7 @@ namespace EnlightenMobile.ViewModels
             ////////////////////////////////////////////////////////////////////
 
             logger.debug("btnConnect_clicked done");
+            spec.bleDevice = bleDevice;
 
             // allow disconnect
             buttonConnectEnabled = true;

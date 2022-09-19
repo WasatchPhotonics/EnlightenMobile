@@ -168,7 +168,7 @@
 
                         <!-- Command buttons -->
                         <StackLayout Grid.Row="2" Grid.Column="0" Margin="2">
-                            <Button Text="Connect" Margin="5" Clicked="connectPage"/>
+                            <Button Text="{Binding bleBtnTxt}" Margin="5" Clicked="connectPage"/>
                             <FlexLayout
                                 Wrap="Wrap"
                                 AlignItems="Center"
