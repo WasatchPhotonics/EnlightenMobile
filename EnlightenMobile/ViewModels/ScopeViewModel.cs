@@ -63,8 +63,19 @@ namespace EnlightenMobile.ViewModels
                 new XAxisOption() { name = "wavenumber", unit = "cm⁻¹" }
             };
             xAxisOption = xAxisOptions[0];
+            updateBLEBtn();
 
             updateChart();
+        }
+
+        public void updateBLEBtn() {
+            Console.WriteLine("Calling ble btn update");
+            if(spec.bleDevice != null) {
+                bleBtnTxt = "Disconnect";
+            }
+            else {
+                bleBtnTxt = "Connect";
+            }
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -82,6 +93,15 @@ namespace EnlightenMobile.ViewModels
         {
             get => true;//spec.paired;
         }
+
+        public string bleBtnTxt {
+            get => _bleBtnTxt;
+            set {
+                _bleBtnTxt = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(bleBtnTxt)));
+            }
+        }
+        string _bleBtnTxt = "Connect";
 
         ////////////////////////////////////////////////////////////////////////
         // X-Axis
@@ -415,6 +435,7 @@ namespace EnlightenMobile.ViewModels
                 return false;
 
             // take a fresh Measurement
+            logger.debug("Attempting to take one averaged reading.");
             var startTime = DateTime.Now;
             var ok = await spec.takeOneAveragedAsync();
             if (ok)
@@ -571,34 +592,43 @@ namespace EnlightenMobile.ViewModels
             uint pixels = spec.pixels;
             double[] intensities = spec.measurement.processed;
 
-            // pick our x-axis
-            if (lastAxisType != null && lastAxisType == xAxisOption.name)
+            try
             {
-                // re-use previous axis
-            }
-            else 
-            { 
-                xAxis = null;
-                if (xAxisOption.name == "wavelength")
-                    xAxis = spec.wavelengths;
-                else if (xAxisOption.name == "wavenumber")
-                    xAxis = spec.wavenumbers;
-                else
-                    xAxis = spec.xAxisPixels;
+                // pick our x-axis
+                if (lastAxisType != null && lastAxisType == xAxisOption.name)
+                {
+                    // re-use previous axis
+                }
+                else 
+                { 
+                    xAxis = null;
+                    if (xAxisOption.name == "wavelength")
+                        xAxis = spec.wavelengths;
+                    else if (xAxisOption.name == "wavenumber")
+                        xAxis = spec.wavenumbers;
+                    else
+                        xAxis = spec.xAxisPixels;
 
-                lastAxisType = xAxisOption.name;
-            }
+                    lastAxisType = xAxisOption.name;
+                }
+                if (intensities is null || xAxis is null)
+                    return;
 
-            if (intensities is null || xAxis is null)
+                logger.info("populating ChartData");
+                var updateChartData = new ObservableCollection<ChartDataPoint>();
+                for (int i = 0; i < pixels; i++)
+                    updateChartData.Add(new ChartDataPoint() { intensity = intensities[i], xValue = xAxis[i] });
+                chartData = updateChartData;
+
+                xAxisMinimum = xAxis[0];
+                xAxisMaximum = xAxis[pixels-1];
                 return;
-
-            logger.info("populating ChartData");
-            chartData.Clear();
-            for (int i = 0; i < pixels; i++)
-                chartData.Add(new ChartDataPoint() { intensity = intensities[i], xValue = xAxis[i] });
-
-            xAxisMinimum = xAxis[0];
-            xAxisMaximum = xAxis[pixels-1];
+            }
+            catch
+            {
+                return;
+            }
+            
         }
 
         bool doAdd()

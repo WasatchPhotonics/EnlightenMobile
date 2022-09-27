@@ -11,6 +11,7 @@ using Plugin.Permissions;
 using Plugin.Permissions.Abstractions;
 using Xamarin.Forms;
 using EnlightenMobile.Models;
+using System.Linq;
 
 namespace EnlightenMobile.ViewModels
 {
@@ -77,6 +78,8 @@ namespace EnlightenMobile.ViewModels
 
             scanCmd = new Command(() => { _ = doScanAsync(); });
             connectCmd = new Command(() => { _ = doConnectOrDisconnectAsync(); });
+            Task<bool> task = doDisconnectAsync();
+            task.Wait();
 
             spec.showConnectionProgress += showSpectrometerConnectionProgress;
     }
@@ -346,13 +349,12 @@ namespace EnlightenMobile.ViewModels
             else
             {
                 paired = await doConnectAsync();
-
-                // @todo convert to Shell
-                // if (paired)
-                //     PageNav.getInstance().select("Scope");
+                if (paired)
+                {
+                    await Shell.Current.GoToAsync("..");
+                }
             }
             connectionProgress = 0;
-            await Shell.Current.GoToAsync("//scope");
             return true;
         }
 
@@ -361,14 +363,31 @@ namespace EnlightenMobile.ViewModels
             logger.debug("attempting to disconnect");
             spec.disconnect();
 
-            if (bleDevice is null)
+            if (bleDevice is null && spec.bleDevice is null)
             {
                 logger.error("attempt to disconnect without bleDevice");
                 paired = false;
                 return false;
             }
 
-            await adapter.DisconnectDeviceAsync(bleDevice.device);
+            try { 
+                if(!(spec.bleDevice is null)) {
+                    // See https://github.com/xabre/xamarin-bluetooth-le/issues/311
+                    // I'm getting an exception but looking at the rpi it works
+                    // Using await hangs infinitely here though
+                    var device = spec.bleDevice.device;
+                    spec.bleDevice = null;
+                    adapter.DisconnectDeviceAsync(device).Start();
+                }
+                else {
+                    Console.WriteLine("Not disconnect through spec");
+                    await adapter.DisconnectDeviceAsync(bleDevice.device);
+                } 
+            }
+            catch {
+                Console.WriteLine("Issue with disconnect call");
+            }
+           
             paired = false;
             return true;
         }
@@ -432,10 +451,13 @@ namespace EnlightenMobile.ViewModels
             connectionProgress = 0.05;
 
             // Step 6: connect to primary service
+            await bleDevice.device.RequestMtuAsync(256);
             logger.debug($"connecting to primary service {primaryServiceId}");
             service = await bleDevice.device.GetServiceAsync(primaryServiceId);
             if (service is null)
+            {
                 return logger.error($"did not find primary service {primaryServiceId}");
+            }
 
             logger.debug($"found primary service {service}");
 
@@ -500,15 +522,20 @@ namespace EnlightenMobile.ViewModels
                 foreach (var c in characteristics)
                 {
                     logger.debug($"reading {c.Name}");
-                    var data = await c.ReadAsync();
-                    if (data is null)
+                    // This line is required because for some reason attempting to read
+                    // the Service Changed service cause the program to get blocked here
+                    if(c.Name != "Service Changed")
                     {
-                        logger.error($"can't read {c.Uuid} ({c.Name})");
-                    }
-                    else
-                    {
-                        logger.hexdump(data, prefix: $"  {c.Uuid}: {c.Name} = ");
-                        spec.bleDeviceInfo.add(c.Name, Util.toASCII(data));
+                        var data = await c.ReadAsync();
+                        if (data is null)
+                        {
+                            logger.error($"can't read {c.Uuid} ({c.Name})");
+                        }
+                        else
+                        {
+                            logger.hexdump(data, prefix: $"  {c.Uuid}: {c.Name} = ");
+                            spec.bleDeviceInfo.add(c.Name, Util.toASCII(data));
+                        }
                     }
                 }
             }
@@ -540,6 +567,7 @@ namespace EnlightenMobile.ViewModels
             ////////////////////////////////////////////////////////////////////
 
             logger.debug("btnConnect_clicked done");
+            spec.bleDevice = bleDevice;
 
             // allow disconnect
             buttonConnectEnabled = true;

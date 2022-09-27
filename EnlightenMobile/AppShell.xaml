@@ -60,21 +60,7 @@
             </Grid>
         </DataTemplate>
     </Shell.FlyoutHeaderTemplate>
-    <FlyoutItem Title="About"
-                Icon="tab_about.png"
-                >
-        <ShellContent Route="about">
-            <views:MainPage/>
-        </ShellContent>
-    </FlyoutItem>
-    <FlyoutItem Title="BLE"
-                Icon="tab_ble.png"
-                >
-        <ShellContent Route="ble">
-            <views:BluetoothView />
-        </ShellContent>
-    </FlyoutItem>
-    <FlyoutItem Title="Scope"
+        <FlyoutItem Title="Scope"
                 Icon="tab_scope.png"
                 >
         <ShellContent Route="scope">
@@ -97,6 +83,13 @@
             <ShellContent  Route="log">
                 <views:LogView/>
             </ShellContent>
+        </Tab>
+        <Tab Title="About"
+                Icon="tab_about.png"
+                >
+        <ShellContent Route="about">
+            <views:MainPage/>
+        </ShellContent>
         </Tab>
     </FlyoutItem>
 </Shell>
