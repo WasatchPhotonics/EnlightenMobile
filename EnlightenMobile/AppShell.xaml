@@ -10,7 +10,7 @@
              BackgroundColor="#27c0a1"
              >
     <!-- Styling Definitions -->
-    <!-- Strangely, Xamarin maintains 2 separate styling areas for app and Shell -->
+    <!-- Strangely, Xamarin maintians 2 separate styling areas for app and Shell -->
     <Shell.Resources>
         <ResourceDictionary>
             <Style TargetType="Tab">
@@ -60,18 +60,21 @@
             </Grid>
         </DataTemplate>
     </Shell.FlyoutHeaderTemplate>
-    <FlyoutItem Title="Wasatch Photonics" Icon="tab_scope.png">
-        <Tab Title="Scope" Icon="tab_scope.png" >
-            <ShellContent Route="scope">
-                <views:ScopeView />
-            </ShellContent>
-        </Tab>
+        <FlyoutItem Title="Scope"
+                Icon="tab_scope.png"
+                >
+        <ShellContent Route="scope">
+            <views:ScopeView />
+        </ShellContent>
+    </FlyoutItem>
+    <FlyoutItem Title="Advanced"
+                Icon="tab_spec_settings.png">
         <Tab Title="App" Icon="tab_app_settings.png" >
             <ShellContent Route="settings">
                 <views:AppSettingsView />
             </ShellContent>
         </Tab>
-        <Tab Title="Device" Icon="tab_device.png">
+        <Tab Title="Device" Icon="tab_scope.png">
             <ShellContent  Route="specset">
                 <views:SpectrometerSettingsView/>
             </ShellContent>
