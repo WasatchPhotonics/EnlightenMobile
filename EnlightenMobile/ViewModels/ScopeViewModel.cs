@@ -219,6 +219,7 @@ namespace EnlightenMobile.ViewModels
             set
             {
                 spec.toggleDark();
+                spec.measurement.reload(spec);
                 updateChart();
             }
         }
@@ -621,14 +622,8 @@ namespace EnlightenMobile.ViewModels
                 logger.info("populating ChartData");
                 var updateChartData = new ObservableCollection<ChartDataPoint>();
 
-                if (darkEnabled)
-                    // perform dark subtraction
-                    for (int i = 0; i < pixels; i++)
-                        updateChartData.Add(new ChartDataPoint() { intensity = intensities[i] - spec.dark[i], xValue = xAxis[i] });
-                else
-                    for (int i = 0; i < pixels; i++)
-                        updateChartData.Add(new ChartDataPoint() { intensity = intensities[i], xValue = xAxis[i] });
-
+                for (int i = 0; i < pixels; i++)
+                    updateChartData.Add(new ChartDataPoint() { intensity = intensities[i], xValue = xAxis[i] });
 
                 chartData = updateChartData;
 
