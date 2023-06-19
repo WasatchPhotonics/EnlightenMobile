@@ -10,7 +10,7 @@
              BackgroundColor="#27c0a1"
              >
     <!-- Styling Definitions -->
-    <!-- Strangely, Xamarin maintains 2 separate styling areas for app and Shell -->
+    <!-- Strangely, Xamarin maintians 2 separate styling areas for app and Shell -->
     <Shell.Resources>
         <ResourceDictionary>
             <Style TargetType="Tab">
