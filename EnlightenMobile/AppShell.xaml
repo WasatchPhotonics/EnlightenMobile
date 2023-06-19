@@ -50,17 +50,7 @@
         </DataTemplate>
     </Shell.ItemTemplate>
     <!-- Application Heirarchy Layout -->
-    <Shell.FlyoutHeaderTemplate>
-        <DataTemplate>
-            <Grid BackgroundColor="#474747"
-              HeightRequest="200">
-                <Image Aspect="AspectFit"
-                   Source="enlightenLOGO.png"
-                   Opacity="1" />
-            </Grid>
-        </DataTemplate>
-    </Shell.FlyoutHeaderTemplate>
-    <FlyoutItem Title="Wasatch Photonics" Icon="tab_scope.png">
+    <TabBar>
         <Tab Title="Scope" Icon="tab_scope.png" >
             <ShellContent Route="scope">
                 <views:ScopeView />
@@ -88,5 +78,5 @@
             <views:MainPage/>
         </ShellContent>
         </Tab>
-    </FlyoutItem>
+    </TabBar>
 </Shell>
