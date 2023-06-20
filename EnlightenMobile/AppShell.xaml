@@ -50,31 +50,18 @@
         </DataTemplate>
     </Shell.ItemTemplate>
     <!-- Application Heirarchy Layout -->
-    <Shell.FlyoutHeaderTemplate>
-        <DataTemplate>
-            <Grid BackgroundColor="#474747"
-              HeightRequest="200">
-                <Image Aspect="AspectFit"
-                   Source="enlightenLOGO.png"
-                   Opacity="1" />
-            </Grid>
-        </DataTemplate>
-    </Shell.FlyoutHeaderTemplate>
-        <FlyoutItem Title="Scope"
-                Icon="tab_scope.png"
-                >
-        <ShellContent Route="scope">
-            <views:ScopeView />
-        </ShellContent>
-    </FlyoutItem>
-    <FlyoutItem Title="Advanced"
-                Icon="tab_spec_settings.png">
-        <Tab Title="Settings" Icon="tab_settings.png" >
+    <TabBar>
+        <Tab Title="Scope" Icon="tab_scope.png" >
+            <ShellContent Route="scope">
+                <views:ScopeView />
+            </ShellContent>
+        </Tab>
+        <Tab Title="App" Icon="tab_app_settings.png" >
             <ShellContent Route="settings">
                 <views:SettingsView />
             </ShellContent>
         </Tab>
-        <Tab Title="Device" Icon="tab_scope.png">
+        <Tab Title="Device" Icon="tab_device.png">
             <ShellContent  Route="specset">
                 <views:DeviceView/>
             </ShellContent>
@@ -91,5 +78,5 @@
             <views:AboutView/>
         </ShellContent>
         </Tab>
-    </FlyoutItem>
+    </TabBar>
 </Shell>
