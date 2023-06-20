@@ -43,11 +43,11 @@ namespace EnlightenMobile.Models
 
             if (spec.lastSpectrum is null)
             {
-                // for testing, default measurements with a sine-wave
+                // default measurement is zeroed out
                 raw = new double[spec.pixels];
                 double halfMax = 50000.0 / 2.0;
                 for (int x = 0; x < raw.Length; x++)
-                    raw[x] = halfMax + halfMax * Math.Sin(x * Math.PI * 2 / raw.Length);
+                    raw[x] = 0;
             }
             else
             {
