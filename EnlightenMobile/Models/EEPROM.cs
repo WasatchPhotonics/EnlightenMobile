@@ -13,7 +13,7 @@ namespace EnlightenMobile.Models
         /////////////////////////////////////////////////////////////////////////
 
         // This wouldn't normally be a Singleton; it is normally an attribute
-        // of Spectrometer.  However, since we have a SpectrometerSettingsViewModel
+        // of Spectrometer.  However, since we have a DeviceViewModel
         // that needs to inject its ObservableCollection<ViewableSettings> into
         // the EEPROM at launch, it seems simplest for now to have EEPROM
         // instantiated at launch, even before BLE connection has occured.
@@ -1024,7 +1024,7 @@ namespace EnlightenMobile.Models
         ////////////////////////////////////////////////////////////////////////
 
         // These functions register each EEPROM attribute's (name, value) pair
-        // into the ObservableCollection displayed on SpectrometerSettingsView.
+        // into the ObservableCollection displayed on DeviceView.
 
         void register(string name, bool   value) => register(name, value.ToString());
         void register(string name, float  value) => register(name, value.ToString());

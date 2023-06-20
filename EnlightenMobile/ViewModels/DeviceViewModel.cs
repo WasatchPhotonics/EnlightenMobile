@@ -13,14 +13,14 @@ namespace EnlightenMobile.ViewModels
     // 
     // This is the kind of verbose-yet-useless class that makes people hate MVVM.  
     // IF there's a way to obviate it, let me know.
-    public class SpectrometerSettingsViewModel : INotifyPropertyChanged
+    public class DeviceViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
         Spectrometer spec = Spectrometer.getInstance();
         Logger logger = Logger.getInstance();
 
-        public SpectrometerSettingsViewModel()
+        public DeviceViewModel()
         {
             // as Bluetooth device meta-characteristics are parsed during connection,
             // catch updates so this view is pre-populated 
@@ -62,11 +62,11 @@ namespace EnlightenMobile.ViewModels
         // Util
         ////////////////////////////////////////////////////////////////////////
 
-        // so we can update these from the SpectrometerSettingsView code-behind
+        // so we can update these from the DeviceView code-behind
         // on display, after changing spectrometers.
         public void refresh(string name = null)
         {
-            logger.debug($"refreshing SpectrometerSettingsViewModel ({name})");
+            logger.debug($"refreshing DeviceViewModel ({name})");
 
             if (name != null)
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

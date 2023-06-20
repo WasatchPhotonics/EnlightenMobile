@@ -12,9 +12,9 @@ namespace EnlightenMobile.Models
     // a bit of FileManager and common.py.
     //
     // @todo split Authentication into its own Model
-    public class AppSettings : INotifyPropertyChanged
+    public class Settings : INotifyPropertyChanged
     {
-        static AppSettings instance = null;
+        static Settings instance = null;
 
         public const string stars = "••••••••";
 
@@ -52,14 +52,14 @@ namespace EnlightenMobile.Models
         // Lifecycle
         ////////////////////////////////////////////////////////////////////////
 
-        static public AppSettings getInstance()
+        static public Settings getInstance()
         {
             if (instance is null)
-                instance = new AppSettings();
+                instance = new Settings();
             return instance;
         }
 
-        AppSettings()
+        Settings()
         {
             logger.info($"EnlightenMobile {version}");
             logger.info($"hostDescription = {hostDescription}");
@@ -116,7 +116,7 @@ namespace EnlightenMobile.Models
             {
                 _authenticated = value;
                 Preferences.Set("authenticated", value);
-                // notify anyone listening to AppSettings.authenticated, such as
+                // notify anyone listening to Settings.authenticated, such as
                 // ScopeViewModel (which uses this to decide whether to show the
                 // laserFiring switch, etc)
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(authenticated)));
@@ -124,9 +124,9 @@ namespace EnlightenMobile.Models
         }
         bool _authenticated;
 
-        // The user entered a new password on the AppSettingsView, and hit
+        // The user entered a new password on the SettingsView, and hit
         // return, so the View asked the ViewModel to authenticate it.  The
-        // AppSettingsViewModel then asked the Model to authenticate it.
+        // SettingsViewModel then asked the Model to authenticate it.
         //
         // Obviously this is not a way to conceal genuinely dangerous
         // functionality in an open-source project.  Programmers can access the

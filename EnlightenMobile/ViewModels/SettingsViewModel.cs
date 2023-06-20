@@ -5,17 +5,17 @@ using EnlightenMobile.Models;
 
 namespace EnlightenMobile.ViewModels
 {
-    // Provides the backing logic and bound properties shown on the AppSettingsView.
-    public class AppSettingsViewModel : INotifyPropertyChanged
+    // Provides the backing logic and bound properties shown on the SettingsView.
+    public class SettingsViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        AppSettings appSettings = AppSettings.getInstance();
+        Settings settings = Settings.getInstance();
 
         Spectrometer spec = Spectrometer.getInstance();
         Logger logger = Logger.getInstance();
 
-        public AppSettingsViewModel()
+        public SettingsViewModel()
         {
             laserWatchdogTimeoutSec = spec.laserWatchdogSec;
             laserDelayMS = spec.laserDelayMS;
@@ -31,13 +31,13 @@ namespace EnlightenMobile.ViewModels
             bool saveReferenceValue = Preferences.Get("saveReference", false);
             bool authValue = Preferences.Get("authenticated", false);
 
-            appSettings.savePixel = savePixelValue;
-            appSettings.saveWavelength = saveWavelengthValue;
-            appSettings.saveWavenumber = saveWavenumberValue;
-            appSettings.saveRaw = saveRawValue;
-            appSettings.saveDark = saveDarkValue;
-            appSettings.saveReference = saveReferenceValue;
-            appSettings.authenticated = authValue;
+            settings.savePixel = savePixelValue;
+            settings.saveWavelength = saveWavelengthValue;
+            settings.saveWavenumber = saveWavenumberValue;
+            settings.saveRaw = saveRawValue;
+            settings.saveDark = saveDarkValue;
+            settings.saveReference = saveReferenceValue;
+            settings.authenticated = authValue;
 
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(savePixel)));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(saveWavelength)));
@@ -55,61 +55,61 @@ namespace EnlightenMobile.ViewModels
 
         public bool savePixel 
         {
-            get => appSettings.savePixel;
+            get => settings.savePixel;
             set
             {
-                appSettings.savePixel = value;
+                settings.savePixel = value;
                 Preferences.Set("savePixel", value);
-                System.Console.WriteLine($"Changed save pixel to the following: {appSettings.savePixel.ToString()}");
+                System.Console.WriteLine($"Changed save pixel to the following: {settings.savePixel.ToString()}");
             }
         }
 
         public bool saveWavelength
         {
-            get => appSettings.saveWavelength;
+            get => settings.saveWavelength;
             set
             {
-                appSettings.saveWavelength = value;
+                settings.saveWavelength = value;
                 Preferences.Set("saveWavelength", value);
             }
         }
 
         public bool saveWavenumber 
         {
-            get => appSettings.saveWavenumber;
+            get => settings.saveWavenumber;
             set
             {
-                appSettings.saveWavenumber = value;
+                settings.saveWavenumber = value;
                 Preferences.Set("saveWavenumber", value);
             }
         }
 
         public bool saveRaw 
         {
-            get => appSettings.saveRaw;
+            get => settings.saveRaw;
             set
             {
-                appSettings.saveRaw = value;
+                settings.saveRaw = value;
                 Preferences.Set("saveRaw", value);
             }
         }
 
         public bool saveDark 
         {
-            get => appSettings.saveDark;
+            get => settings.saveDark;
             set
             {
-                appSettings.saveDark = value;
+                settings.saveDark = value;
                 Preferences.Set("saveDark", value);
             }
         }
 
         public bool saveReference 
         {
-            get => appSettings.saveReference;
+            get => settings.saveReference;
             set
             {
-                appSettings.saveReference = value;
+                settings.saveReference = value;
                 Preferences.Set("saveReference", value);
             }
         }
@@ -120,7 +120,7 @@ namespace EnlightenMobile.ViewModels
 
         public string password
         {
-            get => AppSettings.stars;
+            get => Settings.stars;
             set
             {
                 // We are not doing anything here, because we don't want to
@@ -133,13 +133,13 @@ namespace EnlightenMobile.ViewModels
 
         public bool isAuthenticated
         {
-            get => appSettings.authenticated;
+            get => settings.authenticated;
         }
 
         // the user entered a new password on the view, so authenticate it
         public void authenticate(string password)
         {
-            appSettings.authenticate(password);
+            settings.authenticate(password);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(isAuthenticated)));
         }
 

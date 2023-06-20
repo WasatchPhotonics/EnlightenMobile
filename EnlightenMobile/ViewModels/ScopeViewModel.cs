@@ -31,7 +31,7 @@ namespace EnlightenMobile.ViewModels
         ////////////////////////////////////////////////////////////////////////
 
         Spectrometer spec;
-        AppSettings appSettings;
+        Settings settings;
         Logger logger = Logger.getInstance();
         public delegate void UserNotification(string title, string message, string button);
         public event UserNotification notifyUser;
@@ -42,9 +42,9 @@ namespace EnlightenMobile.ViewModels
         public ScopeViewModel()
         {
             spec = Spectrometer.getInstance();
-            appSettings = AppSettings.getInstance();
+            settings = Settings.getInstance();
 
-            appSettings.PropertyChanged += handleAppSettingsChange;
+            settings.PropertyChanged += handleSettingsChange;
             spec.PropertyChanged += handleSpectrometerChange;
             spec.showAcquisitionProgress += showAcquisitionProgress; // closure?
 
@@ -269,14 +269,14 @@ namespace EnlightenMobile.ViewModels
         // logged-in.
         public bool isAuthenticated
         {
-            get => AppSettings.getInstance().authenticated;
+            get => Settings.getInstance().authenticated;
         }
 
-        // Provided so any changes to AppSettings.authenticated will immediately
+        // Provided so any changes to Settings.authenticated will immediately
         // take effect on our View.
-        void handleAppSettingsChange(object sender, PropertyChangedEventArgs e)
+        void handleSettingsChange(object sender, PropertyChangedEventArgs e)
         {
-            logger.debug($"SVM.handleAppSettingsChange: received notification from {sender}, so refreshing isAuthenticated");
+            logger.debug($"SVM.handleSettingsChange: received notification from {sender}, so refreshing isAuthenticated");
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(isAuthenticated)));
 
             updateLaserProperties();
@@ -381,8 +381,8 @@ namespace EnlightenMobile.ViewModels
                 var photo = await MediaPicker.CapturePhotoAsync();
                 logger.info($"Photo taken.");
                 DateTime timestamp = DateTime.Now;
-                AppSettings appSettings = AppSettings.getInstance();
-                string savePath = appSettings.getSavePath();
+                Settings settings = Settings.getInstance();
+                string savePath = settings.getSavePath();
                 var serialNumber = spec is null ? "sim" : spec.eeprom.serialNumber;
                 string measurementID = string.Format("enlighten-{0}-{1}",
                     timestamp.ToString("yyyyMMdd-HHmmss-ffffff"),

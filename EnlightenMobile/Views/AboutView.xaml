@@ -2,12 +2,12 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms" 
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
              xmlns:vm="clr-namespace:EnlightenMobile.ViewModels"
-             x:Class="EnlightenMobile.Views.MainPage"
+             x:Class="EnlightenMobile.Views.AboutView"
              BackgroundColor="#333"
              Title="{Binding title}">
 
     <ContentPage.BindingContext>
-        <vm:MainViewModel />
+        <vm:AboutViewModel />
     </ContentPage.BindingContext>
 
     <ContentPage.Resources>

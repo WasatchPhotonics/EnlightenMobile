@@ -94,8 +94,8 @@ namespace EnlightenMobile.Models
                 return false;
             }
 
-            AppSettings appSettings = AppSettings.getInstance();
-            string savePath = appSettings.getSavePath();
+            Settings settings = Settings.getInstance();
+            string savePath = settings.getSavePath();
             if (savePath is null)
             {
                 logger.error("saveAsync: can't get savePath");
@@ -117,10 +117,10 @@ namespace EnlightenMobile.Models
 
         void writeMetadata(StreamWriter sw)
         { 
-            var appSettings = AppSettings.getInstance();
+            var settings = Settings.getInstance();
 
             // not the full ENLIGHTEN set, but the key ones for now
-            sw.WriteLine("ENLIGHTEN Version, Mobile {0} for {1}", appSettings.version, appSettings.os);
+            sw.WriteLine("ENLIGHTEN Version, Mobile {0} for {1}", settings.version, settings.os);
             sw.WriteLine("Measurement ID, {0}", measurementID);
             sw.WriteLine("Serial Number, {0}", spec.eeprom.serialNumber);
             sw.WriteLine("Model, {0}", spec.eeprom.model);
@@ -138,7 +138,7 @@ namespace EnlightenMobile.Models
             // a few that ENLIGHTEN doesn't have...
             ////////////////////////////////////////////////////////////////////
 
-            sw.WriteLine("Host Description, {0}", appSettings.hostDescription);
+            sw.WriteLine("Host Description, {0}", settings.hostDescription);
             if (location != null)
                 sw.WriteLine("Location, lat {0}, lon {1}", location.Latitude, location.Longitude);
         }
@@ -155,17 +155,17 @@ namespace EnlightenMobile.Models
         void writeSpectra(StreamWriter sw)
         { 
             logger.debug("writeSpectra: starting");
-            AppSettings appSettings = AppSettings.getInstance();
+            Settings settings = Settings.getInstance();
 
             List<string> headers = new List<string>();
 
-            if (appSettings.savePixel     ) headers.Add("Pixel");
-            if (appSettings.saveWavelength) headers.Add("Wavelength");
-            if (appSettings.saveWavenumber) headers.Add("Wavenumber");
+            if (settings.savePixel     ) headers.Add("Pixel");
+            if (settings.saveWavelength) headers.Add("Wavelength");
+            if (settings.saveWavenumber) headers.Add("Wavenumber");
                                             headers.Add("Processed");
-            if (appSettings.saveRaw       ) headers.Add("Raw");
-            if (appSettings.saveDark      ) headers.Add("Dark");
-            if (appSettings.saveReference ) headers.Add("Reference");
+            if (settings.saveRaw       ) headers.Add("Raw");
+            if (settings.saveDark      ) headers.Add("Dark");
+            if (settings.saveReference ) headers.Add("Reference");
 
             // reference-based techniques should output higher precision
             string fmt = reference is null ? "f2" : "f5";
@@ -176,13 +176,13 @@ namespace EnlightenMobile.Models
             {
                 List<string> values = new List<string>();
 
-                if (appSettings.savePixel     ) values.Add(i.ToString());
-                if (appSettings.saveWavelength) values.Add(render(spec.wavelengths, i));
-                if (appSettings.saveWavenumber) values.Add(render(spec.wavenumbers, i));
+                if (settings.savePixel     ) values.Add(i.ToString());
+                if (settings.saveWavelength) values.Add(render(spec.wavelengths, i));
+                if (settings.saveWavenumber) values.Add(render(spec.wavenumbers, i));
                                                 values.Add(render(processed, i, fmt));
-                if (appSettings.saveRaw       ) values.Add(render(raw, i));
-                if (appSettings.saveDark      ) values.Add(render(dark, i));
-                if (appSettings.saveReference ) values.Add(render(reference, i));
+                if (settings.saveRaw       ) values.Add(render(raw, i));
+                if (settings.saveDark      ) values.Add(render(dark, i));
+                if (settings.saveReference ) values.Add(render(reference, i));
 
                 sw.WriteLine(string.Join(", ", values));
             }

@@ -8,10 +8,10 @@ using EnlightenMobile.Models;
 namespace EnlightenMobile.Views
 {
     /// <summary>
-    /// Code-behind for SpectrometerSettingsView.xaml.
+    /// Code-behind for DeviceView.xaml.
     /// </summary>
     /// <remarks>
-    /// This is the View for SpectrometerSettings, which currently means the EEPROM.  
+    /// This is the View for Device, which currently means the EEPROM.  
     /// (FPGA Compilation Options, firmware revisions etc can be added later.)
     ///
     /// Note this class owns and instantiates the actual ObservableCollection of 
@@ -24,30 +24,30 @@ namespace EnlightenMobile.Views
     /// viewableSettings collection.
     ///
     /// However, the display of any one particular ViewableSetting is mediated
-    /// through the SpectrometerSettingsViewModel, which allows for any transforms
+    /// through the DeviceViewModel, which allows for any transforms
     /// between the raw Model data (ViewableSetting) and the display version shown
     /// on the View.  In this case, we're not applying any transforms or display
     /// logic (ViewableSetting is internally stored as a string tuple, with no
     /// transformations required), but this is the MVVM architecture.  
     ///
-    /// Note that the XAML directs the binding context to the SpectrometerSettingsViewModel,
+    /// Note that the XAML directs the binding context to the DeviceViewModel,
     /// but the XAML ListSettings can reference attributes directly within the ViewModel's
     /// public ViewableSetting object.
     /// </remarks>
     /// <todo>
-    /// Make a new SpectrometerSettingsModel class, which "has" an EEPROM, but 
+    /// Make a new DeviceModel class, which "has" an EEPROM, but 
     /// also FPGACompilationOptions, FirmwareRevisions (µC/FPGA ver), BatteryStatus
     /// etc objects, and which populates the ObservableCollection from all of them.
     /// </todo>
-    public partial class SpectrometerSettingsView : ContentPage
+    public partial class DeviceView : ContentPage
     {
         ObservableCollection<ViewableSetting> viewableSettingsEEPROM;
 
-        SpectrometerSettingsViewModel ssvm;
+        DeviceViewModel ssvm;
 
         Logger logger = Logger.getInstance();
 
-        public SpectrometerSettingsView()
+        public DeviceView()
         {
             InitializeComponent();
 
@@ -59,7 +59,7 @@ namespace EnlightenMobile.Views
 
             listViewEEPROM.ItemsSource = viewableSettingsEEPROM;
 
-            ssvm = (SpectrometerSettingsViewModel)BindingContext;
+            ssvm = (DeviceViewModel)BindingContext;
         }
 
         // so the latest BLEDeviceInfo fields will be displayed
@@ -68,7 +68,7 @@ namespace EnlightenMobile.Views
         //       visit this page?
         protected override void OnAppearing()
         {
-            logger.debug("displaying SpectrometerSettingsView");
+            logger.debug("displaying DeviceView");
             base.OnAppearing();
             ssvm.refresh();
         }

@@ -7,11 +7,11 @@ using EnlightenMobile.Models;
 
 namespace EnlightenMobile.ViewModels
 {
-    public class MainViewModel : INotifyPropertyChanged
+    public class AboutViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        AppSettings appSettings = AppSettings.getInstance();
+        Settings settings = Settings.getInstance();
 
         Logger logger = Logger.getInstance();
 
@@ -19,9 +19,9 @@ namespace EnlightenMobile.ViewModels
         // Lifecycle
         ////////////////////////////////////////////////////////////////////////
 
-        public MainViewModel()
+        public AboutViewModel()
         {
-            OpenWebCommand = new Command(async () => await Browser.OpenAsync(appSettings.companyURL));
+            OpenWebCommand = new Command(async () => await Browser.OpenAsync(settings.companyURL));
         }
 
         ////////////////////////////////////////////////////////////////////////

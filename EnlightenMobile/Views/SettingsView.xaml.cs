@@ -7,17 +7,17 @@ using EnlightenMobile.ViewModels;
 namespace EnlightenMobile.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class AppSettingsView : ContentPage
+    public partial class SettingsView : ContentPage
     {
-        AppSettingsViewModel asvm;
+        SettingsViewModel asvm;
 
         Logger logger = Logger.getInstance();
 
-        public AppSettingsView()
+        public SettingsView()
         {
             InitializeComponent();
 
-            asvm = (AppSettingsViewModel)BindingContext;
+            asvm = (SettingsViewModel)BindingContext;
             asvm.loadSettings();
         }
 
@@ -26,7 +26,7 @@ namespace EnlightenMobile.Views
         void entryPassword_Completed(Object sender, EventArgs e)
         {
             var password = entryPassword.Text;
-            entryPassword.Text = AppSettings.stars;
+            entryPassword.Text = Settings.stars;
             asvm.authenticate(password);
         }
 

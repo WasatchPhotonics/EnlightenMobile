@@ -9,9 +9,9 @@ namespace EnlightenMobile.Views
     /// </summary>
     /// <remarks>This was AboutPage in 1.x</remarks>
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class MainPage : ContentPage
+    public partial class AboutView : ContentPage
     {
-        public MainPage()
+        public AboutView()
         {
             InitializeComponent();
         }

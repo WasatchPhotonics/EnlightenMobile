@@ -69,14 +69,14 @@
     </FlyoutItem>
     <FlyoutItem Title="Advanced"
                 Icon="tab_spec_settings.png">
-        <Tab Title="App" Icon="tab_app_settings.png" >
+        <Tab Title="Settings" Icon="tab_settings.png" >
             <ShellContent Route="settings">
-                <views:AppSettingsView />
+                <views:SettingsView />
             </ShellContent>
         </Tab>
         <Tab Title="Device" Icon="tab_scope.png">
             <ShellContent  Route="specset">
-                <views:SpectrometerSettingsView/>
+                <views:DeviceView/>
             </ShellContent>
         </Tab>
         <Tab Title="Log" Icon="tab_log.png">
@@ -88,7 +88,7 @@
                 Icon="tab_about.png"
                 >
         <ShellContent Route="about">
-            <views:MainPage/>
+            <views:AboutView/>
         </ShellContent>
         </Tab>
     </FlyoutItem>

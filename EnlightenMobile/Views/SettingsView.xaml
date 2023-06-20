@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms" 
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
              xmlns:vm="clr-namespace:EnlightenMobile.ViewModels"
-             x:Class="EnlightenMobile.Views.AppSettingsView"
+             x:Class="EnlightenMobile.Views.SettingsView"
              xmlns:telerikDataControls="clr-namespace:Telerik.XamarinForms.DataControls;assembly=Telerik.XamarinForms.DataControls"
              xmlns:telerikPrimitives="clr-namespace:Telerik.XamarinForms.Primitives;assembly=Telerik.XamarinForms.Primitives"
              xmlns:telerikChart="clr-namespace:Telerik.XamarinForms.Chart;assembly=Telerik.XamarinForms.Chart"
@@ -13,7 +13,7 @@
              <!-- Title="💾" -->
              
     <ContentPage.BindingContext>
-        <vm:AppSettingsViewModel/>
+        <vm:SettingsViewModel/>
     </ContentPage.BindingContext>
     
     <ContentPage.Content>

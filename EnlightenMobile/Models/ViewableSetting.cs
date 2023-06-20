@@ -1,7 +1,7 @@
 ﻿namespace EnlightenMobile.Models
 {
     // This class provides the bridge for displaying tuples from the EEPROM's 
-    // Model to the the SpectrometerSettingsView's ListView.
+    // Model to the the DeviceView's ListView.
     public class ViewableSetting
     {
         public string name  { get; set; }
