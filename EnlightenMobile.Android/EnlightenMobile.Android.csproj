@@ -118,7 +118,7 @@
       <Generator>
       </Generator>
     </AndroidResource>
-    <AndroidResource Include="Resources\drawable\tab_app_settings.png">
+    <AndroidResource Include="Resources\drawable\tab_settings.png">
       <SubType>
       </SubType>
       <Generator>
@@ -154,6 +154,9 @@
       <Project>{61AD8B13-2EE8-43AB-8150-F28A7CDE8305}</Project>
       <Name>EnlightenMobile</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\tab_device.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <ProjectExtensions>

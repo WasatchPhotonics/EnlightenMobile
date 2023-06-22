@@ -89,8 +89,8 @@ namespace EnlightenMobile
 
             if (pathname is null)
             {
-                AppSettings appSettings = AppSettings.getInstance();
-                var dir = appSettings.getSavePath();
+                Settings Settings = Settings.getInstance();
+                var dir = Settings.getSavePath();
                 if (dir is null)
                 {
                     Console.WriteLine("no path available to save log");

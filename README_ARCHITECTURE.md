@@ -25,7 +25,7 @@ human operator to act as "Controller" via the View):
 
 - Model (Data)
     - Basically, the underlying data regarding Spectrometer state (including the
-      EEPROM), any Measurements that have been taken, AppSettings (configuration
+      EEPROM), any Measurements that have been taken, Settings (configuration
       of the ENLIGHTEN Android application itself, similar to enlighten.ini), etc.
 
 - View (GUI)
