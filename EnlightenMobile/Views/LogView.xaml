@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="EnlightenMobile.Views.LogView"
              xmlns:vm="clr-namespace:EnlightenMobile.ViewModels"
-             Title="{Binding title}"
+             Shell.NavBarIsVisible="False"
              BackgroundColor="#eee">
              <!-- Title="📋" -->
 

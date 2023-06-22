@@ -63,19 +63,8 @@ namespace EnlightenMobile.ViewModels
                 new XAxisOption() { name = "wavenumber", unit = "cm⁻¹" }
             };
             xAxisOption = xAxisOptions[0];
-            updateBLEBtn();
 
             updateChart();
-        }
-
-        public void updateBLEBtn() {
-            Console.WriteLine("Calling ble btn update");
-            if(spec.bleDevice != null) {
-                bleBtnTxt = "Disconnect";
-            }
-            else {
-                bleBtnTxt = "Connect";
-            }
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -84,24 +73,10 @@ namespace EnlightenMobile.ViewModels
         //
         ////////////////////////////////////////////////////////////////////////
 
-        public string title
-        {
-            get => "Scope Mode";
-        }
-
         public bool paired
         {
             get => true;//spec.paired;
         }
-
-        public string bleBtnTxt {
-            get => _bleBtnTxt;
-            set {
-                _bleBtnTxt = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(bleBtnTxt)));
-            }
-        }
-        string _bleBtnTxt = "Connect";
 
         ////////////////////////////////////////////////////////////////////////
         // X-Axis

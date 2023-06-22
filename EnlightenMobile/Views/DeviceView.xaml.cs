@@ -61,6 +61,10 @@ namespace EnlightenMobile.Views
 
             ssvm = (DeviceViewModel)BindingContext;
         }
+        private async void connectPage(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new BluetoothView());
+        }
 
         // so the latest BLEDeviceInfo fields will be displayed
         // 

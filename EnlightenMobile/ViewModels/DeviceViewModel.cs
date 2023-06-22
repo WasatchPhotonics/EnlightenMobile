@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
+using Xamarin.Forms;
 using System.Runtime.CompilerServices;
 using EnlightenMobile.Models;
 
@@ -13,18 +15,48 @@ namespace EnlightenMobile.ViewModels
     // 
     // This is the kind of verbose-yet-useless class that makes people hate MVVM.  
     // IF there's a way to obviate it, let me know.
-    public class DeviceViewModel : INotifyPropertyChanged
+    public class DeviceViewModel : ContentPage, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
         Spectrometer spec = Spectrometer.getInstance();
         Logger logger = Logger.getInstance();
+        
+        public string bleBtnTxt
+        {
+            get => _bleBtnTxt;
+            set
+            {
+                _bleBtnTxt = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(bleBtnTxt)));
+            }
+        }
+        string _bleBtnTxt = "Connect";
+
+        protected override void OnAppearing()
+        {
+            updateBLEBtn();
+        }
 
         public DeviceViewModel()
         {
             // as Bluetooth device meta-characteristics are parsed during connection,
             // catch updates so this view is pre-populated 
             spec.bleDeviceInfo.PropertyChanged += bleDeviceUpdate;
+            updateBLEBtn();
+        }
+
+        public void updateBLEBtn()
+        {
+            Console.WriteLine("Calling ble btn update");
+            if (spec.bleDevice != null)
+            {
+                bleBtnTxt = "Disconnect";
+            }
+            else
+            {
+                bleBtnTxt = "Connect";
+            }
         }
 
         // the BluetoothView code-behind has registered some metadata, so update 

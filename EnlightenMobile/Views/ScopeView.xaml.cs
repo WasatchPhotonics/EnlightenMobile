@@ -46,11 +46,6 @@ namespace EnlightenMobile.Views
             svm.PropertyChanged += viewModelPropertyChanged;
         }
 
-        protected override void OnAppearing()
-        {
-            svm.updateBLEBtn();
-        }
-
         private void viewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             var name = e.PropertyName;
@@ -238,11 +233,6 @@ namespace EnlightenMobile.Views
         private void qrScan(object sender, EventArgs e)
         {
             performQRScan();
-        }
-
-        private async void connectPage(object sender, EventArgs e)
-        {
-            await Navigation.PushAsync(new BluetoothView());
         }
 
         private void photoCapture(object sender, EventArgs e)

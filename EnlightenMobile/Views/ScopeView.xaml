@@ -8,12 +8,10 @@
 
              x:Class="EnlightenMobile.Views.ScopeView"
              xmlns:vm="clr-namespace:EnlightenMobile.ViewModels"
-             Title="{Binding title}"
              BackgroundColor="#333"
-             xmlns:telerikDataControls="clr-namespace:Telerik.XamarinForms.DataControls;assembly=Telerik.XamarinForms.DataControls"
-             xmlns:telerikPrimitives="clr-namespace:Telerik.XamarinForms.Primitives;assembly=Telerik.XamarinForms.Primitives"
              xmlns:telerikChart="clr-namespace:Telerik.XamarinForms.Chart;assembly=Telerik.XamarinForms.Chart"
-             xmlns:telerikInput="clr-namespace:Telerik.XamarinForms.Input;assembly=Telerik.XamarinForms.Input">
+             xmlns:telerikInput="clr-namespace:Telerik.XamarinForms.Input;assembly=Telerik.XamarinForms.Input"
+             Shell.NavBarIsVisible="False">
 
     <ContentPage.Resources>
 	    <ResourceDictionary>
@@ -168,7 +166,7 @@
 
                         <!-- Command buttons -->
                         <StackLayout Grid.Row="2" Grid.Column="0" Margin="2">
-                            <Button Text="{Binding bleBtnTxt}" Margin="5" Clicked="connectPage"/>
+                            
                             <FlexLayout
                                 Wrap="Wrap"
                                 AlignItems="Center"
@@ -179,10 +177,11 @@
                                                        TextColor="{Binding acquireButtonTextColor}" 
                                                        BackgroundColor="{Binding acquireButtonBackgroundColor}" />
                                 <Button Margin="2" Text="Save" Command="{Binding saveCmd}" />
-                                <Button Margin="2" Text="Add" Command="{Binding addCmd}" />
-                                <Button Margin="2" Text="Clear" Command="{Binding clearCmd}" />
-                                <Button Margin="2" Text="QR" Clicked="qrScan" />
-                                <Button Margin="2" Text="Photo" Clicked="photoCapture" />
+
+                                <!-- <Button Margin="2" Text="Add" Command="{Binding addCmd}" /> -->
+                                <!-- <Button Margin="2" Text="Clear" Command="{Binding clearCmd}" /> -->
+                                <!-- <Button Margin="2" Text="QR" Clicked="qrScan" /> -->
+                                <!-- <Button Margin="2" Text="Photo" Clicked="photoCapture" /> -->
                             </FlexLayout>
                         </StackLayout>
 
