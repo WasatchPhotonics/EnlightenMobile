@@ -74,6 +74,7 @@ namespace EnlightenMobile.Views
         {
             logger.debug("displaying DeviceView");
             base.OnAppearing();
+            ssvm.updateBLEBtn();
             ssvm.refresh();
         }
     }

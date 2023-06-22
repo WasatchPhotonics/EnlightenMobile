@@ -15,7 +15,7 @@ namespace EnlightenMobile.ViewModels
     // 
     // This is the kind of verbose-yet-useless class that makes people hate MVVM.  
     // IF there's a way to obviate it, let me know.
-    public class DeviceViewModel : ContentPage, INotifyPropertyChanged
+    public class DeviceViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -32,11 +32,6 @@ namespace EnlightenMobile.ViewModels
             }
         }
         string _bleBtnTxt = "Connect";
-
-        protected override void OnAppearing()
-        {
-            updateBLEBtn();
-        }
 
         public DeviceViewModel()
         {
