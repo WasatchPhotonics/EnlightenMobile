@@ -1,5 +1,7 @@
 # Version History
 
+- 2023-06-23 1.2.0
+    - Continue UI redesign
 - 2022-09-19 1.1.0
     - New UI design
     - Merge in RPi Fix
