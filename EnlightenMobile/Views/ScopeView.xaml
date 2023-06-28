@@ -59,7 +59,7 @@
 
 
                 <!-- ======================================================= -->
-                <!-- The all-important spectral chart -->
+                <!-- The all-important spectral chart                        -->
                 <!-- ======================================================= -->
 
                 <telerikChart:RadCartesianChart x:Name="chart"
@@ -190,32 +190,30 @@
 
                         <!-- integration time -->
                         <StackLayout>
-                            <Label Text="Integration Time = 3ms"
+                            <Label Text="{Binding label_integration}"
                                    HorizontalOptions="Center"
                                    VerticalOptions="CenterAndExpand" />
 
-                            <Slider Maximum="5000" />
-                            <!--  ValueChanged="OnSliderValueChanged" -->
+                            <!-- You must set the Maximum value before the Minimum -->
+                            <Slider x:Name="IntegrationTimeMsSlider" Value="500" Maximum="5000"  Minimum="1"  ValueChanged="Callback_IntegrationTimeMS"/>
                         </StackLayout>
 
                         <!-- gain -->
                         <StackLayout>
-                            <Label Text="Gain = 16dB"
+                            <Label Text="{Binding label_gain}"
                                    HorizontalOptions="Center"
                                    VerticalOptions="CenterAndExpand" />
 
-                            <Slider Maximum="5000" />
-                            <!--  ValueChanged="OnSliderValueChanged" -->
+                            <Slider x:Name="GainDBSlider"  Value="16" Maximum="72" Minimum="0" ValueChanged="Callback_GainDb" />
                         </StackLayout>
 
                         <!-- averaging -->
                         <StackLayout>
-                            <Label Text="Scans to Average = 1"
+                            <Label Text="{Binding label_averaging}"
                                    HorizontalOptions="Center"
                                    VerticalOptions="CenterAndExpand" />
 
-                            <Slider Maximum="5000" />
-                            <!--  ValueChanged="OnSliderValueChanged" -->
+                            <Slider x:Name="ScanAveragingSlider" Value="1" Maximum="1000" Minimum="1" ValueChanged="Callback_ScansToAverage"/>
                         </StackLayout>
                     </StackLayout>
                 </Grid>

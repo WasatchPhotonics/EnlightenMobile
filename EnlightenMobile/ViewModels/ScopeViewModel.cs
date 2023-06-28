@@ -24,7 +24,10 @@ namespace EnlightenMobile.ViewModels
         // sure what the "best practice" architecture would be.
         public delegate void ToastNotification(string msg);
         public event ToastNotification notifyToast;
-        
+
+        public string label_integration { get => "Integration Time = " + spec.integrationTimeMS + "ms"; }
+        public string label_gain { get => "Gain = " + spec.gainDb + "db"; }
+        public string label_averaging { get => "Scan Average = " + spec.scansToAverage; }
 
         ////////////////////////////////////////////////////////////////////////
         // Private attributes
@@ -127,18 +130,17 @@ namespace EnlightenMobile.ViewModels
         // integrationTimeMS
         ////////////////////////////////////////////////////////////////////////
 
-        public string integrationTimeMS 
+        public UInt32 integrationTimeMS 
         {
-            get => spec.integrationTimeMS.ToString();
+            get => spec.integrationTimeMS;
             set { }
         }
 
         // the ScopeView's code-behind has registered that a final value has
         // been entered into the Entry (hit return), so latch it
-        public void setIntegrationTimeMS(string s)
+        public void setIntegrationTimeMS(UInt32 value)
         {
-            if (UInt32.TryParse(s, out UInt32 value))
-                spec.integrationTimeMS = value;
+            spec.integrationTimeMS = value;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(integrationTimeMS)));
         }
         
@@ -148,18 +150,17 @@ namespace EnlightenMobile.ViewModels
         // gainDb
         ////////////////////////////////////////////////////////////////////////
 
-        public string gainDb
+        public float gainDb
         {
-            get => spec.gainDb.ToString();
+            get => spec.gainDb;
             set { }
         }
 
         // the ScopeView's code-behind has registered that a final value has
         // been entered into the Entry (hit return), so latch it
-        public void setGainDb(string s)
+        public void setGainDb(float value)
         {
-            if (float.TryParse(s, out float value))
-                spec.gainDb = value;
+            spec.gainDb = value;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(gainDb)));
         }
 
@@ -167,21 +168,18 @@ namespace EnlightenMobile.ViewModels
         // scansToAverage
         ////////////////////////////////////////////////////////////////////////
 
-        public string scansToAverage
+        public UInt32 scansToAverage
         {
-            get => spec.scansToAverage.ToString();
+            get => spec.scansToAverage;
             set { }
         }
 
         // the ScopeView's code-behind has registered that a final value has
         // been entered into the Entry (hit return), so latch it
-        public void setScansToAverage(string s)
+        public void setScansToAverage(UInt32 value)
         {
-            if (ushort.TryParse(s, out ushort value))
-            {
-                spec.scansToAverage = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(scansToAverage)));
-            }
+            spec.scansToAverage = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(scansToAverage)));
         }
 
         ////////////////////////////////////////////////////////////////////////
