@@ -10,6 +10,7 @@ using Telerik.XamarinForms.Chart;
 using System.IO;
 using Plugin.Permissions;
 using Plugin.Permissions.Abstractions;
+using Telerik.Windows.Documents.Spreadsheet.Expressions.Functions;
 
 namespace EnlightenMobile.ViewModels
 {
@@ -33,7 +34,7 @@ namespace EnlightenMobile.ViewModels
         // Private attributes
         ////////////////////////////////////////////////////////////////////////
 
-        Spectrometer spec;
+        public Spectrometer spec;
         Settings settings;
         Logger logger = Logger.getInstance();
         public delegate void UserNotification(string title, string message, string button);
@@ -143,25 +144,17 @@ namespace EnlightenMobile.ViewModels
             spec.integrationTimeMS = value;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(integrationTimeMS)));
         }
-        
-
 
         ////////////////////////////////////////////////////////////////////////
         // gainDb
         ////////////////////////////////////////////////////////////////////////
-
-        public float gainDb
-        {
-            get => spec.gainDb;
-            set { }
-        }
 
         // the ScopeView's code-behind has registered that a final value has
         // been entered into the Entry (hit return), so latch it
         public void setGainDb(float value)
         {
             spec.gainDb = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(gainDb)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(spec.gainDb)));
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -681,7 +674,7 @@ namespace EnlightenMobile.ViewModels
             else if (name == "integrationTimeMS")
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(integrationTimeMS)));
             else if (name == "gainDb")
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(gainDb)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(spec.gainDb)));
             else if (name == "laserState" || name == "ramanModeEnabled" || name == "laserEnabled")
                 updateLaserProperties();
         }

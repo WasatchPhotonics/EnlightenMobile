@@ -56,20 +56,34 @@ namespace EnlightenMobile.Views
         void Callback_IntegrationTimeMS(Object sender, EventArgs e)
         {
             var slider = sender as Slider;
-            svm.setIntegrationTimeMS((uint)slider.Value);
+
+            // snap to multiples of 100ms
+            uint s = (uint) (slider.Value / 100 + .5);
+            s *= 100;
+
+            // exception, instead of 0ms, the lowest is 1ms
+            if (s == 0) s = 1;
+
+            svm.spec.integrationTimeMS = s;
+            Label LabelIntegrationTime = this.FindByName("LabelIntegrationTime") as Label;
+            LabelIntegrationTime.Text = svm.label_integration;
         }
 
         void Callback_GainDb(Object sender, EventArgs e)
         {
             var slider = sender as Slider;
-            svm.setGainDb((float)slider.Value);
+            svm.spec.gainDb = (int)(slider.Value+.5);
+            Label LabelGain = this.FindByName("LabelGain") as Label;
+            LabelGain.Text = svm.label_gain;
         }
         async void notifyUserAsync(string title, string message, string button) =>
            await DisplayAlert(title, message, button);
         void Callback_ScansToAverage(Object sender, EventArgs e)
         {
             var slider = sender as Slider;
-            svm.setScansToAverage((uint)slider.Value);
+            svm.spec.scansToAverage = (uint)(slider.Value + .5);
+            Label LabelScanAveraging = this.FindByName("LabelScanAveraging") as Label;
+            LabelScanAveraging.Text = svm.label_averaging;
         }
 
         ////////////////////////////////////////////////////////////////////////

@@ -364,7 +364,7 @@ namespace EnlightenMobile.Models
             get => _nextGainDb;
             set 
             { 
-                if (value > 0 && value < 256)
+                if (value >= 0 && value < 256)
                 {
                     _nextGainDb = value;
                     logger.debug($"Spectrometer.gainDb: next = {value}");

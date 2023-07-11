@@ -190,30 +190,33 @@
 
                         <!-- integration time -->
                         <StackLayout>
-                            <Label Text="{Binding label_integration}"
+                            <Label x:Name="LabelIntegrationTime"
+                                   Text="{Binding label_integration}"
                                    HorizontalOptions="Center"
                                    VerticalOptions="CenterAndExpand" />
 
                             <!-- You must set the Maximum value before the Minimum -->
-                            <Slider x:Name="IntegrationTimeMsSlider" Value="500" Maximum="5000"  Minimum="1"  ValueChanged="Callback_IntegrationTimeMS"/>
+                            <Slider x:Name="IntegrationTimeMsSlider" Maximum="5000"  Minimum="1" Value="500" ValueChanged="Callback_IntegrationTimeMS" ThumbImageSource="thumb.png"/>
                         </StackLayout>
 
                         <!-- gain -->
                         <StackLayout>
-                            <Label Text="{Binding label_gain}"
+                            <Label x:Name="LabelGain"
+                                   Text="{Binding label_gain}"
                                    HorizontalOptions="Center"
                                    VerticalOptions="CenterAndExpand" />
 
-                            <Slider x:Name="GainDBSlider"  Value="16" Maximum="72" Minimum="0" ValueChanged="Callback_GainDb" />
+                            <Slider x:Name="GainDBSlider"  Maximum="72" Minimum="0" Value="16" ValueChanged="Callback_GainDb" ThumbImageSource="thumb.png" />
                         </StackLayout>
 
                         <!-- averaging -->
                         <StackLayout>
-                            <Label Text="{Binding label_averaging}"
+                            <Label x:Name="LabelScanAveraging"
+                                   Text="{Binding label_averaging}"
                                    HorizontalOptions="Center"
                                    VerticalOptions="CenterAndExpand" />
 
-                            <Slider x:Name="ScanAveragingSlider" Value="1" Maximum="1000" Minimum="1" ValueChanged="Callback_ScansToAverage"/>
+                            <Slider x:Name="ScanAveragingSlider" Maximum="32" Minimum="1" Value="1" ValueChanged="Callback_ScansToAverage" ThumbImageSource="thumb.png"/>
                         </StackLayout>
                     </StackLayout>
                 </Grid>
