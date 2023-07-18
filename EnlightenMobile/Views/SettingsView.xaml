@@ -52,17 +52,6 @@
                         <Switch IsToggled="{Binding saveReference}" HorizontalOptions="EndAndExpand" />
                     </StackLayout>
 
-                    <Label Text="Advanced Features" FontSize="Large"/>
-
-                    <FlexLayout JustifyContent="SpaceBetween">
-                        <Label Text="Password" />
-                        <Entry Text="{Binding password}"
-                               x:Name="entryPassword"
-                               HorizontalTextAlignment="Center"
-                               Focused="entry_Focused"
-                               Completed="entryPassword_Completed"
-                               WidthRequest="200" />
-                    </FlexLayout>
                     <FlexLayout JustifyContent="SpaceBetween" IsVisible="{Binding isAuthenticated}">
                         <Label Text="Laser Watchdog Timeout (sec)" />
                         <Entry Text="{Binding laserWatchdogTimeoutSec}" 
