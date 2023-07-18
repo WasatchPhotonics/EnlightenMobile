@@ -10,7 +10,6 @@ using Telerik.XamarinForms.Chart;
 using System.IO;
 using Plugin.Permissions;
 using Plugin.Permissions.Abstractions;
-using Telerik.Windows.Documents.Spreadsheet.Expressions.Functions;
 
 namespace EnlightenMobile.ViewModels
 {
