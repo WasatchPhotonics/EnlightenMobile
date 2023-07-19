@@ -57,7 +57,14 @@ namespace EnlightenMobile.Views
         {
             var slider = sender as Slider;
 
-            svm.spec.integrationTimeMS = (uint)(slider.Value);
+            // snap to multiples of 100ms
+            uint s = (uint) (slider.Value / 100 + .5);
+            s *= 100;
+
+            // exception, instead of 0ms, the lowest is 1ms
+            if (s == 0) s = 1;
+
+            svm.spec.integrationTimeMS = s;
             Label LabelIntegrationTime = this.FindByName("LabelIntegrationTime") as Label;
             LabelIntegrationTime.Text = svm.label_integration;
         }
