@@ -28,11 +28,6 @@ namespace EnlightenMobile.ViewModels
         // Public Properties
         ////////////////////////////////////////////////////////////////////////
 
-        public string title 
-        {
-            get => String.Format("About Enlighten");
-        }
-
         public string version
         {
             get => String.Format("Enlighten Mobile version 1.1.0");

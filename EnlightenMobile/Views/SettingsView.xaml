@@ -7,8 +7,7 @@
              xmlns:telerikPrimitives="clr-namespace:Telerik.XamarinForms.Primitives;assembly=Telerik.XamarinForms.Primitives"
              xmlns:telerikChart="clr-namespace:Telerik.XamarinForms.Chart;assembly=Telerik.XamarinForms.Chart"
              xmlns:telerikInput="clr-namespace:Telerik.XamarinForms.Input;assembly=Telerik.XamarinForms.Input"
-
-             Title="{Binding title}"
+             Shell.NavBarIsVisible="False"
              BackgroundColor="White">
              <!-- Title="💾" -->
              
@@ -53,17 +52,6 @@
                         <Switch IsToggled="{Binding saveReference}" HorizontalOptions="EndAndExpand" />
                     </StackLayout>
 
-                    <Label Text="Advanced Features" FontSize="Large"/>
-
-                    <FlexLayout JustifyContent="SpaceBetween">
-                        <Label Text="Password" />
-                        <Entry Text="{Binding password}"
-                               x:Name="entryPassword"
-                               HorizontalTextAlignment="Center"
-                               Focused="entry_Focused"
-                               Completed="entryPassword_Completed"
-                               WidthRequest="200" />
-                    </FlexLayout>
                     <FlexLayout JustifyContent="SpaceBetween" IsVisible="{Binding isAuthenticated}">
                         <Label Text="Laser Watchdog Timeout (sec)" />
                         <Entry Text="{Binding laserWatchdogTimeoutSec}" 

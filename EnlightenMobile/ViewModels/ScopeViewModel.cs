@@ -24,13 +24,16 @@ namespace EnlightenMobile.ViewModels
         // sure what the "best practice" architecture would be.
         public delegate void ToastNotification(string msg);
         public event ToastNotification notifyToast;
-        
+
+        public string label_integration { get => "Integration Time = " + spec.integrationTimeMS + "ms"; }
+        public string label_gain { get => "Gain = " + spec.gainDb + "db"; }
+        public string label_averaging { get => "Scan Average = " + spec.scansToAverage; }
 
         ////////////////////////////////////////////////////////////////////////
         // Private attributes
         ////////////////////////////////////////////////////////////////////////
 
-        Spectrometer spec;
+        public Spectrometer spec;
         Settings settings;
         Logger logger = Logger.getInstance();
         public delegate void UserNotification(string title, string message, string button);
@@ -63,19 +66,8 @@ namespace EnlightenMobile.ViewModels
                 new XAxisOption() { name = "wavenumber", unit = "cm⁻¹" }
             };
             xAxisOption = xAxisOptions[0];
-            updateBLEBtn();
 
             updateChart();
-        }
-
-        public void updateBLEBtn() {
-            Console.WriteLine("Calling ble btn update");
-            if(spec.bleDevice != null) {
-                bleBtnTxt = "Disconnect";
-            }
-            else {
-                bleBtnTxt = "Connect";
-            }
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -84,24 +76,10 @@ namespace EnlightenMobile.ViewModels
         //
         ////////////////////////////////////////////////////////////////////////
 
-        public string title
-        {
-            get => "Scope Mode";
-        }
-
         public bool paired
         {
             get => true;//spec.paired;
         }
-
-        public string bleBtnTxt {
-            get => _bleBtnTxt;
-            set {
-                _bleBtnTxt = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(bleBtnTxt)));
-            }
-        }
-        string _bleBtnTxt = "Connect";
 
         ////////////////////////////////////////////////////////////////////////
         // X-Axis
@@ -152,61 +130,48 @@ namespace EnlightenMobile.ViewModels
         // integrationTimeMS
         ////////////////////////////////////////////////////////////////////////
 
-        public string integrationTimeMS 
+        public UInt32 integrationTimeMS 
         {
-            get => spec.integrationTimeMS.ToString();
+            get => spec.integrationTimeMS;
             set { }
         }
 
         // the ScopeView's code-behind has registered that a final value has
         // been entered into the Entry (hit return), so latch it
-        public void setIntegrationTimeMS(string s)
+        public void setIntegrationTimeMS(UInt32 value)
         {
-            if (UInt32.TryParse(s, out UInt32 value))
-                spec.integrationTimeMS = value;
+            spec.integrationTimeMS = value;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(integrationTimeMS)));
         }
-        
-
 
         ////////////////////////////////////////////////////////////////////////
         // gainDb
         ////////////////////////////////////////////////////////////////////////
 
-        public string gainDb
-        {
-            get => spec.gainDb.ToString();
-            set { }
-        }
-
         // the ScopeView's code-behind has registered that a final value has
         // been entered into the Entry (hit return), so latch it
-        public void setGainDb(string s)
+        public void setGainDb(float value)
         {
-            if (float.TryParse(s, out float value))
-                spec.gainDb = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(gainDb)));
+            spec.gainDb = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(spec.gainDb)));
         }
 
         ////////////////////////////////////////////////////////////////////////
         // scansToAverage
         ////////////////////////////////////////////////////////////////////////
 
-        public string scansToAverage
+        public UInt32 scansToAverage
         {
-            get => spec.scansToAverage.ToString();
+            get => spec.scansToAverage;
             set { }
         }
 
         // the ScopeView's code-behind has registered that a final value has
         // been entered into the Entry (hit return), so latch it
-        public void setScansToAverage(string s)
+        public void setScansToAverage(UInt32 value)
         {
-            if (ushort.TryParse(s, out ushort value))
-            {
-                spec.scansToAverage = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(scansToAverage)));
-            }
+            spec.scansToAverage = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(scansToAverage)));
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -708,7 +673,7 @@ namespace EnlightenMobile.ViewModels
             else if (name == "integrationTimeMS")
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(integrationTimeMS)));
             else if (name == "gainDb")
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(gainDb)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(spec.gainDb)));
             else if (name == "laserState" || name == "ramanModeEnabled" || name == "laserEnabled")
                 updateLaserProperties();
         }

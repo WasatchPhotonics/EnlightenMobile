@@ -4,7 +4,7 @@
              xmlns:vm="clr-namespace:EnlightenMobile.ViewModels"
              x:Class="EnlightenMobile.Views.AboutView"
              BackgroundColor="#333"
-             Title="{Binding title}">
+             Shell.NavBarIsVisible="False">
 
     <ContentPage.BindingContext>
         <vm:AboutViewModel />

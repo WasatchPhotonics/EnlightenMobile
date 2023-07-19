@@ -40,22 +40,6 @@ namespace EnlightenMobile.Views
             svm.notifyToast += (string msg) => Util.toast(msg, scrollOptions);
 
             svm.theChart = chart;
-
-            // since the ramanModeEnabled switch is not "bound" to the ViewModel,
-            // we must manually process PropertyChange notifications
-            svm.PropertyChanged += viewModelPropertyChanged;
-        }
-
-        protected override void OnAppearing()
-        {
-            svm.updateBLEBtn();
-        }
-
-        private void viewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            var name = e.PropertyName;
-            if (name == "ramanModeEnabled" && switchRamanMode.IsToggled != svm.ramanModeEnabled)
-                switchRamanMode.IsToggled = svm.ramanModeEnabled;
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -69,23 +53,30 @@ namespace EnlightenMobile.Views
             entry.Text = "";
         }
         
-        void entryIntegrationTimeMS_Completed(Object sender, EventArgs e)
+        void Callback_IntegrationTimeMS(Object sender, EventArgs e)
         {
-            var entry = sender as Entry;
-            svm.setIntegrationTimeMS(entry.Text);
+            var slider = sender as Slider;
+
+            svm.spec.integrationTimeMS = (uint)(slider.Value);
+            Label LabelIntegrationTime = this.FindByName("LabelIntegrationTime") as Label;
+            LabelIntegrationTime.Text = svm.label_integration;
         }
 
-        void entryGainDb_Completed(Object sender, EventArgs e)
+        void Callback_GainDb(Object sender, EventArgs e)
         {
-            var entry = sender as Entry;
-            svm.setGainDb(entry.Text);
+            var slider = sender as Slider;
+            svm.spec.gainDb = (int)(slider.Value+.5);
+            Label LabelGain = this.FindByName("LabelGain") as Label;
+            LabelGain.Text = svm.label_gain;
         }
         async void notifyUserAsync(string title, string message, string button) =>
            await DisplayAlert(title, message, button);
-        void entryScansToAverage_Completed(Object sender, EventArgs e)
+        void Callback_ScansToAverage(Object sender, EventArgs e)
         {
-            var entry = sender as Entry;
-            svm.setScansToAverage(entry.Text);
+            var slider = sender as Slider;
+            svm.spec.scansToAverage = (uint)(slider.Value + .5);
+            Label LabelScanAveraging = this.FindByName("LabelScanAveraging") as Label;
+            LabelScanAveraging.Text = svm.label_averaging;
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -98,34 +89,6 @@ namespace EnlightenMobile.Views
             scrollOptions.IsVisible = showingControls = !showingControls;
             buttonExpander.Text = showingControls ? rightArrow : leftArrow;
             updateLandscapeGridColumns();
-        }
-
-        // Since we use the GUI to provide verification, this is properly
-        // implemented in the View rather than ViewModel.  The confirmed value
-        // is written to the ViewModel at the end.
-        async void ramanMode_Toggled(object sender, EventArgs e)
-        {
-            logger.debug("ScopeView: Raman Mode changed on GUI");
-            var enabled = switchRamanMode.IsToggled;
-            if (!enabled)
-            {
-                // if the switch is off, just disable Raman Mode and go
-                logger.debug("ScopeView: disabling Raman Mode in SVM");
-                svm.ramanModeEnabled = false;
-                return;
-            }
-
-            // apparently we were asked to enable Raman Mode...this deserves
-            // confirmation
-            logger.debug("ScopeView.confirmRamanMode: Raising a DisplayAlert");
-            var confirmed = await DisplayAlert("Raman Mode",
-                    "Enabling Raman mode means the laser will AUTOMATICALLY fire each " +
-                    "time you take a measurement.  Do you wish to continue?",
-                    "Yes", "Cancel");
-            logger.debug($"ScopeView.confirmRamanMode: confirmed = {confirmed}");
-            svm.ramanModeEnabled = confirmed;
-            if (!confirmed)
-                switchRamanMode.IsToggled = false;
         }
 
         // This event is used to reformat the ScopeView from Portrait to Landscape 
@@ -238,11 +201,6 @@ namespace EnlightenMobile.Views
         private void qrScan(object sender, EventArgs e)
         {
             performQRScan();
-        }
-
-        private async void connectPage(object sender, EventArgs e)
-        {
-            await Navigation.PushAsync(new BluetoothView());
         }
 
         private void photoCapture(object sender, EventArgs e)

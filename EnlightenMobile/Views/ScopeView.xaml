@@ -8,12 +8,10 @@
 
              x:Class="EnlightenMobile.Views.ScopeView"
              xmlns:vm="clr-namespace:EnlightenMobile.ViewModels"
-             Title="{Binding title}"
              BackgroundColor="#333"
-             xmlns:telerikDataControls="clr-namespace:Telerik.XamarinForms.DataControls;assembly=Telerik.XamarinForms.DataControls"
-             xmlns:telerikPrimitives="clr-namespace:Telerik.XamarinForms.Primitives;assembly=Telerik.XamarinForms.Primitives"
              xmlns:telerikChart="clr-namespace:Telerik.XamarinForms.Chart;assembly=Telerik.XamarinForms.Chart"
-             xmlns:telerikInput="clr-namespace:Telerik.XamarinForms.Input;assembly=Telerik.XamarinForms.Input">
+             xmlns:telerikInput="clr-namespace:Telerik.XamarinForms.Input;assembly=Telerik.XamarinForms.Input"
+             Shell.NavBarIsVisible="False">
 
     <ContentPage.Resources>
 	    <ResourceDictionary>
@@ -56,12 +54,12 @@
                          VerticalOptions="FillAndExpand">
                 
                 <!-- Page header (when in portrait mode) -->
-                <Image x:Name="logoVertical" Source="enlightenLOGO" WidthRequest="300" BackgroundColor="#333"
-                       Margin="0, 5, 0, 5" />
+                <Image x:Name="logoVertical" Source="enlightenLOGO" WidthRequest="200" BackgroundColor="#333"
+                       Margin="5, 5, 5, 5" HorizontalOptions="Start" />
 
 
                 <!-- ======================================================= -->
-                <!-- The all-important spectral chart -->
+                <!-- The all-important spectral chart                        -->
                 <!-- ======================================================= -->
 
                 <telerikChart:RadCartesianChart x:Name="chart"
@@ -135,186 +133,94 @@
             </StackLayout>
 
             <!-- User Controls: keep together (will be "right" (but hideable) in Landscape) -->
-            <RefreshView Grid.Row="2" 
-                         Grid.Column="0" 
-                         x:Name="scrollOptions"
-                         IsRefreshing="{Binding isRefreshing}"
-                         IsEnabled="{Binding paired}"
-                         Command="{Binding refreshCmd}">
+            <ScrollView x:Name="scrollOptions" Grid.Row="2" 
+                         Grid.Column="0" IsEnabled="False">
 
-                <ScrollView IsEnabled="{Binding paired}">
-                    
-		            <Grid x:Name="innerGrid" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsEnabled="{Binding paired}">
+                <Grid x:Name="innerGrid" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsEnabled="{Binding paired}">
 
-                        <!-- initialize to Portrait mode (1 col, 2 rows) -->
-			            <Grid.RowDefinitions>
-				            <RowDefinition Height="Auto"/> <!--         Logo           -->
-                            <RowDefinition Height="Auto"/> <!--      ProgressBar       -->
-				            <RowDefinition Height="Auto"/> <!-- Acquire Save Add Clear -->
-                            <RowDefinition Height="Auto"/> <!-- Acquisition Parameters -->
-				            <RowDefinition Height="Auto"/> <!--      Status Bar        -->
-			            </Grid.RowDefinitions>
-			            <Grid.ColumnDefinitions>
-				            <ColumnDefinition Width="*"/>
-			            </Grid.ColumnDefinitions>
-			
-                        <!-- Page header if in landscape mode -->
-                        <Image Grid.Row="0" Grid.Column="0" x:Name="logoHorizontal" WidthRequest="300" Source="enlightenLOGO" IsVisible="False"/>
+                    <!-- initialize to Portrait mode (1 col, 2 rows) -->
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <!--         Logo           -->
+                        <RowDefinition Height="Auto"/>
+                        <!--      ProgressBar       -->
+                        <RowDefinition Height="Auto"/>
+                        <!-- Acquire Save Add Clear -->
+                        <RowDefinition Height="Auto"/>
+                        <!-- Acquisition Parameters -->
+                        <RowDefinition Height="Auto"/>
+                        <!--      Status Bar        -->
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                        <!-- Acquisition ProgressBar -->
-                        <ProgressBar Grid.Row="1" Grid.Column="0"
+                    <!-- Page header if in landscape mode -->
+                    <Image Grid.Row="0" Grid.Column="0" x:Name="logoHorizontal" WidthRequest="250" Source="enlightenLOGO" IsVisible="False"/>
+
+                    <!-- Acquisition ProgressBar -->
+                    <ProgressBar Grid.Row="1" Grid.Column="0"
                                      Progress="{Binding acquisitionProgress}"
                                      ProgressColor="#2994d3"/>
 
-                        <!-- Command buttons -->
-                        <StackLayout Grid.Row="2" Grid.Column="0" Margin="2">
-                            <Button Text="{Binding bleBtnTxt}" Margin="5" Clicked="connectPage"/>
-                            <FlexLayout
+                    <!-- Command buttons -->
+                    <StackLayout Grid.Row="2" Grid.Column="0" Margin="2">
+
+                        <FlexLayout
                                 Wrap="Wrap"
                                 AlignItems="Center"
                                 VerticalOptions="Start"
                                 JustifyContent="Center"
                                 >
-                                <Button Margin="2" Text="Acquire" Command="{Binding acquireCmd}"
+
+                            <Button Margin="2" Padding="6" HorizontalOptions="StartAndExpand" Text="Turn Laser On" />
+                            <Button Margin="2" Text="Acquire" Command="{Binding acquireCmd}"
                                                        TextColor="{Binding acquireButtonTextColor}" 
                                                        BackgroundColor="{Binding acquireButtonBackgroundColor}" />
-                                <Button Margin="2" Text="Save" Command="{Binding saveCmd}" />
-                                <Button Margin="2" Text="Add" Command="{Binding addCmd}" />
-                                <Button Margin="2" Text="Clear" Command="{Binding clearCmd}" />
-                                <Button Margin="2" Text="QR" Clicked="qrScan" />
-                                <Button Margin="2" Text="Photo" Clicked="photoCapture" />
-                            </FlexLayout>
-                        </StackLayout>
+                            <Button Margin="2" Text="Save" Command="{Binding saveCmd}" />
 
-                        <StackLayout Grid.Row="3" Grid.Column="0" HorizontalOptions="FillAndExpand" Padding="20, 10, 20, 10">
-
-                            <!-- integration time -->
-                            <FlexLayout JustifyContent="SpaceBetween">
-                                <Label Text="Integration Time (ms)" />
-                                <Entry x:Name="entryIntegrationTimeMS"
-                                       Text="{Binding integrationTimeMS}" 
-                                       Placeholder="3"
-                                       WidthRequest="100"
-                                       HorizontalTextAlignment="Center"
-                                       Focused="entry_Focused"
-                                       Completed="entryIntegrationTimeMS_Completed"
-                                       Keyboard="Numeric" />
-                            </FlexLayout>
-
-                            <!-- gain -->
-                            <FlexLayout JustifyContent="SpaceBetween">
-                                <Label Text="Gain (dB)" />
-                                <Entry x:Name="entryGainDb"
-                                       Text="{Binding gainDb}" 
-                                       Placeholder="24"
-                                       HorizontalTextAlignment="Center"
-                                       WidthRequest="100"
-                                       Focused="entry_Focused"
-                                       Completed="entryGainDb_Completed"
-                                       Keyboard="Numeric" />
-                            </FlexLayout>
-
-                            <!-- averaging -->
-                            <FlexLayout JustifyContent="SpaceBetween">
-                                <Label Text="Scans to Average" />
-                                <Entry x:Name="entryScansToAverage"
-                                       Text="{Binding scansToAverage}" 
-                                       Placeholder="1"
-                                       HorizontalTextAlignment="Center"
-                                       Focused="entry_Focused"
-                                       Completed="entryScansToAverage_Completed"
-                                       WidthRequest="100"
-                                       Keyboard="Numeric" />
-                            </FlexLayout>
-
-                            <!-- dark -->
-                            <Label Style="{StaticResource spacingLabel}"/>
-                            <FlexLayout JustifyContent="SpaceBetween" MinimumHeightRequest="80" >
-                                <Label  Text="Dark" MinimumWidthRequest="75" />
-                                <Switch IsToggled="{Binding darkEnabled}" Scale="1.5"/>
-                            </FlexLayout>
-
-                            <!-- Raman mode (no binding because code-behind pops-up confirmation dialog) -->
-                            <Label Style="{StaticResource spacingLabel}"/> 
-                            <FlexLayout JustifyContent="SpaceBetween">
-                                <Label  Text="Raman Mode" />
-                                <Switch x:Name="switchRamanMode" Toggled="ramanMode_Toggled" Scale="1.5" />
-                            </FlexLayout>    
-
-                            <!-- laser (if not in Raman Mode) -->
-                            <StackLayout IsVisible="{Binding isAuthenticated}" Orientation="Vertical">
-                                <Label Style="{StaticResource spacingLabel}"/>
-                                <FlexLayout JustifyContent="SpaceBetween" MinimumHeightRequest="80">
-                                    <Label  Text="Fire Laser" />
-                                    <Switch IsToggled="{Binding laserEnabled}" IsEnabled="{Binding laserIsAvailable}" Scale="1.5" />
-                                </FlexLayout>
-                            </StackLayout>
-
-                            <!-- x-axis -->
-                            <Label MinimumHeightRequest="12" />
-                            <FlexLayout JustifyContent="SpaceBetween">
-                                <Label Text="X-Axis" />
-                                <telerikInput:RadListPicker Placeholder="x-axis" 
-                                                            DisplayMemberPath="displayName"
-                                                            ItemsSource="{Binding xAxisOptions}"
-                                                            SelectedItem="{Binding xAxisOption}"
-                                                            DisplayLabelStyle="{StaticResource listPickerDisplayLabelStyle}"
-                                                            ItemStyle="{StaticResource listPickerItemStyle}"
-                                                            SelectedItemStyle="{StaticResource listPickerSelectedItemStyle}">
-                                    <telerikInput:RadListPicker.ItemTemplate>
-                                        <DataTemplate>
-                                            <Label Text="{Binding name}"
-                                                   HorizontalTextAlignment="Center"
-                                                   TextColor="#555" />
-                                        </DataTemplate>
-                                    </telerikInput:RadListPicker.ItemTemplate>
-                                    <telerikInput:RadListPicker.SelectorSettings>
-                                        <telerikInput:PickerPopupSelectorSettings IsPopupModal="True"
-                                                                                  HeaderLabelText="Select X-Axis"
-                                                                                  PopupViewStyle="{StaticResource listPickerPopupViewStyle}"
-                                                                                  HeaderStyle="{StaticResource listPickerHeaderStyle}"
-                                                                                  HeaderLabelStyle="{StaticResource listPickerHeaderLabelStyle}"
-                                                                                  AcceptButtonStyle="{StaticResource listPickerAcceptButtonStyle}"
-                                                                                  CancelButtonStyle="{StaticResource listPickerCancelButtonStyle}"/>
-                                    </telerikInput:RadListPicker.SelectorSettings>
-                                </telerikInput:RadListPicker>
-                            </FlexLayout>
-
-                            <!-- note -->
-                            <StackLayout Grid.Row="0" Grid.Column="0"
-                                         Orientation="Horizontal"
-                                         HorizontalOptions="FillAndExpand"
-                                         VerticalOptions="FillAndExpand">
-                                <Label Text="Note" VerticalTextAlignment="Center"/>
-                                <Entry x:Name="entryNote"
-                                       Text="{Binding note}" 
-                                       Placeholder="your text here"
-                                       VerticalOptions="FillAndExpand"
-                                       HorizontalOptions="FillAndExpand" />
-                            </StackLayout>
-                            <FlexLayout Grid.Row="0" Grid.Column="0"
-                                         HorizontalOptions="FillAndExpand"
-                                         VerticalOptions="FillAndExpand"
-                                         JustifyContent="SpaceBetween">
-                                <Label Text="QR Result" VerticalTextAlignment="Center"/>
-                                <Label Text="{Binding qrText}" VerticalTextAlignment="Center"/>
-                            </FlexLayout>
-                        </StackLayout>
-
-                        <!-- Status Bar -->
-                        <FlexLayout Grid.Row="4" Grid.Column="0"
-                                    JustifyContent="SpaceBetween"
-                                    BackgroundColor="#444"
-                                    HeightRequest="30"
-                                    VerticalOptions="End"
-                                    Padding="10">
-                            <Label Text="{Binding spectrumMax}" />
-                            <Label Text="{Binding batteryState, StringFormat='Batt: {0}'}" TextColor="{Binding batteryColor}" />
+                            <!-- <Button Margin="2" Text="Add" Command="{Binding addCmd}" /> -->
+                            <!-- <Button Margin="2" Text="Clear" Command="{Binding clearCmd}" /> -->
+                            <!-- <Button Margin="2" Text="QR" Clicked="qrScan" /> -->
+                            <!-- <Button Margin="2" Text="Photo" Clicked="photoCapture" /> -->
                         </FlexLayout>
+                    </StackLayout>
 
-                    </Grid>
-                </ScrollView>
-            </RefreshView>
+                    <StackLayout Grid.Row="3" Grid.Column="0" HorizontalOptions="FillAndExpand" Padding="20, 10, 20, 10">
+
+                        <!-- integration time -->
+                        <StackLayout>
+                            <Label x:Name="LabelIntegrationTime"
+                                   Text="{Binding label_integration}"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="CenterAndExpand" />
+
+                            <!-- You must set the Maximum value before the Minimum -->
+                            <Slider x:Name="IntegrationTimeMsSlider" Maximum="5000"  Minimum="1" Value="500" ValueChanged="Callback_IntegrationTimeMS" ThumbImageSource="thumb.png"/>
+                        </StackLayout>
+
+                        <!-- gain -->
+                        <StackLayout>
+                            <Label x:Name="LabelGain"
+                                   Text="{Binding label_gain}"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="CenterAndExpand" />
+
+                            <Slider x:Name="GainDBSlider"  Maximum="72" Minimum="0" Value="16" ValueChanged="Callback_GainDb" ThumbImageSource="thumb.png" />
+                        </StackLayout>
+
+                        <!-- averaging -->
+                        <StackLayout>
+                            <Label x:Name="LabelScanAveraging"
+                                   Text="{Binding label_averaging}"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="CenterAndExpand" />
+
+                            <Slider x:Name="ScanAveragingSlider" Maximum="32" Minimum="1" Value="1" ValueChanged="Callback_ScansToAverage" ThumbImageSource="thumb.png"/>
+                        </StackLayout>
+                    </StackLayout>
+                </Grid>
+            </ScrollView>
         </Grid>
     </ContentPage.Content>
 </ContentPage>
