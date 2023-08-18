@@ -1,105 +1,14 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Application xmlns="http://xamarin.com/schemas/2014/forms" 
-			 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-			 xmlns:d="http://xamarin.com/schemas/2014/forms/design" 
-			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-
-             xmlns:telerikDataControls="clr-namespace:Telerik.XamarinForms.DataControls;assembly=Telerik.XamarinForms.DataControls"
-             xmlns:telerikInput="clr-namespace:Telerik.XamarinForms.Input;assembly=Telerik.XamarinForms.Input"
-
-			 mc:Ignorable="d" 
-			 x:Class="EnlightenMobile.App">
-
+﻿<?xml version = "1.0" encoding = "UTF-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:EnlightenMobile"
+             x:Class="EnlightenMobile.App">
     <Application.Resources>
-
-        <!-- This is basically your stylesheet.css for the whole app -->
         <ResourceDictionary>
-
-            <!-- =========================================================== -->
-            <!-- Xamarin Forms -->
-            <!-- =========================================================== -->
-
-            <Style TargetType="NavigationPage">
-                <Setter Property="BarBackgroundColor"       Value="#474747" />
-                <Setter Property="BarTextColor"             Value="White" />
-            </Style>
-            <Style TargetType="Button">
-                <Setter Property="TextColor"                Value="#333"    />
-                <Setter Property="BackgroundColor"          Value="#ccc"    />
-                <Setter Property="BorderColor"              Value="#999"    />
-
-                <!-- iOS buttons need explicit MinimumWidthRequest and Padding 
-                     that perversely look bad on Android -->
-                <Setter Property="Padding">
-                    <Setter.Value>
-                        <OnPlatform x:TypeArguments="Thickness" iOS="20, 0, 20, 0" /> 
-                    </Setter.Value>
-                </Setter>
-                <Setter Property="MinimumWidthRequest">
-                  <Setter.Value>
-                    <OnPlatform x:TypeArguments="x:Double" iOS="150" />
-                  </Setter.Value>
-                </Setter>
-            </Style>
-            <Style TargetType="Label">
-                <Setter Property="VerticalTextAlignment"    Value="Center" />
-                <Setter Property="TextColor"                Value="#ccc" />
-            </Style>
-            <Style TargetType="Entry">
-                <Setter Property="BackgroundColor"          Value="#555" />
-                <Setter Property="TextColor"                Value="#fff" />
-                <Setter Property="ClearButtonVisibility"    Value="WhileEditing" />
-                <Setter Property="PlaceholderColor"         Value="#f7e842" />
-            </Style>
-
-            <!-- =========================================================== -->
-            <!-- Telerik ListPicker -->
-            <!-- =========================================================== -->
-
-            <!-- the label with the value you click to summon the pop-up -->
-            <Style TargetType="Label" x:Key="listPickerDisplayLabelStyle">
-                <Setter Property="VerticalTextAlignment" Value="Center"/>
-                <Setter Property="Padding" Value="10, 5, 10, 5" />
-                <Setter Property="TextColor" Value="#bbb"/>
-                <Setter Property="BackgroundColor" Value="#555"/>
-                <Setter Property="FontSize" Value="Medium"/>
-            </Style>
-
-            <!-- the pop-up frame -->
-            <Style TargetType="telerikInput:PickerPopupContentView" x:Key="listPickerPopupViewStyle">
-                <Setter Property="BackgroundColor" Value="#bbb"/>
-                <Setter Property="HeightRequest" Value="300" />
-            </Style>
-
-            <!-- the frames holding the item Labels, which are themselves styled by the Template -->
-            <Style TargetType="telerikDataControls:SpinnerItemView" x:Key="listPickerItemStyle">
-                <Setter Property="BackgroundColor" Value="#aaa"/> 
-            </Style>
-            <Style TargetType="telerikDataControls:SpinnerItemView" x:Key="listPickerSelectedItemStyle">
-                <Setter Property="BackgroundColor" Value="#ccc"/> 
-            </Style>
-
-            <!-- the pop-up header -->
-            <Style TargetType="telerikInput:PickerPopupHeaderView" x:Key="listPickerHeaderStyle">
-                <Setter Property="BackgroundColor" Value="#999"/>
-                <Setter Property="HorizontalOptions" Value="FillAndExpand"/>
-            </Style>
-            <Style TargetType="Label" x:Key="listPickerHeaderLabelStyle">
-                <Setter Property="TextColor" Value="#444"/>
-                <Setter Property="HorizontalOptions" Value="Center"/>
-                <Setter Property="VerticalOptions" Value="Center"/>
-                <Setter Property="FontSize" Value="Title"/>
-            </Style>
-
-            <!-- the pop-up footer -->
-            <Style TargetType="Button" x:Key="listPickerCancelButtonStyle">
-                <Setter Property="TextColor" Value="#777"/>
-            </Style>
-            <Style TargetType="Button" x:Key="listPickerAcceptButtonStyle">
-                <Setter Property="TextColor" Value="#555"/>
-                <Setter Property="FontAttributes" Value="Bold"/>
-            </Style>
-
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
+                <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

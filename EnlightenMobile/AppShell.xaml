@@ -1,92 +1,14 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<Shell xmlns="http://xamarin.com/schemas/2014/forms" 
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
-             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:views="clr-namespace:EnlightenMobile.Views"
-             mc:Ignorable="d"
-             x:Class="EnlightenMobile.AppShell"
-             FlyoutBackgroundColor="#474747"
-             BackgroundColor="#27c0a1"
-             >
-    <!-- Styling Definitions -->
-    <!-- Strangely, Xamarin maintains 2 separate styling areas for app and Shell -->
-    <Shell.Resources>
-        <ResourceDictionary>
-            <Style TargetType="Tab">
-                <Setter Property="Shell.TabBarBackgroundColor" Value="#27c0a1" />
-                <Setter Property="Shell.TabBarTitleColor" Value="White" />
-            </Style>
-        </ResourceDictionary>
-        <Style x:Key="FlyoutItemActivation" TargetType="Grid">
-            <Setter Property="VisualStateManager.VisualStateGroups">
-                <VisualStateGroupList>
-                    <VisualStateGroup x:Name="CommonStates">
-                        <VisualState x:Name="Normal" />
-                        <VisualState x:Name="Selected">
-                            <VisualState.Setters>
-                                <Setter Property="BackgroundColor" Value="#7d7d7d" />
-                            </VisualState.Setters>
-                        </VisualState>
-                    </VisualStateGroup>
-                </VisualStateGroupList>
-            </Setter>
-        </Style>
-    </Shell.Resources>
-    <Shell.ItemTemplate>
-        <DataTemplate >
-            <Grid Style="{StaticResource FlyoutItemActivation}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="0.1*" />
-                    <ColumnDefinition Width="0.9*" />
-                </Grid.ColumnDefinitions>
-                <Image Source="{Binding FlyoutIcon}"/>
-                <Label Grid.Column="1"
-        Text="{Binding Title}"
-		Margin="15"
-        VerticalTextAlignment="Center" 
-        TextColor="White"/>
-            </Grid>
-        </DataTemplate>
-    </Shell.ItemTemplate>
-    <!-- Application Heirarchy Layout -->
-    <Shell.FlyoutHeaderTemplate>
-        <DataTemplate>
-            <Grid BackgroundColor="#474747"
-              HeightRequest="200">
-                <Image Aspect="AspectFit"
-                   Source="enlightenLOGO.png"
-                   Opacity="1" />
-            </Grid>
-        </DataTemplate>
-    </Shell.FlyoutHeaderTemplate>
-    <FlyoutItem Title="Wasatch Photonics" Icon="tab_scope.png">
-        <Tab Title="Scope" Icon="tab_scope.png" >
-            <ShellContent Route="scope">
-                <views:ScopeView />
-            </ShellContent>
-        </Tab>
-        <Tab Title="App" Icon="tab_app_settings.png" >
-            <ShellContent Route="settings">
-                <views:AppSettingsView />
-            </ShellContent>
-        </Tab>
-        <Tab Title="Device" Icon="tab_device.png">
-            <ShellContent  Route="specset">
-                <views:SpectrometerSettingsView/>
-            </ShellContent>
-        </Tab>
-        <Tab Title="Log" Icon="tab_log.png">
-            <ShellContent  Route="log">
-                <views:LogView/>
-            </ShellContent>
-        </Tab>
-        <Tab Title="About"
-                Icon="tab_about.png"
-                >
-        <ShellContent Route="about">
-            <views:MainPage/>
-        </ShellContent>
-        </Tab>
-    </FlyoutItem>
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="EnlightenMobile.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:EnlightenMobile"
+    Shell.FlyoutBehavior="Disabled">
+
+    <ShellContent
+        Title="Home"
+        ContentTemplate="{DataTemplate local:MainPage}"
+        Route="MainPage" />
+
 </Shell>
