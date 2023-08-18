@@ -1,6 +1,6 @@
 # EnlightenMobile
 
-This branch contains an experimental rewrite,
+This branch contains an experimental rewrite.
 
 The purpose is to simplify compliance with [#33](https://github.com/WasatchPhotonics/EnlightenMobile/issues/33) and prepare for EOY development goals.
 
