@@ -13,5 +13,4 @@ We will want to integrate existing documentation related to app publishing. (REA
 
 ! Stop 🛑 ! 
 
-If this message is still in the README after 2023-09, this project did not reach critical mass and should be archived or deleted by future maintainers.
-
+This branch is not yet ready for review.
