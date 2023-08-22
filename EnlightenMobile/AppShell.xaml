@@ -4,11 +4,53 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:EnlightenMobile"
-    Shell.FlyoutBehavior="Disabled">
+    Shell.FlyoutBehavior="Disabled"
+    CurrentItem="{x:Reference Device}">
 
+    <!--
+    This is the page that displays spectra and has laser, integration time controls.
+    -->
     <ShellContent
-        Title="Home"
+        Title="Scope"
+        Icon="UI/ico_spectra.png"
         ContentTemplate="{DataTemplate local:MainPage}"
         Route="MainPage" />
 
+    <!-- 
+    This is the page that allows connection to an XS device.
+    
+    x:Name is used to specify the default tab 
+    
+    I may want to do this in C# instead so I can do the following conditional logic:
+        (1) IF device is already connected default to SCOPE
+        (2) IF NOT device is already connected default to DEVICE
+    -->
+    <ShellContent
+        x:Name="Device" 
+        Title="Device"
+        Icon="UI/ico_xs.png"
+        ContentTemplate="{DataTemplate local:MainPage}"
+        Route="MainPage" />
+    
+    <!-- 
+    This is the page that keeps saved spectra as well as any post-processing offerings we may include.
+    
+    Renaming "Saves" from the 2023-05-16 design to "Data"
+    in anticipation of future features
+    -->
+    <ShellContent
+        Title="Data"
+        Icon="UI/ico_page.png"
+        ContentTemplate="{DataTemplate local:MainPage}"
+        Route="MainPage" />
+    
+    <!--
+    This is the page where we link to our organization and provide access to logs, additional resources.
+    -->
+    <ShellContent
+        Title="Info"
+        Icon="UI/ico_info.png"
+        ContentTemplate="{DataTemplate local:MainPage}"
+        Route="MainPage" />
+    
 </Shell>
