@@ -1,5 +1,6 @@
 
 # Developer's Introduction to EnlightenMobile
+#### Samie Bee 2023-08-22
 
 ## This repo
 
@@ -8,6 +9,31 @@ The status of this repo should be described in the top-level README file. Notice
 EnlightenMobile is an app that takes spectra over bluetooth, and it has been redesigned again to be tab-centric.
 
 This branch contains the .NET 7 MAUI rewrite. The primary reason for rewriting is to be prepared for advanced spectral matching use-cases. It's also a convenient time to switch to .NET 7 to promote longevity with respect to phone OS versions. See [#34](https://github.com/WasatchPhotonics/EnlightenMobile/issues/34).
+
+## UI Terminology
+
+I wrote this originally about Xamarin. I think the same terminology applies to MAUI as well.
+
+> Use the following Development Reference. 
+https://learn.microsoft.com/en-us/dotnet/maui/ [1]
+> 
+>Find documentation about something specific, such as `Xamarin.Forms.Application`
+using the table of contents. For example "Application Fundamentals > App Class".
+>
+> Xamarin does not have a single object that can be used
+as either a control or hiearchial object or both. This matches how Qt works and signifies something of a relic in software UI culture.
+>
+> There are two competing concepts of 'Page' in the world of Xamarin and MAUI. I did my best to disambiguate below.
+>
+> - **Shell** - AppShell provides user navigation via tabs and menus.
+> - **\<Subject\>Page.xaml** - Within the repository, there are files named in this form. These pages group related actions for the user. They consist of a single Layout which consists of several Views. Some examples include ScopePage.xaml and DevicePage.xaml. This naming convention follows from MainPage.xaml from the default project.
+> - **Page (Navigation)** - As you will see in the documentation, Some pages are used for navigation such as TabbedPage and FlyoutPage. These pages will link to various \<Subject\>Page.xaml. We do not directly use these kinds of pages in this repository. AppShell orchestrates navigation for us.
+> - **Layout** - Includes StackLayout, Grid, ScrollView; These orchestrate a collection of Views on screen, making decisions about spacing and location.
+> - **View** - Includes Label, Button, Checkbox; This is what you may know of as 'Widgets' or 'Controls'. They are interactive screen elements that provide output and take input.
+> This is explained in the official documentation: https://learn.microsoft.com/en-us/dotnet/maui/user-interface/controls/ [2]
+>
+> ~1: Formerly https://learn.microsoft.com/en-us/xamarin/xamarin-forms/app-fundamentals/~ \
+> ~2: Formerly https://learn.microsoft.com/en-us/xamarin/xamarin-forms/app-fundamentals/custom-renderer/renderers~
 
 ## Multi-Platform
 
