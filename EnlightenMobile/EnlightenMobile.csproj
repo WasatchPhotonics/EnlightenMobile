@@ -51,4 +51,10 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Compile Update="Pages\DevicePage.xaml.cs">
+	    <DependentUpon>DevicePage.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
 </Project>

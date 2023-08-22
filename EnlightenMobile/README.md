@@ -26,7 +26,7 @@ as either a control or hiearchial object or both. This matches how Qt works and 
 > There are two competing concepts of 'Page' in the world of Xamarin and MAUI. I did my best to disambiguate below.
 >
 > - **Shell** - AppShell provides user navigation via tabs and menus.
-> - **\<Subject\>Page.xaml** - Within the repository, there are files named in this form. These pages group related actions for the user. They consist of a single Layout which consists of several Views. Some examples include ScopePage.xaml and DevicePage.xaml. This naming convention follows from MainPage.xaml from the default project.
+> - **\<Subject\>Page.xaml** - Within the repository, there are files named in this form. These pages group related actions for the user. They consist of a single Layout which consists of several Views. Some examples include ScopePage.xaml and DevicePage.xaml. This naming convention follows from MainPage.xaml from the default project. The Pages folder of this repository is referring to this kind of page.
 > - **Page (Navigation)** - As you will see in the documentation, Some pages are used for navigation such as TabbedPage and FlyoutPage. These pages will link to various \<Subject\>Page.xaml. We do not directly use these kinds of pages in this repository. AppShell orchestrates navigation for us.
 > - **Layout** - Includes StackLayout, Grid, ScrollView; These orchestrate a collection of Views on screen, making decisions about spacing and location.
 > - **View** - Includes Label, Button, Checkbox; This is what you may know of as 'Widgets' or 'Controls'. They are interactive screen elements that provide output and take input.

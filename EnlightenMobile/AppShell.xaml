@@ -5,12 +5,24 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:EnlightenMobile"
     Shell.FlyoutBehavior="Disabled"
+    x:Name="AppShell"
     CurrentItem="{x:Reference Device}">
 
+    <!-- 
+    The use of x:Names makes symbols directly accessible in .xaml.cs
+    
+    This example from StackOverflow shows shelltab_0 could be referenced directly:
+        https://stackoverflow.com/questions/75551165/switch-app-shell-tab-programmatically-to-current-page-on-tab-not-with-gotoasync
+    -->
+    
     <!--
     This is the page that displays spectra and has laser, integration time controls.
+    
+    This is the default tab when there is an existing device connection.
+        See AppShell.xaml.cs for conditional logic
     -->
     <ShellContent
+        x:Name="ScopeTab" 
         Title="Scope"
         Icon="UI/ico_spectra.png"
         ContentTemplate="{DataTemplate local:MainPage}"
@@ -19,18 +31,15 @@
     <!-- 
     This is the page that allows connection to an XS device.
     
-    x:Name is used to specify the default tab 
-    
-    I may want to do this in C# instead so I can do the following conditional logic:
-        (1) IF device is already connected default to SCOPE
-        (2) IF NOT device is already connected default to DEVICE
+    This is the default tab when there is not an existing device connection.
+        See AppShell.xaml.cs for conditional logic
     -->
     <ShellContent
-        x:Name="Device" 
+        x:Name="DeviceTab" 
         Title="Device"
         Icon="UI/ico_xs.png"
         ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+        Route="DevicePage" />
     
     <!-- 
     This is the page that keeps saved spectra as well as any post-processing offerings we may include.
@@ -39,6 +48,7 @@
     in anticipation of future features
     -->
     <ShellContent
+        x:Name="DataTab" 
         Title="Data"
         Icon="UI/ico_page.png"
         ContentTemplate="{DataTemplate local:MainPage}"
@@ -48,6 +58,7 @@
     This is the page where we link to our organization and provide access to logs, additional resources.
     -->
     <ShellContent
+        x:Name="InfoTab" 
         Title="Info"
         Icon="UI/ico_info.png"
         ContentTemplate="{DataTemplate local:MainPage}"
