@@ -3,11 +3,11 @@
 
 ## This repo
 
-The status of this repo should be described in the top-level README file. 
+The status of this repo should be described in the top-level README file. Notice that that file and any other's on the same level are not visible within Visual Studio, but it's the first thing people see when they open the repo in Github.
 
 EnlightenMobile is an app that takes spectra over bluetooth, and it has been redesigned again to be tab-centric.
 
-EnlightenLite, this repo, is a rewrite. The primary reason for rewriting is to be prepared for advanced spectral matching use-cases. It's also a convenient time to switch to .NET 7 to promote longevity with respect to phone OS versions. See [#34](https://github.com/WasatchPhotonics/EnlightenMobile/issues/34).
+This branch contains the .NET 7 MAUI rewrite. The primary reason for rewriting is to be prepared for advanced spectral matching use-cases. It's also a convenient time to switch to .NET 7 to promote longevity with respect to phone OS versions. See [#34](https://github.com/WasatchPhotonics/EnlightenMobile/issues/34).
 
 ## Multi-Platform
 
