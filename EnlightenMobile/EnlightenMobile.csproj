@@ -52,7 +52,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Pages\DevicePage.xaml.cs">
+	  <Compile Update="UI\DevicePage.xaml.cs">
 	    <DependentUpon>DevicePage.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
