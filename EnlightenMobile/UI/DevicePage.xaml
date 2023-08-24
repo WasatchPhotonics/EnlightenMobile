@@ -1,41 +1,58 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="EnlightenMobile.MainPage">
-
+             x:Class="EnlightenMobile.DevicePage">
     <ScrollView>
+  
         <VerticalStackLayout
             Spacing="25"
-            Padding="30,0"
-            VerticalOptions="Center">
+            BackgroundColor="#333" 
+            Padding="10, 0, 10, 0">
 
-            <Image
-                Source="dotnet_bot.png"
-                SemanticProperties.Description="Cute dot net bot waving hi to you!"
-                HeightRequest="200"
-                HorizontalOptions="Center" />
+        <!-- Page header -->
+        <Image Source="img_enlighten_logo" WidthRequest="300"/>
 
-            <Label
-                Text="Hello, World!"
-                SemanticProperties.HeadingLevel="Level1"
-                FontSize="32"
-                HorizontalOptions="Center" />
+        <!-- Button Bar -->
+        <Frame CornerRadius="10" BackgroundColor="#666" Padding="2">
+            <Frame CornerRadius="10" BackgroundColor="#444" Padding="2">
+                <StackLayout Orientation="Horizontal" Padding="2" HorizontalOptions="FillAndExpand">
+                    <Button Text="Scan" Command="{Binding scanCmd}" IsEnabled="{Binding bluetoothEnabled}"
+                            TextColor="{Binding scanButtonTextColor}" 
+                            BackgroundColor="{Binding scanButtonBackgroundColor}" />
+                    <Button Text="{Binding buttonConnectText}" Command="{Binding connectCmd}" IsEnabled="{Binding buttonConnectEnabled}" />
+                </StackLayout>
+            </Frame>
+        </Frame>
 
-            <Label
-                Text="Welcome to .NET Multi-platform App UI"
-                SemanticProperties.HeadingLevel="Level2"
-                SemanticProperties.Description="Welcome to dot net Multi platform App U I"
-                FontSize="18"
-                HorizontalOptions="Center" />
+        <!-- Connection ProgressBar -->
+        <ProgressBar Progress="{Binding connectionProgress}"
+                        ProgressColor="#2994d3" />
 
-            <Button
-                x:Name="CounterBtn"
-                Text="Click me"
-                SemanticProperties.Hint="Counts the number of times you click"
-                Clicked="OnCounterClicked"
-                HorizontalOptions="Center" />
-
+        <!-- List of discovered BLE devices -->
+        <ListView x:Name="listView" 
+                    SeparatorColor="#555" 
+                    BackgroundColor="#333" 
+                    Margin="20, 0, 20, 0" 
+                    HasUnevenRows="True">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <StackLayout Orientation="Vertical"
+                                        BackgroundColor="{Binding backgroundColor}"
+                                        MinimumHeightRequest="100">
+                            <StackLayout Orientation="Horizontal">
+                                <Label TextColor="#27c0a1" Text="{Binding rssi, StringFormat='RSSI: {0}'}" FontSize="Large"/>
+                                <Label TextColor="#2994d3" Text="{Binding name}" FontSize="Large"/>
+                            </StackLayout>
+                            <Label TextColor="#cccccc" Text="{Binding id}"/>
+                        </StackLayout>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+            
         </VerticalStackLayout>
+        
     </ScrollView>
 
 </ContentPage>
