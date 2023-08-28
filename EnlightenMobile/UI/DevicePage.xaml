@@ -1,59 +1,69 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--
+Why should the app initiate and maintain it's own Bluetooth connections?
+https://github.com/WasatchPhotonics/EnlightenMobile/wiki/Port-to-MAUI-2023-08-(1)-Design
+
+If I were to use Spotify with a bluetooth speaker on iOS, 
+I would first connect to the bluetooth device in settings then open the app.
+
+The OS would handle device pairing and forgetting.
+-->
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="EnlightenMobile.DevicePage"
              Shell.NavBarIsVisible="False">
-    <ScrollView>
-  
-        <VerticalStackLayout
-            Spacing="25"
-            BackgroundColor="#333" 
-            Padding="10, 0, 10, 0">
 
-        <!-- Page header -->
-        <Image Source="img_enlighten_logo" WidthRequest="300"/>
+    <ContentPage.Content>
 
-        <!-- Button Bar -->
-        <Frame CornerRadius="10" BackgroundColor="#666" Padding="2">
-            <Frame CornerRadius="10" BackgroundColor="#444" Padding="2">
-                <StackLayout Orientation="Horizontal" Padding="2" HorizontalOptions="FillAndExpand">
-                    <Button Text="Scan" Command="{Binding scanCmd}" IsEnabled="{Binding bluetoothEnabled}"
-                            TextColor="{Binding scanButtonTextColor}" 
-                            BackgroundColor="{Binding scanButtonBackgroundColor}" />
-                    <Button Text="{Binding buttonConnectText}" Command="{Binding connectCmd}" IsEnabled="{Binding buttonConnectEnabled}" />
-                </StackLayout>
-            </Frame>
-        </Frame>
+        <ScrollView>
+            <StackLayout Orientation="Vertical" BackgroundColor="#333" Padding="10, 0, 10, 0">
 
-        <!-- Connection ProgressBar -->
-        <ProgressBar Progress="{Binding connectionProgress}"
-                        ProgressColor="#2994d3" />
+                <!-- Page header -->
+            <Image Source="enlightenLOGO" WidthRequest="300"/>
 
-        <!-- List of discovered BLE devices -->
-        <ListView x:Name="listView" 
-                    SeparatorColor="#555" 
-                    BackgroundColor="#333" 
-                    Margin="20, 0, 20, 0" 
-                    HasUnevenRows="True">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <ViewCell>
-                        <StackLayout Orientation="Vertical"
-                                        BackgroundColor="{Binding backgroundColor}"
-                                        MinimumHeightRequest="100">
+            <!-- BLE Device Info -->
+            <Label FontSize="Large" Text="BLE Device Info"/>
+            <Button Text="Untitled" Margin="5"/>
+            <StackLayout Margin="10, 0, 10, 0">
+                <FlexLayout JustifyContent="SpaceBetween">
+                    <Label Text="Device Name"/>
+                    <Label Text="Untitled"/>
+                </FlexLayout>
+                <FlexLayout JustifyContent="SpaceBetween">
+                    <Label Text="Manufacturer Name"/>
+                    <Label Text="Untitled"/>
+                </FlexLayout>
+                <FlexLayout JustifyContent="SpaceBetween">
+                    <Label Text="BLE FW Revision"/>
+                    <Label Text="Untitled"/>
+                </FlexLayout>
+                <FlexLayout JustifyContent="SpaceBetween">
+                    <Label Text="FPGA FW Revision"/>
+                    <Label Text="Untitled"/>
+                </FlexLayout>
+                <FlexLayout JustifyContent="SpaceBetween">
+                    <Label Text="Hardware Revision"/>
+                    <Label Text="Untitled"/>
+                </FlexLayout>
+            </StackLayout>
+
+            <!-- Scrolling ListView of EEPROM (name, value) tuples -->
+            <Label Text="EEPROM" FontSize="Large" Margin="0, 10, 0, 0"/>
+            <ListView x:Name="listViewEEPROM" BackgroundColor="#333" SeparatorColor="#555"  Margin="10, 0, 10, 0">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
                             <StackLayout Orientation="Horizontal">
-                                <Label TextColor="#27c0a1" Text="{Binding rssi, StringFormat='RSSI: {0}'}" FontSize="Large"/>
-                                <Label TextColor="#2994d3" Text="{Binding name}" FontSize="Large"/>
+                                <Label TextColor="#999" Text="Untitled"/>
+                                <Label TextColor="#eee" Text="Untitled" HorizontalTextAlignment="End" HorizontalOptions="EndAndExpand"/>
                             </StackLayout>
-                            <Label TextColor="#cccccc" Text="{Binding id}"/>
-                        </StackLayout>
-                    </ViewCell>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-            
-        </VerticalStackLayout>
-        
-    </ScrollView>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            </StackLayout>
+        </ScrollView>
+
+    </ContentPage.Content>
 
 </ContentPage>
