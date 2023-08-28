@@ -2,6 +2,27 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" 
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
              x:Class="EnlightenMobile.AboutPage"
-             BackgroundColor="#333">
-    <!-- Shell.NavBarIsVisible="False"> -->
+             BackgroundColor="#333"
+            Shell.NavBarIsVisible="False">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Color x:Key="DarkGray">#333</Color>
+            <Color x:Key="Teal">#27c0a1</Color>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <FlexLayout BackgroundColor="{StaticResource DarkGray}" 
+                Direction="Column"
+                AlignItems="Center"
+                JustifyContent="SpaceEvenly">
+        <Image Source="enlightenLOGO.png" HeightRequest="100" />
+        <Label FontSize="22" TextColor="#eee" Text="{Binding version}" />
+        <Button Padding="40,10,40,10" 
+                Text="Learn more" 
+                Command="{Binding OpenWebCommand}" 
+                BackgroundColor="{StaticResource Teal}" 
+                TextColor="White" />
+    </FlexLayout>
+
 </ContentPage>
