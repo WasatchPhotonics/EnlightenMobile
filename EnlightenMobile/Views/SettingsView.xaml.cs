@@ -25,9 +25,6 @@ namespace EnlightenMobile.Views
         // hide what he entered, then ask the ViewModel to authenticate
         void entryPassword_Completed(Object sender, EventArgs e)
         {
-            var password = entryPassword.Text;
-            entryPassword.Text = Settings.stars;
-            asvm.authenticate(password);
         }
 
         // the user clicked in an Entry, so clear the field
